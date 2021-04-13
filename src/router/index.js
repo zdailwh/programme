@@ -93,6 +93,20 @@ export const constantRoutes = [
             meta: { title: '用户设置', icon: 'peoples' }
           }
         ]
+      },
+      {
+        path: 'channel',
+        component: () => import('@/views/setting/channel/layout'),
+        name: 'Channel',
+        redirect: '/setting/channel/index',
+        children: [
+          {
+            path: 'index',
+            component: () => import('@/views/setting/channel/index'),
+            name: 'ChannelList',
+            meta: { title: '频道设置', icon: 'el-icon-monitor' }
+          }
+        ]
       }
     ]
   }
