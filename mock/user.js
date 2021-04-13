@@ -23,27 +23,45 @@ const users = {
   }
 }
 
+const authentication = {
+  id: 5,
+  class: 'app\\user\\admin\\Authentication',
+  class_name: '登录认证',
+  model_name: '认证',
+  create_time: '2021-03-30 08:22:59',
+  update_time: '2021-03-30 08:22:59',
+  status: 0,
+  statusstr: '活跃',
+  path: '/api/admin/v1/authentications/5',
+  session: '2sjvqmrsip4o99rfbpp641sr01',
+  clientip: '111.203.200.208',
+  expiretime: '2021-03-30 10:22:59',
+  user: {
+    id: 1,
+    class: 'app\\user\\admin\\User',
+    class_name: '系统管理员',
+    model_name: '用户',
+    create_time: '2021-03-17 14:30:29',
+    update_time: '2021-03-17 14:30:29',
+    status: 1,
+    statusstr: '活跃',
+    username: 'system',
+    mobile: '13900000000',
+    isadmin: 2,
+    activity: 0
+  }
+}
+
 module.exports = [
   // user login
   {
-    url: '/vue-element-admin/user/login',
+    url: '/admin/v1/authentications',
     type: 'post',
     response: config => {
       const { username } = config.body
       const token = tokens[username]
 
-      // mock error
-      if (!token) {
-        return {
-          code: 60204,
-          message: 'Account and password are incorrect.'
-        }
-      }
-
-      return {
-        code: 20000,
-        data: token
-      }
+      return authentication
     }
   },
 
@@ -72,8 +90,8 @@ module.exports = [
 
   // user logout
   {
-    url: '/vue-element-admin/user/logout',
-    type: 'post',
+    url: '/admin/v1/authentications',
+    type: 'delete',
     response: _ => {
       return {
         code: 20000,

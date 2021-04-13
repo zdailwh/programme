@@ -5,9 +5,10 @@ import router, { resetRouter } from '@/router'
 const state = {
   token: getToken(),
   name: '',
-  avatar: '',
+  avatar: 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif',
   introduction: '',
-  roles: []
+  roles: [],
+  isadmin: ''
 }
 
 const mutations = {
@@ -25,18 +26,27 @@ const mutations = {
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_ISADMIN: (state, isadmin) => {
+    state.isadmin = isadmin
   }
 }
 
 const actions = {
+  setRole({ commit }, roles) {
+    return new Promise(resolve => {
+      commit('SET_ROLES', roles)
+      resolve()
+    })
+  },
   // user login
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+      login({ username: username.trim(), password: password }).then(data => {
+        commit('SET_ISADMIN', data.user.isadmin)
+        commit('SET_TOKEN', data.user.id)
+        setToken(data.user.id)
         resolve()
       }).catch(error => {
         reject(error)
