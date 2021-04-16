@@ -95,6 +95,20 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/proEdit',
+    component: Layout,
+    redirect: '/pro-edit/index',
+    meta: { title: '编单', icon: 'el-icon-edit-outline' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/pro-edit/index'),
+        name: 'ProEditMain',
+        meta: { title: '编单', icon: 'el-icon-edit-outline' }
+      }
+    ]
+  },
+  {
     path: '/examine',
     component: Layout,
     redirect: '/examine/index',
