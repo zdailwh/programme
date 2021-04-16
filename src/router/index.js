@@ -75,6 +75,40 @@ export const constantRoutes = [
     redirect: '/setting/admin/index'
   },
   {
+    path: '/program',
+    component: Layout,
+    redirect: '/program/index',
+    meta: { title: '节目管理', icon: 'el-icon-film' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/program/index'),
+        name: 'ProgramList',
+        meta: { title: '节目列表', icon: 'el-icon-files' }
+      },
+      {
+        path: 'add',
+        component: () => import('@/views/program/add'),
+        name: 'ProgramAdd',
+        meta: { title: '节目上载', icon: 'el-icon-upload' }
+      }
+    ]
+  },
+  {
+    path: '/examine',
+    component: Layout,
+    redirect: '/examine/index',
+    meta: { title: '审核播出', icon: 'el-icon-s-claim' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/examine/index'),
+        name: 'ExamineMain',
+        meta: { title: '审核播出', icon: 'el-icon-s-check' }
+      }
+    ]
+  },
+  {
     path: '/setting',
     component: Layout,
     redirect: '/setting/admin',
