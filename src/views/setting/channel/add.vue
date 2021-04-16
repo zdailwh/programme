@@ -10,8 +10,11 @@
         <el-form-item label="频道名称" prop="name">
           <el-input v-model="formadd.name" />
         </el-form-item>
-        <el-form-item label="频道描述" prop="desc">
-          <el-input v-model="formadd.desc" />
+        <el-form-item label="播出端口" prop="port">
+          <el-input v-model="formadd.port" />
+        </el-form-item>
+        <el-form-item label="EPG路径" prop="epg">
+          <el-input v-model="formadd.epg" />
         </el-form-item>
         <el-form-item label="视频编码" prop="v_codec">
           <el-input v-model="formadd.v_codec" />
@@ -46,7 +49,8 @@ export default {
     return {
       formadd: {
         name: '',
-        desc: '',
+        port: '',
+        epg: '',
         v_codec: '',
         v_resolution_w: '1920',
         v_resolution_h: '1080'
@@ -55,8 +59,11 @@ export default {
         name: [
           { required: true, type: 'string', message: '频道名称不能为空', trigger: 'blur' }
         ],
-        desc: [
-          { required: true, type: 'string', message: '频道描述不能为空', trigger: 'blur' }
+        port: [
+          { required: true, type: 'string', message: '播出端口不能为空', trigger: 'blur' }
+        ],
+        epg: [
+          { required: true, type: 'string', message: 'EPG路径不能为空', trigger: 'blur' }
         ],
         v_codec: [
           { required: true, type: 'string', message: '视频编码不能为空', trigger: 'blur' }
@@ -92,7 +99,8 @@ export default {
         })
         this.formadd = {
           name: '',
-          desc: '',
+          port: '',
+          epg: '',
           v_codec: '',
           v_resolution_w: '',
           v_resolution_h: ''

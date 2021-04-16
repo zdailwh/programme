@@ -37,14 +37,14 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="频道描述" align="center">
+      <el-table-column label="播出端口" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.desc }}</span>
+          <span>{{ row.port }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="业务类型" align="center">
+      <el-table-column label="EPG路径" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.type }}</span>
+          <span>{{ row.epg }}</span>
         </template>
       </el-table-column>
       <el-table-column label="视频编码" align="center">
@@ -64,15 +64,15 @@
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button v-if="row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
-          <el-button v-if="row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
+          <!-- <el-button v-if="row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
+          <el-button v-if="row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button> -->
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-popover
             placement="top"
             width="170"
             trigger="hover"
           >
-            <p>确定要删除此用户吗？</p>
+            <p>确定要删除此频道吗？</p>
             <div style="text-align: right; margin: 0">
               <el-button type="danger" size="mini" @click="delChannel(row.id, $index)">确定</el-button>
             </div>
