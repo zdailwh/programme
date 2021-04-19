@@ -57,3 +57,24 @@ export function deleteUser(query) {
     method: 'delete'
   })
 }
+
+export function updatePwd(data) {
+  return request({
+    url: '/admin/v1/users/changepassword',
+    method: 'put',
+    data: {
+      old: data.old,
+      new: data.new
+    }
+  })
+}
+
+export function resetPwd(data) {
+  return request({
+    url: '/admin/v1/users/' + data.id + '/resetpassword',
+    method: 'put',
+    data: {
+      password: data.password
+    }
+  })
+}

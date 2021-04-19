@@ -90,6 +90,20 @@ module.exports = [
     response: config => {
       return user
     }
+  },
+  {
+    url: '/admin/v1/users/changepassword',
+    type: 'put',
+    response: config => {
+      return user
+    }
+  },
+  {
+    url: '/admin/v1/users/[0-9]/resetpassword',
+    type: 'put',
+    response: config => {
+      return user
+    }
   }
 ]
 

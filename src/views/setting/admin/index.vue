@@ -21,38 +21,38 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
-        创建用户
-      </el-button>
+      <el-form-item>
+        <el-button v-if="currUser.isadmin !== '' && currUser.isadmin !== 0" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">创建用户</el-button>
+      </el-form-item>
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="ID" align="center">
+      <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="用户名" align="center">
+      <el-table-column label="用户名" align="center" width="110">
         <template slot-scope="{row}">
           <span>{{ row.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="手机号" align="center">
+      <el-table-column label="手机号" align="center" width="110">
         <template slot-scope="{row}">
           <span>{{ row.mobile }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="管理员标识" align="center">
+      <el-table-column label="管理员标识" align="center" width="110">
         <template slot-scope="{row}">
           <span>{{ row.isadmin | isadminFilter }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="活跃度" align="center">
+      <el-table-column label="活跃度" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.activity }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="100">
         <template slot-scope="{row}">
           <el-tag v-if="row.status === 1" type="success">{{ row.statusstr }}</el-tag>
           <el-tag v-else-if="row.status === 2" type="danger">{{ row.statusstr }}</el-tag>
@@ -61,10 +61,12 @@
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button v-if="row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
-          <el-button v-if="row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
-          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
-          <el-popover
+          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin !== 0 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
+          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin !== 0 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
+          <el-button v-if="currUser.id === row.id && parseInt(row.status) === 1" type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
+          <el-button v-if="currUser.id === row.id && parseInt(row.status) === 1" type="text" size="medium" @click="updatePwdHandle(row, $index)">修改密码</el-button>
+          <el-button v-if="parseInt(currUser.isadmin) > parseInt(row.isadmin) && parseInt(row.status) === 2" type="text" size="medium" @click="resetPwdHandle(row, $index)">重置密码</el-button>
+          <!-- <el-popover
             placement="top"
             width="170"
             trigger="hover"
@@ -74,7 +76,7 @@
               <el-button type="danger" size="mini" @click="delUser(row.id, $index)">确定</el-button>
             </div>
             <el-button slot="reference" type="text" size="medium" style="margin-left: 10px;">删除</el-button>
-          </el-popover>
+          </el-popover> -->
         </template>
       </el-table-column>
     </el-table>
@@ -83,6 +85,8 @@
 
     <Add :dialog-visible-add="dialogVisibleAdd" @changeAddVisible="changeAddVisible" @refresh="getList" />
     <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <UpdatePwd :dialog-visible-update-pwd="dialogVisibleUpdatePwd" @changeUpdatePwdVisible="changeUpdatePwdVisible" />
+    <ResetPwd :edit-item="editItem" :dialog-visible-reset-pwd="dialogVisibleResetPwd" @changeResetPwdVisible="changeResetPwdVisible" />
   </div>
 </template>
 
@@ -92,9 +96,12 @@ import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
 import Edit from './edit.vue'
+import UpdatePwd from './updatePwd.vue'
+import ResetPwd from './resetPwd.vue'
+import { getToken } from '@/utils/auth'
 
 export default {
-  components: { Pagination, Add, Edit },
+  components: { Pagination, Add, Edit, UpdatePwd, ResetPwd },
   directives: { waves },
   filters: {
     isadminFilter(val) {
@@ -104,6 +111,7 @@ export default {
   },
   data() {
     return {
+      currUser: JSON.parse(getToken()),
       list: null,
       total: 0,
       listLoading: true,
@@ -118,7 +126,9 @@ export default {
       editItem: {},
       editIndex: '',
       dialogVisibleAdd: false,
-      dialogVisibleEdit: false
+      dialogVisibleEdit: false,
+      dialogVisibleUpdatePwd: false,
+      dialogVisibleResetPwd: false
     }
   },
   created() {
@@ -158,7 +168,11 @@ export default {
     },
     actived(id, idx) {
       actived({ id: id }).then(data => {
-        this.list[idx] = data
+        this.$message({
+          message: '激活成功！',
+          type: 'success'
+        })
+        this.getList()
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
@@ -168,7 +182,11 @@ export default {
     },
     inactived(id, idx) {
       inactived({ id: id }).then(data => {
-        this.list[idx] = data
+        this.$message({
+          message: '禁用成功！',
+          type: 'success'
+        })
+        this.getList()
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
@@ -200,6 +218,19 @@ export default {
     },
     changeEditVisible(params) {
       this.dialogVisibleEdit = params
+    },
+    updatePwdHandle(item, idx) {
+      this.dialogVisibleUpdatePwd = true
+    },
+    changeUpdatePwdVisible(params) {
+      this.dialogVisibleUpdatePwd = params
+    },
+    resetPwdHandle(item, idx) {
+      this.editItem = item
+      this.dialogVisibleResetPwd = true
+    },
+    changeResetPwdVisible(params) {
+      this.dialogVisibleResetPwd = params
     }
   }
 }
