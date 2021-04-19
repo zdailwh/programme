@@ -1,8 +1,8 @@
 <template>
   <div class="app-container">
     <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
-      <el-form-item prop="disksn">
-        <el-input v-model="filterForm.disksn" placeholder="硬盘序列号" style="width:120px" />
+      <el-form-item prop="name">
+        <el-input v-model="filterForm.name" placeholder="节目名称" style="width:120px" />
       </el-form-item>
       <el-form-item prop="createdate">
         <el-date-picker
@@ -45,9 +45,11 @@
       </el-form-item>
     </el-form>
 
-    <el-radio-group v-model="radio1">
-      <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
-    </el-radio-group>
+    <div class="channelTabs">
+      <el-radio-group v-model="radio1">
+        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
+      </el-radio-group>
+    </div>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
       <el-table-column label="ID" align="center">
@@ -194,3 +196,8 @@ export default {
   }
 }
 </script>
+<style scoped>
+.channelTabs {
+  margin-bottom: 10px;
+}
+</style>

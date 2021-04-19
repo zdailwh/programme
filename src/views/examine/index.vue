@@ -49,7 +49,7 @@ export default {
   padding: 20px;
 }
 .channelTabs {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .clearfix:before, .clearfix:after {
   display: table;
