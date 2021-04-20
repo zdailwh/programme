@@ -24,3 +24,13 @@
 .el-card__header {
   padding: 13px 20px;
 }
+
+.el-card__body {
+  padding: 10px !important;
+}
+.programListWrap .pagination-container {
+  padding: 15px 0 !important;
+}
+.programListWrap .el-table .el-button {
+  padding: 0 !important;
+}

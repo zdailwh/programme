@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="programListWrap">
     <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
       <el-form-item prop="name">
         <el-input v-model="filterForm.name" clearable placeholder="节目名称" style="width:120px" />
@@ -20,15 +20,20 @@
         </el-button>
       </el-form-item>
       <el-form-item>
-        <el-button class="filter-item" type="primary" icon="el-icon-d-arrow-left" :disabled="!selectedItems.length">
+        <el-button class="filter-item" type="primary" icon="el-icon-d-arrow-left" :disabled="!selectedItems.length" @click="handleAddSelected">
           插入
         </el-button>
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" size="mini" fit highlight-current-row style="width: 100%;" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
+    <el-table ref="multipleTable" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
       <el-table-column type="selection" width="50" />
       <el-table-column type="index" width="40" />
+      <el-table-column label="ID" align="center" width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.id }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="文件名" align="center">
         <template slot-scope="{row}">
           <span>{{ row.size }}</span>
@@ -61,7 +66,6 @@
 </template>
 
 <script>
-import { parseTime } from '@/utils'
 import { fetchList } from '@/api/program'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -70,10 +74,6 @@ export default {
   components: { Pagination },
   directives: { waves },
   filters: {
-    formatDate(val) {
-      if (val === '') return ''
-      return parseTime(val)
-    },
     formateSeconds(second) {
       let secondTime = parseInt(second) // 将传入的秒的值转化为Number
       let min = 0 // 初始化分
@@ -102,25 +102,13 @@ export default {
       },
       filterForm: {
       },
-      selectedItems: [],
-      start_time: (new Date().getTime()) - 24 * 60 * 60 * 1000
+      selectedItems: []
     }
   },
   created() {
     this.getList()
   },
   methods: {
-    calcMap() {
-      this.list[0].start_time = this.start_time
-      this.list.map((item, idx, arr) => {
-        if (idx === 0) {
-          item.start_time = this.start_time
-        } else {
-          item.start_time = arr[idx - 1].end_time
-        }
-        item.end_time = item.start_time + item.duration * 1000
-      })
-    },
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
@@ -128,7 +116,6 @@ export default {
         this.total = data.total
 
         this.listLoading = false
-        this.calcMap()
       }).catch(error => {
         this.listLoading = false
         this.$message({
@@ -149,6 +136,10 @@ export default {
     },
     handleSortChange(val) {
       console.log(val)
+    },
+    handleAddSelected() {
+      this.$emit('append-pro', { items: this.selectedItems })
+      this.$refs.multipleTable.clearSelection()
     }
   }
 }

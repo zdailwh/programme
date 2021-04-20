@@ -1,21 +1,26 @@
 <template>
-  <div>
-    <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
+  <div class="programListWrap">
+    <el-form ref="filterForm" :inline="true" size="mini" class="filter-form">
       <el-form-item>
-        <el-button class="filter-item" type="primary" icon="el-icon-document-copy" :disabled="!selectedItems.length">
+        <el-button class="filter-item" type="primary" icon="el-icon-document-copy" :disabled="!selectedItems.length" @click="handleCopySelected">
           复制
         </el-button>
       </el-form-item>
       <el-form-item>
-        <el-button class="filter-item" type="danger" icon="el-icon-d-arrow-right" :disabled="!selectedItems.length">
+        <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelected">
           删除
         </el-button>
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" size="mini" fit highlight-current-row style="width: 100%;" @selection-change="handleSelectionChange">
+    <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
       <el-table-column type="selection" width="50" />
       <el-table-column type="index" width="40" />
+      <el-table-column label="ID" align="center" width="50">
+        <template slot-scope="{row}">
+          <span>{{ row.id }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
           <span>{{ row.start_time | formatDate }}</span>
@@ -55,18 +60,14 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" :layout="'total, prev, pager, next, sizes'" @pagination="getList" />
   </div>
 </template>
 
 <script>
 import { parseTime } from '@/utils'
-import { fetchList, deleteProgram } from '@/api/program'
 import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
-  components: { Pagination },
   directives: { waves },
   filters: {
     formatDate(val) {
@@ -90,23 +91,36 @@ export default {
       return result
     }
   },
+  props: {
+    listCurr: {
+      type: Array,
+      default() {
+        return []
+      }
+    }
+  },
   data() {
     return {
-      list: null,
-      total: 0,
-      listLoading: true,
-      listQuery: {
-        page: 1,
-        limit: 20
-      },
-      filterForm: {
-      },
       selectedItems: [],
+      currentRow: null,
       start_time: (new Date().getTime()) - 24 * 60 * 60 * 1000
     }
   },
+  watch: {
+    listCurr(newVal) {
+      if (!newVal.length) return []
+      newVal[0].start_time = this.start_time
+      newVal.map((item, idx, arr) => {
+        if (idx === 0) {
+          item.start_time = this.start_time
+        } else {
+          item.start_time = arr[idx - 1].end_time
+        }
+        item.end_time = item.start_time + item.duration * 1000
+      })
+    }
+  },
   created() {
-    this.getList()
   },
   methods: {
     calcMap() {
@@ -120,45 +134,19 @@ export default {
         item.end_time = item.start_time + item.duration * 1000
       })
     },
-    getList() {
-      this.listLoading = true
-      fetchList(this.listQuery).then(data => {
-        this.list = data.items
-        this.total = data.total
-
-        this.listLoading = false
-        this.calcMap()
-      }).catch(error => {
-        this.listLoading = false
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
-      })
+    handleDelSelected() {
+      this.$emit('remove-pro', { items: this.selectedItems })
+      this.$refs.multipleTable.clearSelection()
     },
-    handleFilter() {
-      this.listQuery = {
-        page: 1,
-        limit: 20
-      }
-      this.getList()
-    },
-    delProgram(id, idx) {
-      deleteProgram({ id: id }).then(response => {
-        this.$message({
-          message: '删除成功！',
-          type: 'success'
-        })
-        this.getList()
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
-      })
+    handleCopySelected() {
+      this.$emit('copy-pro', { items: this.selectedItems })
+      this.$refs.multipleTable.clearSelection()
     },
     handleSelectionChange(val) {
       this.selectedItems = val
+    },
+    handleCurrentChange(val) {
+      this.currentRow = val
     }
   }
 }

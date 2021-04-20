@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <el-table v-loading="listLoading" :data="list" size="mini" fit highlight-current-row style="width: 100%;">
+  <div class="programListWrap">
+    <el-table v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600">
       <el-table-column type="index" width="50" />
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
