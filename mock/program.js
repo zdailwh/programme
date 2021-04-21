@@ -7,30 +7,40 @@ for (let i = 0; i < count; i++) {
   List.push(Mock.mock({
     id: '@increment',
     create_time: '@datetime',
-    name: '节目名称',
-    channel: '所属频道',
-    filename: '文件名',
+    showname: '节目名称',
+    chnids: '所属频道ID',
+    chnnames: '所属频道',
+    name: '文件名称',
     'duration|300-1800': 100, // 秒 5分钟-30分钟
-    createdate: '@date',
+    finishtime: '@date',
     size: 12345,
-    bitrate: 801846,
-    'status|1': [0, 1],
-    'statusstr|1': ['有效', '无效']
+    coderate: 801846,
+    ext: 'ts',
+    realpath: '节目路径',
+    md5: '124e4q3reqw3432',
+    info: '简介',
+    'status|1': [0, 1, 2],
+    'statusstr|1': ['已创建', '文件待上传', '文件上传成功']
   }))
 }
 
 const program = Mock.mock({
   id: '@increment',
   create_time: '@datetime',
-  name: '节目名称',
-  channel: '所属频道',
-  filename: '文件名',
+  showname: '节目名称',
+  chnids: '所属频道ID',
+  chnnames: '所属频道',
+  name: '文件名称',
   'duration|300-1800': 100, // 秒 5分钟-30分钟
-  createdate: '@date',
+  finishtime: '@date',
   size: 12345,
-  bitrate: 801846,
-  'status|1': [0, 1],
-  'statusstr|1': ['有效', '无效']
+  coderate: 801846,
+  ext: 'ts',
+  realpath: '节目路径',
+  md5: '124e4q3reqw3432',
+  info: '简介',
+  'status|1': [0, 1, 2],
+  'statusstr|1': ['已创建', '文件待上传', '文件上传成功']
 })
 
 const task = Mock.mock({
@@ -60,7 +70,7 @@ const task = Mock.mock({
 
 module.exports = [
   {
-    url: '/admin/programme/v1/programs',
+    url: '/admin/programme/v1/programmes',
     type: 'get',
     response: config => {
       const { importance, type, title, page = 0, per_page = 20, sort } = config.query
@@ -85,21 +95,21 @@ module.exports = [
     }
   },
   {
-    url: '/admin/programme/v1/programs/[0-9]',
+    url: '/admin/programme/v1/programmes/[0-9]',
     type: 'delete',
     response: config => {
       return program
     }
   },
   {
-    url: '/admin/programme/v1/filereviews',
+    url: '/admin/programme/v1/programmes',
     type: 'post',
     response: config => {
       return task
     }
   },
   {
-    url: '/admin/programme/v1/filereviews/[0-9]/merge',
+    url: '/admin/programme/v1/programmes/[0-9]/merge',
     type: 'put',
     response: config => {
       return task

@@ -1,16 +1,13 @@
 <template>
   <div class="app-container">
     <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
-      <el-form-item prop="name">
-        <el-input v-model="filterForm.name" placeholder="节目名称" style="width:120px" />
+      <el-form-item prop="showname">
+        <el-input v-model="filterForm.showname" placeholder="节目名称" style="width:120px" />
       </el-form-item>
-      <el-form-item prop="createdate">
-        <el-date-picker
-          v-model="filterForm.createdate"
-          type="date"
-          value-format="yyyy-MM-dd"
-          placeholder="导入时间"
-        />
+      <el-form-item prop="chnids">
+        <el-select v-model="filterForm.chnids" multiple placeholder="请选择频道名称" style="width: auto">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+        </el-select>
       </el-form-item>
       <el-form-item prop="create_time_range">
         <el-date-picker
@@ -52,50 +49,67 @@
     </div>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="ID" align="center">
+      <el-table-column type="expand">
+        <template slot-scope="{row}">
+          <el-form label-position="left" inline class="table-expand" label-width="100px">
+            <el-form-item v-if="row.realpath" label="节目路径">
+              <span>{{ row.realpath }}</span>
+            </el-form-item>
+            <el-form-item v-if="row.size" label="文件大小">
+              <span>{{ row.size }}</span>
+            </el-form-item>
+            <el-form-item v-if="row.ext" label="扩展名">
+              <span>{{ row.ext }}</span>
+            </el-form-item>
+            <el-form-item v-if="row.md5" label="MD5值">
+              <span>{{ row.md5 }}</span>
+            </el-form-item>
+            <el-form-item v-if="row.info" label="简介">
+              <span>{{ row.info }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
+      <el-table-column label="ID" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.name }}</span>
+          <span>{{ row.showname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="所属频道" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.channel }}</span>
+          <span>{{ row.chnnames }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="时长" align="center">
+      <el-table-column label="时长" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.duration }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="码率" align="center">
+      <el-table-column label="码率" align="center" width="80">
         <template slot-scope="{row}">
-          <span>{{ row.bitrate }}</span>
+          <span>{{ row.coderate }}</span>
         </template>
       </el-table-column>
       <el-table-column label="导入时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.createdate }}</span>
+          <span>{{ row.finishtime }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="文件名" align="center">
+      <el-table-column label="文件名称" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.size }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="文件大小" align="center">
+      <el-table-column label="状态" align="center" width="120" fixed="right">
         <template slot-scope="{row}">
-          <span>{{ row.filename }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="状态" align="center">
-        <template slot-scope="{row}">
-          <el-tag v-if="row.status === 0" type="success">{{ row.statusstr }}</el-tag>
-          <el-tag v-else type="info">{{ row.statusstr }}</el-tag>
+          <el-tag :type="row.statusstr | statusFilter">
+            {{ row.statusstr }}
+          </el-tag>
         </template>
       </el-table-column>
       <!-- <el-table-column label="操作" align="center">
@@ -112,16 +126,28 @@
 
 <script>
 import { fetchList, deleteProgram } from '@/api/program'
+import { getAllChannels } from '@/api/channel'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
 export default {
   components: { Pagination },
   directives: { waves },
+  filters: {
+    statusFilter(status) {
+      const statusMap = {
+        '已创建': 'info',
+        '文件待上传': 'warning',
+        '文件上传成功': 'success'
+      }
+      return statusMap[status]
+    }
+  },
   data() {
     return {
       radio1: '频道1',
-      options: [{ value: '11', label: '频道1' }, { value: '12', label: '频道2' }, { value: '13', label: '频道3' }, { value: '14', label: '频道4' }, { value: '15', label: '频道5' }],
+      options: [],
+      allChannels: [],
       list: null,
       total: 0,
       listLoading: true,
@@ -130,16 +156,38 @@ export default {
         limit: 20
       },
       filterForm: {
-        createdate: '',
+        showname: '',
+        chnids: [],
+        chnnames: [],
         create_time_range: [],
         update_time_range: [],
         status: ''
       },
-      statusArr: [{ label: '有效', value: 0 }, { label: '无效', value: 1 }]
+      statusArr: [{ label: '已创建', value: 0 }, { label: '文件待上传', value: 1 }, { label: '文件上传成功', value: 2 }]
+    }
+  },
+  watch: {
+    allChannels: function(newVal) {
+      if (newVal.length) {
+        this.options = newVal.map((item, idx, arr) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
+    },
+    'filterForm.chnids': function(newVal) {
+      this.filterForm.chnnames = this.options.filter((item, idx, arr) => {
+        return newVal.indexOf(item.value) !== -1
+      }).map((item, idx, arr) => {
+        return item.label
+      })
     }
   },
   created() {
     this.getList()
+    this.getAllChannels()
   },
   methods: {
     getList() {
@@ -162,8 +210,14 @@ export default {
         page: 1,
         limit: 20
       }
-      if (this.filterForm.createdate !== '') {
-        this.listQuery.createdate = this.filterForm.createdate
+      if (this.filterForm.showname !== '') {
+        this.listQuery.showname = this.filterForm.showname
+      }
+      if (this.filterForm.chnids.length) {
+        this.listQuery.chnids = this.filterForm.chnids
+      }
+      if (this.filterForm.chnnames.length) {
+        this.listQuery.chnnames = this.filterForm.chnnames
       }
       if (this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
@@ -186,6 +240,16 @@ export default {
           type: 'success'
         })
         this.getList()
+      }).catch(error => {
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
+      })
+    },
+    getAllChannels() {
+      getAllChannels().then(data => {
+        this.allChannels = data.items
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',

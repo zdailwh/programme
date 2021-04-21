@@ -13,19 +13,17 @@
         <el-form-item label="播出端口" prop="port">
           <el-input v-model="formadd.port" />
         </el-form-item>
-        <el-form-item label="EPG路径" prop="epg">
-          <el-input v-model="formadd.epg" />
-        </el-form-item>
-        <el-form-item label="视频编码" prop="v_codec">
-          <el-input v-model="formadd.v_codec" />
-        </el-form-item>
         <el-form-item label="分辨率">
           <el-col :span="11">
-            <el-input v-model="formadd.v_resolution_w" placeholder="分辨率宽" />
+            <el-form-item prop="width">
+              <el-input v-model="formadd.width" placeholder="分辨率宽" />
+            </el-form-item>
           </el-col>
           <el-col :span="2" style="text-align: center;">x</el-col>
           <el-col :span="11">
-            <el-input v-model="formadd.v_resolution_h" placeholder="分辨率高" />
+            <el-form-item prop="height">
+              <el-input v-model="formadd.height" placeholder="分辨率高" />
+            </el-form-item>
           </el-col>
         </el-form-item>
       </el-form>
@@ -50,10 +48,8 @@ export default {
       formadd: {
         name: '',
         port: '',
-        epg: '',
-        v_codec: '',
-        v_resolution_w: '1920',
-        v_resolution_h: '1080'
+        width: '1920',
+        height: '1080'
       },
       ruleValidate: {
         name: [
@@ -62,16 +58,10 @@ export default {
         port: [
           { required: true, type: 'string', message: '播出端口不能为空', trigger: 'blur' }
         ],
-        epg: [
-          { required: true, type: 'string', message: 'EPG路径不能为空', trigger: 'blur' }
-        ],
-        v_codec: [
-          { required: true, type: 'string', message: '视频编码不能为空', trigger: 'blur' }
-        ],
-        v_resolution_w: [
+        width: [
           { required: true, type: 'string', message: '分辨率宽不能为空', trigger: 'blur' }
         ],
-        v_resolution_h: [
+        height: [
           { required: true, type: 'string', message: '分辨率高不能为空', trigger: 'blur' }
         ]
       }
@@ -100,10 +90,8 @@ export default {
         this.formadd = {
           name: '',
           port: '',
-          epg: '',
-          v_codec: '',
-          v_resolution_w: '',
-          v_resolution_h: ''
+          width: '',
+          height: ''
         }
         this.$emit('changeAddVisible', false)
         this.$emit('refresh')

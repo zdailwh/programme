@@ -9,10 +9,9 @@ for (let i = 0; i < count; i++) {
     create_time: '@datetime',
     name: '@first',
     port: '1',
-    epg: '/service1/XML/',
-    v_codec: 'h264',
-    v_resolution_w: '1920',
-    v_resolution_h: '1080',
+    epgurl: '/service1/XML/',
+    width: '1920',
+    height: '1080',
     'status|1': [0, 1, 2]
   }))
 }
@@ -22,16 +21,15 @@ const user = Mock.mock({
   create_time: '@datetime',
   name: '@first',
   port: '2',
-  epg: '/service1/XML/',
-  v_codec: 'h264',
-  v_resolution_w: '1920',
-  v_resolution_h: '1080',
+  epgurl: '/service1/XML/',
+  width: '1920',
+  height: '1080',
   'status|1': [0, 1, 2]
 })
 
 module.exports = [
   {
-    url: '/admin/v1/channels',
+    url: '/admin/v1/programme/v1/channels',
     type: 'get',
     response: config => {
       const { importance, type, title, page = 0, per_page = 20, sort } = config.query
@@ -56,35 +54,35 @@ module.exports = [
     }
   },
   {
-    url: '/admin/v1/channels/[0-9]',
+    url: '/admin/v1/programme/v1/channels/[0-9]',
     type: 'put',
     response: config => {
       return user
     }
   },
   {
-    url: '/admin/v1/channels',
+    url: '/admin/v1/programme/v1/channels',
     type: 'post',
     response: config => {
       return user
     }
   },
   {
-    url: '/admin/v1/channels/[0-9]',
+    url: '/admin/v1/programme/v1/channels/[0-9]',
     type: 'delete',
     response: config => {
       return user
     }
   },
   {
-    url: '/admin/v1/channels/[0-9]/actived',
+    url: '/admin/v1/programme/v1/channels/[0-9]/actived',
     type: 'put',
     response: config => {
       return user
     }
   },
   {
-    url: '/admin/v1/channels/[0-9]/inactived',
+    url: '/admin/v1/programme/v1/channels/[0-9]/inactived',
     type: 'put',
     response: config => {
       return user

@@ -7,11 +7,21 @@
   >
     <div>
       <el-form ref="form" :model="editItem" :rules="ruleValidate" label-width="80px">
-        <el-form-item label="频道名称" prop="name">
-          <el-input v-model="editItem.name" />
+        <el-form-item label="频道名称" prop="port">
+          <el-input v-model="editItem.port" />
         </el-form-item>
-        <el-form-item label="频道描述" prop="desc">
-          <el-input v-model="editItem.desc" />
+        <el-form-item label="分辨率">
+          <el-col :span="11">
+            <el-form-item prop="width">
+              <el-input v-model="editItem.width" placeholder="分辨率宽" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="2" style="text-align: center;">x</el-col>
+          <el-col :span="11">
+            <el-form-item prop="height">
+              <el-input v-model="editItem.height" placeholder="分辨率高" />
+            </el-form-item>
+          </el-col>
         </el-form-item>
       </el-form>
     </div>
@@ -39,11 +49,14 @@ export default {
   data() {
     return {
       ruleValidate: {
-        name: [
-          { required: true, type: 'string', message: '频道名称不能为空', trigger: 'blur' }
+        port: [
+          { required: true, type: 'string', message: '播出端口不能为空', trigger: 'blur' }
         ],
-        desc: [
-          { required: true, type: 'string', message: '频道描述不能为空', trigger: 'blur' }
+        width: [
+          { required: true, type: 'string', message: '分辨率宽不能为空', trigger: 'blur' }
+        ],
+        height: [
+          { required: true, type: 'string', message: '分辨率高不能为空', trigger: 'blur' }
         ]
       }
     }

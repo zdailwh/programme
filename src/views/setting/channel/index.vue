@@ -1,17 +1,29 @@
 <template>
   <div class="app-container">
     <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
+      <el-form-item prop="name">
+        <el-input v-model="filterForm.name" placeholder="频道名称" style="width:120px" />
+      </el-form-item>
+      <el-form-item prop="port">
+        <el-input v-model="filterForm.port" placeholder="播出端口" style="width:120px" />
+      </el-form-item>
       <el-form-item prop="create_time_range">
         <el-date-picker
           v-model="filterForm.create_time_range"
           type="datetimerange"
           value-format="yyyy-MM-dd HH:mm:ss"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          start-placeholder="创建开始日期"
+          end-placeholder="创建结束日期"
         />
       </el-form-item>
-      <el-form-item prop="name">
-        <el-input v-model="filterForm.name" placeholder="频道名称" style="width:120px" />
+      <el-form-item prop="update_time_range">
+        <el-date-picker
+          v-model="filterForm.update_time_range"
+          type="datetimerange"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          start-placeholder="更新开始日期"
+          end-placeholder="更新结束日期"
+        />
       </el-form-item>
       <el-form-item>
         <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
@@ -44,22 +56,17 @@
       </el-table-column>
       <el-table-column label="EPG路径" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.epg }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="视频编码" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.v_codec }}</span>
+          <span>{{ row.epgurl }}</span>
         </template>
       </el-table-column>
       <el-table-column label="分辨率宽" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.v_resolution_w }}</span>
+          <span>{{ row.width }}</span>
         </template>
       </el-table-column>
       <el-table-column label="分辨率高" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.v_resolution_h }}</span>
+          <span>{{ row.height }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
@@ -110,7 +117,9 @@ export default {
       },
       filterForm: {
         create_time_range: [],
-        name: ''
+        update_time_range: [],
+        name: '',
+        port: ''
       },
       editItem: {},
       editIndex: '',
@@ -145,8 +154,14 @@ export default {
       if (this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
       }
+      if (this.filterForm.update_time_range.length) {
+        this.listQuery.update_time_range = this.filterForm.update_time_range
+      }
       if (this.filterForm.name !== '') {
         this.listQuery.name = this.filterForm.name
+      }
+      if (this.filterForm.port !== '') {
+        this.listQuery.port = this.filterForm.port
       }
       this.getList()
     },

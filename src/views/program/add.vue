@@ -2,8 +2,8 @@
   <div class="app-container">
     <div class="formWrap upload-file">
       <el-form ref="addForm" label-width="100px">
-        <el-form-item prop="channel" label="所属频道：">
-          <el-select v-model="addForm.channel" multiple placeholder="请选择" style="width: 100%;">
+        <el-form-item prop="chnids" label="所属频道：">
+          <el-select v-model="addForm.chnids" multiple placeholder="请选择" style="width: 100%;">
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -78,7 +78,8 @@
   </div>
 </template>
 <script>
-import { createTask, mergeTask } from '@/api/program'
+import { createProgram, mergeProgram } from '@/api/program'
+import { getAllChannels } from '@/api/channel'
 const SIZE = 32 * 1024 * 1024 // 切片大小
 
 export default {
@@ -105,14 +106,16 @@ export default {
   },
   data() {
     return {
-      options: [{ value: '11', label: '频道1' }, { value: '12', label: '频道2' }, { value: '13', label: '频道3' }, { value: '14', label: '频道4' }, { value: '15', label: '频道5' }],
+      options: [],
+      allChannels: [],
       handleList: [],
       list: [],
       filterList: [],
       checkedList: [],
       rootHandle: {},
       addForm: {
-        channel: []
+        chnids: [],
+        chnnames: []
       },
       container: {
         file: null,
@@ -130,9 +133,27 @@ export default {
       listLoading: false
     }
   },
-  computed: {
+  watch: {
+    allChannels: function(newVal) {
+      if (newVal.length) {
+        this.options = newVal.map((item, idx, arr) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
+    },
+    'addForm.chnids': function(newVal) {
+      this.addForm.chnnames = this.options.filter((item, idx, arr) => {
+        return newVal.indexOf(item.value) !== -1
+      }).map((item, idx, arr) => {
+        return item.label
+      })
+    }
   },
   created() {
+    this.getAllChannels()
   },
   mounted() {
   },
@@ -224,7 +245,7 @@ export default {
       this.checkedList = val
     },
     async createHandle() {
-      if (!this.addForm.channel.length) {
+      if (!this.addForm.chnids.length) {
         this.$message({
           message: '请选择所属频道！',
           type: 'warning'
@@ -248,8 +269,8 @@ export default {
       console.log(startIdx + '切片个数：' + fileChunkList.length)
       listItem.hash = await this.calculateHash(fileChunkList, filelist, startIdx)
       await this.createTask(listItem, startIdx).then(async(response) => {
-        console.log('创建任务返回' + startIdx + '/' + response.id)
-        filelist[startIdx].taskid = response.id
+        console.log('创建节目返回' + startIdx + '/' + response.id)
+        filelist[startIdx].programid = response.id
 
         this.uploadFiles(filelist, startIdx)
       }).catch({
@@ -266,19 +287,17 @@ export default {
       }
     },
     async createTask(fileItem, idx) {
-      console.log('开始创建任务' + idx)
+      console.log('开始创建节目' + idx)
       var md5 = fileItem.hash
       var params = {
-        channel: this.addForm.channel.join('#'),
-        localpath: fileItem.file.path,
+        chnids: this.addForm.chnids.join('#'),
+        chnnames: this.addForm.chnnames.join('#'),
         name: fileItem.file.name,
         md5: md5,
-        size: fileItem.file.size,
-        ext: fileItem.ext,
-        realpath: md5 + '/' + md5 + '.' + fileItem.ext
+        ext: fileItem.ext
       }
       return new Promise((resolve, reject) => {
-        createTask(params).then(response => {
+        createProgram(params).then(response => {
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -292,7 +311,7 @@ export default {
 
       var requestList = []
       // this.chunkData = fileChunkList.map(({ file }, index) => ({
-      //   taskid: listItem.taskid,
+      //   programid: listItem.programid,
       //   fileHash: listItem.hash,
       //   index,
       //   hash: listItem.hash + '-' + index,
@@ -304,7 +323,7 @@ export default {
       // requestList = await this.uploadChunks(filelist, startIdx, this.chunkData)
       // await Promise.all(requestList).then(async(result) => {
       //   // 合并切片
-      //   await this.mergeRequest(listItem.taskid)
+      //   await this.mergeRequest(listItem.programid)
       // }).catch((error) => {
       //   console.log('分片上传失败了')
       //   console.log(error)
@@ -314,7 +333,7 @@ export default {
       if (verifyRes === '资源不存在') {
         // 说明大文件file在服务端不存在，前端按正常流程将所有分片上传
         this.chunkData = fileChunkList.map(({ file }, index) => ({
-          taskid: listItem.taskid,
+          programid: listItem.programid,
           fileHash: listItem.hash,
           index,
           hash: listItem.hash + '-' + index,
@@ -326,7 +345,7 @@ export default {
         requestList = await this.uploadChunks(filelist, startIdx, this.chunkData)
         await Promise.all(requestList).then(async(result) => {
           // 合并切片
-          await this.mergeRequest(listItem.taskid)
+          await this.mergeRequest(listItem.programid)
         }).catch((error) => {
           console.log('分片上传失败了')
           console.log(error)
@@ -338,7 +357,7 @@ export default {
         // 若file为空，分片chunks有值，说明部分分片已接收
         var uploadedList = verifyRes.chunks
         this.chunkData = fileChunkList.map(({ file }, index) => ({
-          taskid: listItem.taskid,
+          programid: listItem.programid,
           fileHash: listItem.hash,
           index,
           hash: listItem.hash + '-' + index,
@@ -350,7 +369,7 @@ export default {
         requestList = await this.uploadChunks(filelist, startIdx, this.chunkData, uploadedList)
         await Promise.all(requestList).then(async(result) => {
           // 合并切片
-          await this.mergeRequest(listItem.taskid)
+          await this.mergeRequest(listItem.programid)
         }).catch((error) => {
           console.log('分片上传失败了')
           console.log(error)
@@ -361,9 +380,9 @@ export default {
     async uploadChunks(filelist, startIdx, chunkData, uploadedList = []) {
       const requestList = chunkData
         .filter(({ hash }) => !uploadedList.includes(hash))
-        .map(({ taskid, fileHash, chunk, hash, index }) => {
+        .map(({ programid, fileHash, chunk, hash, index }) => {
           const formData = new FormData()
-          formData.append('reviewId', taskid)
+          formData.append('programId', programid)
           formData.append('chunk', chunk)
           formData.append('hash', hash)
           formData.append('chunkTotal', chunkData.length)
@@ -372,7 +391,7 @@ export default {
         })
         .map(async({ formData, index }) =>
           this.myRequest({
-            url: '/api/admin/review/v1/chunks',
+            url: '/api/admin/programme/v1/chunks',
             method: 'post',
             data: formData,
             onProgress: this.createProgressHandler(chunkData[index], filelist, startIdx, chunkData),
@@ -419,7 +438,7 @@ export default {
     calculateHash(fileChunkList, filelist, startIdx) {
       console.log('开始计算hash' + startIdx)
       return new Promise(resolve => {
-        this.container.worker = new Worker('/filereview/hash.js')
+        this.container.worker = new Worker('/programme/hash.js')
         this.container.worker.postMessage({ fileChunkList })
         this.container.worker.onmessage = e => {
           const { percentage, hash } = e.data
@@ -432,7 +451,7 @@ export default {
     },
     // 通知服务端合并切片
     async mergeRequest(id) {
-      mergeTask({ id: id }).then(response => {
+      mergeProgram({ id: id }).then(response => {
         // this.$message({
         //   message: '合并成功！',
         //   type: 'success'
@@ -448,7 +467,7 @@ export default {
     // 没有才进行上传
     async verifyUpload(fileHash) {
       const { data } = await this.myRequest({
-        url: '/api/admin/review/v1/filereviews/verify?md5=' + fileHash,
+        url: '/api/admin/programme/v1/programmes/verify?md5=' + fileHash,
         method: 'get',
         headers: {
           'content-type': 'application/json'
@@ -484,6 +503,16 @@ export default {
       }
       this.inputExtVisible = false
       this.inputExtValue = ''
+    },
+    getAllChannels() {
+      getAllChannels().then(data => {
+        this.allChannels = data.items
+      }).catch(error => {
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
+      })
     }
   }
 }

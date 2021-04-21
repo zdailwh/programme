@@ -5,11 +5,15 @@ export function fetchList(query) {
     page: query.page - 1,
     per_page: query.limit
   }
-  if (query.disksn !== '') {
-    params.disksn = query.disksn
+
+  if (query.showname !== '') {
+    params.showname = query.showname
   }
-  if (query.createdate !== '') {
-    params.createdate = query.createdate
+  if (query.chnids && query.chnids.length) {
+    params.chnids = query.chnids
+  }
+  if (query.chnnames && query.chnnames.length) {
+    params.chnnames = query.chnnames
   }
   if (query.create_time_range && query.create_time_range.length) {
     params.create_time_range = query.create_time_range
@@ -21,7 +25,7 @@ export function fetchList(query) {
     params.status = query.status
   }
   return request({
-    url: '/admin/programme/v1/programs',
+    url: '/admin/programme/v1/programmes',
     method: 'get',
     params
   })
@@ -29,22 +33,22 @@ export function fetchList(query) {
 
 export function deleteProgram(query) {
   return request({
-    url: '/admin/programme/v1/programs/' + query.id + '/delete',
+    url: '/admin/programme/v1/programmes/' + query.id + '/delete',
     method: 'get'
   })
 }
 
-export function createTask(data) {
+export function createProgram(data) {
   return request({
-    url: '/admin/programme/v1/filereviews',
+    url: '/admin/programme/v1/programmes',
     method: 'post',
     data: data
   })
 }
 
-export function mergeTask(query) {
+export function mergeProgram(query) {
   return request({
-    url: `/admin/programme/v1/filereviews/${query.id}/merge`,
+    url: `/admin/programme/v1/programmes/${query.id}/merge`,
     method: 'put'
   })
 }

@@ -8,33 +8,46 @@ export function fetchList(query) {
   if (query.create_time_range && query.create_time_range.length) {
     params.create_time_range = query.create_time_range
   }
+  if (query.update_time_range && query.update_time_range.length) {
+    params.update_time_range = query.update_time_range
+  }
   if (query.name !== '') {
     params.name = query.name
   }
+  if (query.port !== '') {
+    params.port = query.port
+  }
   return request({
-    url: '/admin/v1/channels',
+    url: '/admin/v1/programme/v1/channels',
     method: 'get',
     params
   })
 }
 
+export function getAllChannels() {
+  return request({
+    url: '/admin/v1/programme/v1/channels',
+    method: 'get'
+  })
+}
+
 export function actived(query) {
   return request({
-    url: '/admin/v1/channels/' + query.id + '/actived',
+    url: '/admin/v1/programme/v1/channels/' + query.id + '/actived',
     method: 'put'
   })
 }
 
 export function inactived(query) {
   return request({
-    url: '/admin/v1/channels/' + query.id + '/inactived',
+    url: '/admin/v1/programme/v1/channels/' + query.id + '/inactived',
     method: 'put'
   })
 }
 
 export function createChannel(data) {
   return request({
-    url: '/admin/v1/channels',
+    url: '/admin/v1/programme/v1/channels',
     method: 'post',
     data: data
   })
@@ -42,21 +55,19 @@ export function createChannel(data) {
 
 export function updateChannel(data) {
   return request({
-    url: '/admin/v1/channels/' + data.id,
+    url: '/admin/v1/programme/v1/channels/' + data.id,
     method: 'put',
     data: {
-      name: data.name,
-      desc: data.desc,
-      v_codec: data.v_codec,
-      v_resolution_w: data.v_resolution_w,
-      v_resolution_h: data.v_resolution_h
+      port: data.port,
+      height: data.height,
+      width: data.width
     }
   })
 }
 
 export function deleteChannel(query) {
   return request({
-    url: '/admin/v1/channels/' + query.id,
+    url: '/admin/v1/programme/v1/channels/' + query.id,
     method: 'delete'
   })
 }
