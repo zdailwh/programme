@@ -12,7 +12,7 @@
             <span>在编节目单</span>
             <el-button type="text" icon="el-icon-upload2" class="cardBtn">提交审核</el-button>
           </div>
-          <Edit ref="editlist" :list-curr="listCurr" @remove-pro="removePro" @copy-pro="copyPro" />
+          <Edit ref="editlist" :list-curr="listCurr" @remove-pro="removePro" @copy-pro="copyPro" @update-start-time="updateStartTime" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -46,7 +46,25 @@ export default {
     return {
       radio1: '频道1',
       options: [{ value: '11', label: '频道1' }, { value: '12', label: '频道2' }, { value: '13', label: '频道3' }, { value: '14', label: '频道4' }, { value: '15', label: '频道5' }],
-      listCurr: []
+      listCurr: [],
+      start_time: (new Date().getTime()) - 24 * 60 * 60 * 1000,
+      updateStartIdx: 0
+    }
+  },
+  watch: {
+    listCurr: {
+      handler: function(newVal) {
+        if (!newVal.length) return []
+        newVal.map((item, idx, arr) => {
+          if (idx === this.updateStartIdx) {
+            item.start_time = this.start_time
+          } else if (idx > this.updateStartIdx) {
+            item.start_time = arr[idx - 1].end_time
+          }
+          item.end_time = item.start_time + item.duration * 1000
+        })
+      },
+      deep: true
     }
   },
   mounted() {
@@ -81,6 +99,11 @@ export default {
     copyPro(params) {
       var pros = deepClone2(params.items)
       this.listCurr = this.listCurr.concat(pros)
+    },
+    updateStartTime({ index, starttime }) {
+      this.updateStartIdx = index
+      this.start_time = new Date(starttime).getTime()
+      this.listCurr[index].start_time = new Date(starttime).getTime()
     }
   }
 }

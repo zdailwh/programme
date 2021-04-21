@@ -29,11 +29,6 @@
     <el-table ref="multipleTable" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
       <el-table-column type="selection" width="50" />
       <el-table-column type="index" width="40" />
-      <el-table-column label="ID" align="center" width="50">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="文件名" align="center">
         <template slot-scope="{row}">
           <span>{{ row.size }}</span>
@@ -112,6 +107,10 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
+        data.items.map((item, idx, arr) => {
+          item.start_time = ''
+          item.end_time = ''
+        })
         this.list = data.items
         this.total = data.total
 

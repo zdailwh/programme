@@ -16,11 +16,6 @@
     <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
       <el-table-column type="selection" width="50" />
       <el-table-column type="index" width="40" />
-      <el-table-column label="ID" align="center" width="50">
-        <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
           <span>{{ row.start_time | formatDate }}</span>
@@ -48,11 +43,11 @@
             placement="top"
             width="190"
             trigger="hover"
+            @show="setDefaultStartTime(row.start_time)"
           >
-            <el-input :value="row.start_time | formatDate" size="small" placeholder="请输入节目开始时间" style="margin-bottom: 10px;" />
+            <el-input v-model="myStartTime" size="small" placeholder="请输入节目开始时间" style="margin-bottom: 10px;" />
             <div style="text-align: right; margin: 0">
               <el-button type="danger" size="mini" @click="updateStartTime(row, $index)">确定</el-button>
-              <el-button size="mini">取消</el-button>
             </div>
             <el-button slot="reference" type="text" size="small">编辑</el-button>
           </el-popover>
@@ -103,36 +98,17 @@ export default {
     return {
       selectedItems: [],
       currentRow: null,
-      start_time: (new Date().getTime()) - 24 * 60 * 60 * 1000
-    }
-  },
-  watch: {
-    listCurr(newVal) {
-      if (!newVal.length) return []
-      newVal[0].start_time = this.start_time
-      newVal.map((item, idx, arr) => {
-        if (idx === 0) {
-          item.start_time = this.start_time
-        } else {
-          item.start_time = arr[idx - 1].end_time
-        }
-        item.end_time = item.start_time + item.duration * 1000
-      })
+      myStartTime: ''
     }
   },
   created() {
   },
   methods: {
-    calcMap() {
-      this.list[0].start_time = this.start_time
-      this.list.map((item, idx, arr) => {
-        if (idx === 0) {
-          item.start_time = this.start_time
-        } else {
-          item.start_time = arr[idx - 1].end_time
-        }
-        item.end_time = item.start_time + item.duration * 1000
-      })
+    setDefaultStartTime(starttime) {
+      this.myStartTime = parseTime(starttime)
+    },
+    updateStartTime(row, idx) {
+      this.$emit('update-start-time', { index: idx, starttime: this.myStartTime })
     },
     handleDelSelected() {
       this.$emit('remove-pro', { items: this.selectedItems })
