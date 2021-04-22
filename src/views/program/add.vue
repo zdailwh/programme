@@ -395,7 +395,7 @@ export default {
         .filter(({ hash }) => !uploadedList.includes(hash))
         .map(({ programid, fileHash, chunk, hash, index }) => {
           const formData = new FormData()
-          formData.append('programId', programid)
+          formData.append('bigFileId', programid)
           formData.append('chunk', chunk)
           formData.append('hash', hash)
           formData.append('chunkTotal', chunkData.length)
