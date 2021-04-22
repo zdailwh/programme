@@ -155,7 +155,7 @@ export default {
         page: 1,
         limit: 20
       }
-      if (this.filterForm.create_time_range.length) {
+      if (this.filterForm.create_time_range && this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
       }
       if (this.filterForm.username !== '') {
@@ -165,6 +165,7 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+      this.handleFilter()
     },
     actived(id, idx) {
       actived({ id: id }).then(data => {

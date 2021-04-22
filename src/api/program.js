@@ -21,6 +21,9 @@ export function fetchList(query) {
   if (query.update_time_range && query.update_time_range.length) {
     params.update_time_range = query.update_time_range
   }
+  if (query.finishtime_range && query.finishtime_range.length) {
+    params.finishtime_range = query.finishtime_range
+  }
   if (query.status !== '') {
     params.status = query.status
   }

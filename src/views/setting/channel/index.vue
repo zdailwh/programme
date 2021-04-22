@@ -147,10 +147,10 @@ export default {
         page: 1,
         limit: 20
       }
-      if (this.filterForm.create_time_range.length) {
+      if (this.filterForm.create_time_range && this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
       }
-      if (this.filterForm.update_time_range.length) {
+      if (this.filterForm.update_time_range && this.filterForm.update_time_range.length) {
         this.listQuery.update_time_range = this.filterForm.update_time_range
       }
       if (this.filterForm.name !== '') {
@@ -163,6 +163,7 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+      this.handleFilter()
     },
     actived(id, idx) {
       actived({ id: id }).then(data => {

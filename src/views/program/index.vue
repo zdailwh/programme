@@ -245,10 +245,10 @@ export default {
       if (this.filterForm.channelId !== '') {
         this.listQuery.channelId = this.filterForm.channelId
       }
-      if (this.filterForm.create_time_range.length) {
+      if (this.filterForm.create_time_range && this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
       }
-      if (this.filterForm.update_time_range.length) {
+      if (this.filterForm.update_time_range && this.filterForm.update_time_range.length) {
         this.listQuery.update_time_range = this.filterForm.update_time_range
       }
       if (this.filterForm.status !== '') {
@@ -258,6 +258,7 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+      this.handleFilter()
     },
     delProgram(id, idx) {
       deleteProgram({ id: id }).then(response => {
