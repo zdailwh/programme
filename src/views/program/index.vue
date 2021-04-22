@@ -82,7 +82,7 @@
       </el-table-column>
       <el-table-column label="所属频道" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.chnnames }}</span>
+          <span>{{ row.chnnames | tojoin }}</span>
         </template>
       </el-table-column>
       <el-table-column label="时长" align="center" width="100">
@@ -155,6 +155,9 @@ export default {
         '文件上传成功': 'success'
       }
       return statusMap[status]
+    },
+    tojoin(val) {
+      return val.join('#')
     }
   },
   data() {
@@ -210,7 +213,17 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
-        this.list = data.items
+        if (data.items) {
+          data.items.map((item, idx, arr) => {
+            item.chnids = item.chnids.split('#').map((it) => {
+              return parseInt(it)
+            })
+            item.chnnames = item.chnnames.split('#')
+          })
+          this.list = data.items
+        } else {
+          this.list = []
+        }
         this.total = data.total
 
         this.listLoading = false
