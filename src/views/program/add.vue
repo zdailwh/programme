@@ -56,9 +56,20 @@
             <span>{{ row.file.size | change }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="类型" align="center" width="80">
+          <template slot-scope="{row}">
+            <span>{{ row.ext }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="文件路径" align="center">
           <template slot-scope="{row}">
             <span>{{ row.file.path }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="计算hash进度" align="center" width="120">
+          <template slot-scope="{row}">
+            <el-progress :percentage="row.percentageHash" />
+            <!-- <span>{{ row.percentage }}</span> -->
           </template>
         </el-table-column>
         <el-table-column label="上传进度" align="center" width="120">
@@ -294,7 +305,9 @@ export default {
         chnnames: this.addForm.chnnames.join('#'),
         name: fileItem.file.name,
         md5: md5,
-        ext: fileItem.ext
+        ext: fileItem.ext,
+        duration: 123,
+        coderate: 1234
       }
       return new Promise((resolve, reject) => {
         createProgram(params).then(response => {

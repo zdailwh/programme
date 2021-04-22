@@ -96,6 +96,13 @@ module.exports = [
   },
   {
     url: '/admin/programme/v1/programmes/[0-9]',
+    type: 'put',
+    response: config => {
+      return program
+    }
+  },
+  {
+    url: '/admin/programme/v1/programmes/[0-9]',
     type: 'delete',
     response: config => {
       return program

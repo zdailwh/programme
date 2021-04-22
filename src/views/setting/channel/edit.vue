@@ -7,7 +7,7 @@
   >
     <div>
       <el-form ref="form" :model="editItem" :rules="ruleValidate" label-width="80px">
-        <el-form-item label="频道名称" prop="port">
+        <el-form-item label="播出端口" prop="port">
           <el-input v-model="editItem.port" />
         </el-form-item>
         <el-form-item label="分辨率">
@@ -82,11 +82,6 @@ export default {
         })
         this.$emit('changeEditVisible', false)
         this.$emit('refresh')
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     reset() {

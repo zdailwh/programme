@@ -31,6 +31,18 @@ export function fetchList(query) {
   })
 }
 
+export function updateProgram(data) {
+  return request({
+    url: '/admin/programme/v1/programmes/' + data.id,
+    method: 'put',
+    data: {
+      showname: data.showname,
+      chnnames: data.chnnames,
+      chnids: data.chnids
+    }
+  })
+}
+
 export function deleteProgram(query) {
   return request({
     url: '/admin/programme/v1/programmes/' + query.id + '/delete',

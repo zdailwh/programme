@@ -107,20 +107,21 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
-        data.items.map((item, idx, arr) => {
-          item.start_time = ''
-          item.end_time = ''
-        })
-        this.list = data.items
+        if (data.items) {
+          data.items.map((item, idx, arr) => {
+            item.start_time = ''
+            item.end_time = ''
+          })
+          this.list = data.items
+        } else {
+          this.list = []
+        }
+
         this.total = data.total
 
         this.listLoading = false
-      }).catch(error => {
+      }).catch(() => {
         this.listLoading = false
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     handleFilter() {

@@ -138,12 +138,8 @@ export default {
         this.total = data.total
 
         this.listLoading = false
-      }).catch(error => {
+      }).catch(() => {
         this.listLoading = false
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     handleFilter() {
@@ -171,21 +167,11 @@ export default {
     actived(id, idx) {
       actived({ id: id }).then(data => {
         this.list[idx] = data
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     inactived(id, idx) {
       inactived({ id: id }).then(data => {
         this.list[idx] = data
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     delChannel(id, idx) {
@@ -195,11 +181,6 @@ export default {
           type: 'success'
         })
         this.getList()
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     changeAddVisible(params) {

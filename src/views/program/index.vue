@@ -42,11 +42,11 @@
       </el-form-item>
     </el-form>
 
-    <div class="channelTabs">
+    <!-- <div class="channelTabs">
       <el-radio-group v-model="radio1">
         <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
       </el-radio-group>
-    </div>
+    </div> -->
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
       <el-table-column type="expand">
@@ -105,21 +105,34 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center" width="120" fixed="right">
+      <el-table-column label="状态" align="center" width="120">
         <template slot-scope="{row}">
           <el-tag :type="row.statusstr | statusFilter">
             {{ row.statusstr }}
           </el-tag>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button type="text" size="medium" @click="delProgram(row.id, $index)">删除</el-button>
+          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
+          <el-popover
+            placement="top"
+            width="170"
+            trigger="hover"
+          >
+            <p>确定要删除此节目吗？</p>
+            <div style="text-align: right; margin: 0">
+              <el-button type="danger" size="mini" @click="delProgram(row.id, $index)">确定</el-button>
+            </div>
+            <el-button slot="reference" type="text" size="medium" style="margin-left: 10px;">删除</el-button>
+          </el-popover>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+
+    <Edit :edit-item="editItem" :all-channels="allChannels" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
 
   </div>
 </template>
@@ -129,9 +142,10 @@ import { fetchList, deleteProgram } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import Edit from './edit.vue'
 
 export default {
-  components: { Pagination },
+  components: { Pagination, Edit },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -163,7 +177,10 @@ export default {
         update_time_range: [],
         status: ''
       },
-      statusArr: [{ label: '已创建', value: 0 }, { label: '文件待上传', value: 1 }, { label: '文件上传成功', value: 2 }]
+      statusArr: [{ label: '已创建', value: 0 }, { label: '文件待上传', value: 1 }, { label: '文件上传成功', value: 2 }],
+      editItem: {},
+      editIndex: '',
+      dialogVisibleEdit: false
     }
   },
   watch: {
@@ -197,12 +214,8 @@ export default {
         this.total = data.total
 
         this.listLoading = false
-      }).catch(error => {
+      }).catch(() => {
         this.listLoading = false
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     handleFilter() {
@@ -240,22 +253,20 @@ export default {
           type: 'success'
         })
         this.getList()
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     getAllChannels() {
       getAllChannels().then(data => {
         this.allChannels = data.items
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
+    },
+    editHandle(item, idx) {
+      this.editItem = item
+      this.editIndex = idx
+      this.dialogVisibleEdit = true
+    },
+    changeEditVisible(params) {
+      this.dialogVisibleEdit = params
     }
   }
 }

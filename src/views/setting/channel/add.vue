@@ -13,6 +13,9 @@
         <el-form-item label="播出端口" prop="port">
           <el-input v-model="formadd.port" />
         </el-form-item>
+        <el-form-item label="EPG路径" prop="epgurl">
+          <el-input v-model="formadd.epgurl" />
+        </el-form-item>
         <el-form-item label="分辨率">
           <el-col :span="11">
             <el-form-item prop="width">
@@ -48,6 +51,7 @@ export default {
       formadd: {
         name: '',
         port: '',
+        epgurl: '',
         width: '1920',
         height: '1080'
       },
@@ -57,6 +61,9 @@ export default {
         ],
         port: [
           { required: true, type: 'string', message: '播出端口不能为空', trigger: 'blur' }
+        ],
+        epgurl: [
+          { required: true, type: 'string', message: 'EPG路径不能为空', trigger: 'blur' }
         ],
         width: [
           { required: true, type: 'string', message: '分辨率宽不能为空', trigger: 'blur' }
@@ -90,16 +97,12 @@ export default {
         this.formadd = {
           name: '',
           port: '',
+          epgurl: '',
           width: '',
           height: ''
         }
         this.$emit('changeAddVisible', false)
         this.$emit('refresh')
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
       })
     },
     reset() {

@@ -18,7 +18,7 @@ export function fetchList(query) {
     params.port = query.port
   }
   return request({
-    url: '/admin/v1/programme/v1/channels',
+    url: '/admin/programme/v1/channels',
     method: 'get',
     params
   })
@@ -26,28 +26,28 @@ export function fetchList(query) {
 
 export function getAllChannels() {
   return request({
-    url: '/admin/v1/programme/v1/channels',
+    url: '/admin/programme/v1/channels',
     method: 'get'
   })
 }
 
 export function actived(query) {
   return request({
-    url: '/admin/v1/programme/v1/channels/' + query.id + '/actived',
+    url: '/admin/programme/v1/channels/' + query.id + '/actived',
     method: 'put'
   })
 }
 
 export function inactived(query) {
   return request({
-    url: '/admin/v1/programme/v1/channels/' + query.id + '/inactived',
+    url: '/admin/programme/v1/channels/' + query.id + '/inactived',
     method: 'put'
   })
 }
 
 export function createChannel(data) {
   return request({
-    url: '/admin/v1/programme/v1/channels',
+    url: '/admin/programme/v1/channels',
     method: 'post',
     data: data
   })
@@ -55,7 +55,7 @@ export function createChannel(data) {
 
 export function updateChannel(data) {
   return request({
-    url: '/admin/v1/programme/v1/channels/' + data.id,
+    url: '/admin/programme/v1/channels/' + data.id,
     method: 'put',
     data: {
       port: data.port,
@@ -67,7 +67,7 @@ export function updateChannel(data) {
 
 export function deleteChannel(query) {
   return request({
-    url: '/admin/v1/programme/v1/channels/' + query.id,
+    url: '/admin/programme/v1/channels/' + query.id,
     method: 'delete'
   })
 }
