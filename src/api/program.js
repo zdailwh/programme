@@ -9,11 +9,11 @@ export function fetchList(query) {
   if (query.showname !== '') {
     params.showname = query.showname
   }
-  if (query.chnids && query.chnids.length) {
-    params.chnids = query.chnids
+  if (query.channel !== '') {
+    params.channel = query.channel
   }
-  if (query.chnnames && query.chnnames.length) {
-    params.chnnames = query.chnnames
+  if (query.channelId !== '') {
+    params.channelId = query.channelId
   }
   if (query.create_time_range && query.create_time_range.length) {
     params.create_time_range = query.create_time_range

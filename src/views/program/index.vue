@@ -4,11 +4,6 @@
       <el-form-item prop="showname">
         <el-input v-model="filterForm.showname" placeholder="节目名称" style="width:120px" />
       </el-form-item>
-      <el-form-item prop="chnids">
-        <el-select v-model="filterForm.chnids" multiple placeholder="请选择频道名称" style="width: auto">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-        </el-select>
-      </el-form-item>
       <el-form-item prop="create_time_range">
         <el-date-picker
           v-model="filterForm.create_time_range"
@@ -42,11 +37,12 @@
       </el-form-item>
     </el-form>
 
-    <!-- <div class="channelTabs">
-      <el-radio-group v-model="radio1">
+    <div class="channelTabs">
+      <el-radio-group v-model="currChannel" @change="handleFilter">
+        <el-radio-button label="全部" />
         <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
       </el-radio-group>
-    </div> -->
+    </div>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
       <el-table-column type="expand">
@@ -162,7 +158,7 @@ export default {
   },
   data() {
     return {
-      radio1: '频道1',
+      currChannel: '全部',
       options: [],
       allChannels: [],
       list: null,
@@ -174,8 +170,8 @@ export default {
       },
       filterForm: {
         showname: '',
-        chnids: [],
-        chnnames: [],
+        channel: '',
+        channelId: '',
         create_time_range: [],
         update_time_range: [],
         status: ''
@@ -197,12 +193,16 @@ export default {
         })
       }
     },
-    'filterForm.chnids': function(newVal) {
-      this.filterForm.chnnames = this.options.filter((item, idx, arr) => {
-        return newVal.indexOf(item.value) !== -1
-      }).map((item, idx, arr) => {
-        return item.label
-      })
+    currChannel: function(newVal) {
+      if (newVal !== '全部') {
+        this.filterForm.channel = newVal
+        this.filterForm.channelId = this.options.filter((item, idx, arr) => {
+          return item.label === newVal
+        })[0].value
+      } else {
+        this.filterForm.channel = ''
+        this.filterForm.channelId = ''
+      }
     }
   },
   created() {
@@ -239,11 +239,11 @@ export default {
       if (this.filterForm.showname !== '') {
         this.listQuery.showname = this.filterForm.showname
       }
-      if (this.filterForm.chnids.length) {
-        this.listQuery.chnids = this.filterForm.chnids
+      if (this.filterForm.channel !== '') {
+        this.listQuery.channel = this.filterForm.channel
       }
-      if (this.filterForm.chnnames.length) {
-        this.listQuery.chnnames = this.filterForm.chnnames
+      if (this.filterForm.channelId !== '') {
+        this.listQuery.channelId = this.filterForm.channelId
       }
       if (this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
