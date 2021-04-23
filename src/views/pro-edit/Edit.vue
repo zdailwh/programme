@@ -18,12 +18,12 @@
       <el-table-column type="index" width="40" />
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.starttime | formatDate }}</span>
+          <span>{{ row.starttime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.endtime | formatDate }}</span>
+          <span>{{ row.endtime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目名称" align="center">
@@ -59,16 +59,11 @@
 </template>
 
 <script>
-import { parseTime } from '@/utils'
 import waves from '@/directive/waves' // waves directive
 
 export default {
   directives: { waves },
   filters: {
-    formatDate(val) {
-      if (val === '') return ''
-      return parseTime(val)
-    },
     formateSeconds(second) {
       let secondTime = parseInt(second) // 将传入的秒的值转化为Number
       let min = 0 // 初始化分
@@ -105,7 +100,7 @@ export default {
   },
   methods: {
     setDefaultStartTime(starttime) {
-      this.myStartTime = parseTime(starttime)
+      this.myStartTime = starttime
     },
     updateStartTime(row, idx) {
       this.$emit('update-start-time', { index: idx, starttime: this.myStartTime })

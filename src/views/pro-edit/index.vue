@@ -63,7 +63,7 @@ export default {
       options: [],
       allChannels: [],
       listCurr: [],
-      firstStartTime: (new Date().getTime()) - 24 * 60 * 60 * 1000,
+      firstStartTime: parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000),
       updateStartIdx: 0
     }
   },
@@ -77,7 +77,7 @@ export default {
           } else if (idx > this.updateStartIdx) {
             item.starttime = arr[idx - 1].endtime
           }
-          item.endtime = item.starttime + item.duration * 1000
+          item.endtime = parseTime(new Date(item.starttime).getTime() + item.duration * 1000)
         })
       },
       deep: true
@@ -163,8 +163,8 @@ export default {
     },
     updateStartTime({ index, starttime }) {
       this.updateStartIdx = index
-      this.starttime = new Date(starttime).getTime()
-      this.listCurr[index].starttime = new Date(starttime).getTime()
+      this.firstStartTime = starttime
+      this.listCurr[index].starttime = starttime
     },
     createHandler() {
       var epg = this.listCurr.map((item, idx, arr) => {
@@ -210,6 +210,30 @@ function deepClone2(obj) {
   var _obj = JSON.stringify(obj)
   var objClone = JSON.parse(_obj)
   return objClone
+}
+function toDub(n) {
+  if (n < 10) return '0' + n
+  else return n
+}
+function toThr(n) {
+  if (n < 10) return '00' + n
+  else if (n < 100) return '0' + n
+  else return n
+}
+function parseTime(time) {
+  const date = new Date(time)
+
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay(),
+    ms: date.getMilliseconds()
+  }
+  return `${formatObj.y}-${toDub(formatObj.m)}-${toDub(formatObj.d)} ${toDub(formatObj.h)}:${toDub(formatObj.i)}:${toDub(formatObj.s)}.${toThr(formatObj.ms)}`
 }
 </script>
 <style scoped>
