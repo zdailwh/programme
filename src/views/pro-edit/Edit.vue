@@ -18,17 +18,17 @@
       <el-table-column type="index" width="40" />
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.start_time | formatDate }}</span>
+          <span>{{ row.starttime | formatDate }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.end_time | formatDate }}</span>
+          <span>{{ row.endtime | formatDate }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.name }}</span>
+          <span>{{ row.showname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="时长" align="center">
@@ -43,7 +43,7 @@
             placement="top"
             width="190"
             trigger="hover"
-            @show="setDefaultStartTime(row.start_time)"
+            @show="setDefaultStartTime(row.starttime)"
           >
             <el-input v-model="myStartTime" size="small" placeholder="请输入节目开始时间" style="margin-bottom: 10px;" />
             <div style="text-align: right; margin: 0">

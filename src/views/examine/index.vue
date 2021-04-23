@@ -10,8 +10,8 @@
         <el-card shadow="always">
           <div slot="header" class="clearfix">
             <span>新编节目单</span>
-            <el-button type="text" icon="el-icon-finished" class="cardBtn">提交播出</el-button>
-            <el-button type="text" icon="el-icon-refresh-left" class="cardBtn">返回再编</el-button>
+            <el-button type="text" icon="el-icon-finished" class="cardBtn" @click="passHandler">提交播出</el-button>
+            <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
           </div>
           <Waiting />
         </el-card>
@@ -28,6 +28,7 @@
   </div>
 </template>
 <script>
+import { pass, fail } from '@/api/temp-epg'
 import Online from './Online.vue'
 import Waiting from './Waiting.vue'
 export default {
@@ -41,6 +42,18 @@ export default {
   mounted() {
   },
   methods: {
+    passHandler() {
+      console.log(this.listCurr)
+      pass().then(data => {
+        console.log(data)
+      })
+    },
+    failHandler() {
+      console.log(this.listCurr)
+      fail().then(data => {
+        console.log(data)
+      })
+    }
   }
 }
 </script>

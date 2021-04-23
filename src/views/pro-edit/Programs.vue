@@ -1,12 +1,12 @@
 <template>
   <div class="programListWrap">
     <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
-      <el-form-item prop="name">
-        <el-input v-model="filterForm.name" clearable placeholder="节目名称" style="width:120px" />
+      <el-form-item prop="showname">
+        <el-input v-model="filterForm.showname" clearable placeholder="节目名称" style="width:120px" />
       </el-form-item>
-      <el-form-item prop="create_time_range">
+      <el-form-item prop="finishtime_range">
         <el-date-picker
-          v-model="filterForm.create_time_range"
+          v-model="filterForm.finishtime_range"
           style="width:330px"
           type="datetimerange"
           value-format="yyyy-MM-dd HH:mm:ss"
@@ -29,14 +29,14 @@
     <el-table ref="multipleTable" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
       <el-table-column type="selection" width="50" />
       <el-table-column type="index" width="40" />
-      <el-table-column label="文件名" align="center">
+      <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.size }}</span>
+          <span>{{ row.showname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="文件大小" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.filename }}</span>
+          <span>{{ row.size }}</span>
         </template>
       </el-table-column>
       <el-table-column label="时长" align="center">
@@ -46,12 +46,12 @@
       </el-table-column>
       <el-table-column label="码率" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.bitrate }}</span>
+          <span>{{ row.coderate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="导入时间" align="center" sortable="custom" prop="createdate">
+      <el-table-column label="导入时间" align="center" sortable="custom" prop="finishtime">
         <template slot-scope="{row}">
-          <span>{{ row.createdate }}</span>
+          <span>{{ row.finishtime }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -96,12 +96,14 @@ export default {
         limit: 20
       },
       filterForm: {
+        showname: '',
+        finishtime_range: []
       },
       selectedItems: []
     }
   },
   created() {
-    this.getList()
+    this.handleFilter()
   },
   methods: {
     getList() {
@@ -109,8 +111,8 @@ export default {
       fetchList(this.listQuery).then(data => {
         if (data.items) {
           data.items.map((item, idx, arr) => {
-            item.start_time = ''
-            item.end_time = ''
+            item.starttime = ''
+            item.endtime = ''
           })
           this.list = data.items
         } else {
@@ -124,10 +126,22 @@ export default {
         this.listLoading = false
       })
     },
-    handleFilter() {
+    handleFilter(channel = '', channelId = '') {
       this.listQuery = {
         page: 1,
         limit: 20
+      }
+      if (this.filterForm.showname !== '') {
+        this.listQuery.showname = this.filterForm.showname
+      }
+      if (channel !== '') {
+        this.listQuery.channel = channel
+      }
+      if (channelId !== '') {
+        this.listQuery.channelId = channelId
+      }
+      if (this.filterForm.finishtime_range && this.filterForm.finishtime_range.length) {
+        this.listQuery.finishtime_range = this.filterForm.finishtime_range
       }
       this.getList()
     },

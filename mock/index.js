@@ -8,6 +8,7 @@ const search = require('./remote-search')
 const admin = require('./admin')
 const channel = require('./channel')
 const program = require('./program')
+const tempEpg = require('./temp-epg')
 
 const mocks = [
   ...user,
@@ -16,7 +17,8 @@ const mocks = [
   ...search,
   ...admin,
   ...channel,
-  ...program
+  ...program,
+  ...tempEpg
 ]
 
 // for front mock

@@ -1,7 +1,8 @@
 <template>
   <div class="container">
     <div class="channelTabs">
-      <el-radio-group v-model="radio1">
+      <el-radio-group v-model="currChannel">
+        <!-- <el-radio-button v-for="item in options" :key="item.value" :label="item.label" :disabled="tempEpg !== null && item.label !== currChannel" /> -->
         <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
       </el-radio-group>
     </div>
@@ -9,8 +10,14 @@
       <el-col :span="12">
         <el-card shadow="always">
           <div slot="header" class="clearfix">
-            <span>在编节目单</span>
-            <el-button type="text" icon="el-icon-upload2" class="cardBtn">提交审核</el-button>
+            <span>在编节目单 <span v-if="tempEpg !== null" style="color: #F56C6C;">（{{ tempEpg.statusstr }}）</span></span>
+            <template v-if="tempEpg === null">
+              <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">保存编单</el-button>
+            </template>
+            <template v-else>
+              <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
+              <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">确认修改</el-button>
+            </template>
           </div>
           <Edit ref="editlist" :list-curr="listCurr" @remove-pro="removePro" @copy-pro="copyPro" @update-start-time="updateStartTime" />
         </el-card>
@@ -20,34 +27,43 @@
           <div slot="header" class="clearfix">
             <span>节目列表</span>
           </div>
-          <Programs @append-pro="appendPro" />
+          <Programs ref="programs" @append-pro="appendPro" />
         </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
 <script>
+import { fetchList, createTempEpg, pend } from '@/api/temp-epg'
+import { getAllChannels } from '@/api/channel'
 import Programs from './Programs.vue'
 import Edit from './Edit.vue'
 export default {
   components: { Programs, Edit },
   beforeRouteLeave(to, from, next) {
-    this.$confirm('您还没有提交编单, 是否继续?', '提示', {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning'
-    }).then(() => {
+    if (this.listCurr.length) {
+      this.$confirm('您还没有提交编单, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        next()
+      }).catch(() => {
+        next(false)
+      })
+    } else {
       next()
-    }).catch(() => {
-      next(false)
-    })
+    }
   },
   data() {
     return {
-      radio1: '频道1',
-      options: [{ value: '11', label: '频道1' }, { value: '12', label: '频道2' }, { value: '13', label: '频道3' }, { value: '14', label: '频道4' }, { value: '15', label: '频道5' }],
+      tempEpg: null,
+      currChannel: '',
+      currChannelId: '',
+      options: [],
+      allChannels: [],
       listCurr: [],
-      start_time: (new Date().getTime()) - 24 * 60 * 60 * 1000,
+      firstStartTime: (new Date().getTime()) - 24 * 60 * 60 * 1000,
       updateStartIdx: 0
     }
   },
@@ -57,19 +73,62 @@ export default {
         if (!newVal.length) return []
         newVal.map((item, idx, arr) => {
           if (idx === this.updateStartIdx) {
-            item.start_time = this.start_time
+            item.starttime = this.firstStartTime
           } else if (idx > this.updateStartIdx) {
-            item.start_time = arr[idx - 1].end_time
+            item.starttime = arr[idx - 1].endtime
           }
-          item.end_time = item.start_time + item.duration * 1000
+          item.endtime = item.starttime + item.duration * 1000
         })
       },
       deep: true
+    },
+    allChannels: function(newVal) {
+      if (newVal.length) {
+        this.options = newVal.map((item, idx, arr) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
+    },
+    currChannel: function(newVal) {
+      var filteredOpt = this.options.filter((item, idx, arr) => {
+        return item.label === newVal
+      })
+      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
+      // 获取指定频道下的节目列表
+      this.$refs.programs.handleFilter(this.currChannel, this.currChannelId)
     }
   },
   mounted() {
+    this.getAllChannels()
+    this.getTempEpg()
   },
   methods: {
+    // 获取临时节目单
+    getTempEpg() {
+      this.listLoading = true
+      fetchList({ page: 1, limit: 20 }).then(data => {
+        this.tempEpg = data.items ? data.items[0] : null
+        console.log('已保存的编单记录')
+        console.log(this.tempEpg)
+        if (this.tempEpg !== null) {
+          this.currChannel = this.tempEpg.name
+          this.listCurr = JSON.parse(this.tempEpg.epg)
+        }
+
+        this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
+      })
+    },
+    getAllChannels() {
+      getAllChannels().then(data => {
+        this.allChannels = data.items
+      })
+    },
+    // 向节目单插入记录
     appendPro(params) {
       var pros = deepClone2(params.items)
       var insertIdx = this.listCurr.indexOf(this.$refs.editlist.currentRow)
@@ -86,6 +145,7 @@ export default {
       // 表格单选行取消选择
       this.$refs.editlist.$refs.multipleTable.setCurrentRow()
     },
+    // 删除节目单中的记录
     removePro(params) {
       var pros = params.items
       var removeIdx = pros.map((item, idx, arr) => {
@@ -96,14 +156,53 @@ export default {
         return removeIdx.indexOf(idx) === -1
       })
     },
+    // 复制节目单记录
     copyPro(params) {
       var pros = deepClone2(params.items)
       this.listCurr = this.listCurr.concat(pros)
     },
     updateStartTime({ index, starttime }) {
       this.updateStartIdx = index
-      this.start_time = new Date(starttime).getTime()
-      this.listCurr[index].start_time = new Date(starttime).getTime()
+      this.starttime = new Date(starttime).getTime()
+      this.listCurr[index].starttime = new Date(starttime).getTime()
+    },
+    createHandler() {
+      var epg = this.listCurr.map((item, idx, arr) => {
+        return {
+          name: item.showname,
+          starttime: item.starttime,
+          endtime: item.endtime,
+          duration: item.duration
+        }
+      })
+      console.log(epg)
+      if (!this.currChannelId) {
+        this.$message({
+          message: '请选择频道！',
+          type: 'warning'
+        })
+        return
+      }
+      if (!epg.length) {
+        this.$message({
+          message: '编单不能为空！',
+          type: 'warning'
+        })
+        return
+      }
+      var params = {
+        channelId: this.currChannelId,
+        epg: JSON.stringify(epg)
+      }
+      createTempEpg(params).then(data => {
+        console.log(data)
+      })
+    },
+    pendHandler() {
+      console.log(this.listCurr)
+      pend().then(data => {
+        console.log(data)
+      })
     }
   }
 }
