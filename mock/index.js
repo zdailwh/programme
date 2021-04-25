@@ -9,6 +9,7 @@ const admin = require('./admin')
 const channel = require('./channel')
 const program = require('./program')
 const tempEpg = require('./temp-epg')
+const epg = require('./epg')
 
 const mocks = [
   ...user,
@@ -18,7 +19,8 @@ const mocks = [
   ...admin,
   ...channel,
   ...program,
-  ...tempEpg
+  ...tempEpg,
+  ...epg
 ]
 
 // for front mock

@@ -4,12 +4,12 @@
       <el-table-column type="index" width="50" />
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.start_time | formatDate }}</span>
+          <span>{{ row.starttime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.end_time | formatDate }}</span>
+          <span>{{ row.endtime }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目名称" align="center">
@@ -31,7 +31,7 @@
           >
             <p>确定要删除此节目吗？</p>
             <div style="text-align: right; margin: 0">
-              <el-button type="danger" size="mini" @click="delProgram(row.id, $index)">确定</el-button>
+              <el-button type="danger" size="mini" @click="delEpg(row.id, $index)">确定</el-button>
             </div>
             <el-button slot="reference" type="text" size="small" style="margin-left: 10px;">删除</el-button>
           </el-popover>
@@ -44,8 +44,7 @@
 </template>
 
 <script>
-import { parseTime } from '@/utils'
-import { fetchList, deleteProgram } from '@/api/program'
+import { fetchList, deleteEpg } from '@/api/epg'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -53,12 +52,9 @@ export default {
   components: { Pagination },
   directives: { waves },
   filters: {
-    formatDate(val) {
-      if (val === '') return ''
-      return parseTime(val)
-    },
     formateSeconds(second) {
-      let secondTime = parseInt(second) // 将传入的秒的值转化为Number
+      let secondTime = parseInt(second / 1000)
+      var haomiao = parseInt(second % 1000)
       let min = 0 // 初始化分
       let h = 0 // 初始化小时
       let result = ''
@@ -70,7 +66,7 @@ export default {
           min = parseInt(min % 60) // 获取小时后取佘的分，获取分钟除以60取佘的分
         }
       }
-      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}`
+      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}.${haomiao.toString().padStart(3, '0')}`
       return result
     }
   },
@@ -84,25 +80,12 @@ export default {
         limit: 20
       },
       filterForm: {
-      },
-      start_time: (new Date().getTime()) - 24 * 60 * 60 * 1000
+      }
     }
   },
   created() {
-    this.getList()
   },
   methods: {
-    calcMap() {
-      this.list[0].start_time = this.start_time
-      this.list.map((item, idx, arr) => {
-        if (idx === 0) {
-          item.start_time = this.start_time
-        } else {
-          item.start_time = arr[idx - 1].end_time
-        }
-        item.end_time = item.start_time + item.duration * 1000
-      })
-    },
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
@@ -110,7 +93,6 @@ export default {
         this.total = data.total
 
         this.listLoading = false
-        this.calcMap()
       }).catch(error => {
         this.listLoading = false
         this.$message({
@@ -119,15 +101,18 @@ export default {
         })
       })
     },
-    handleFilter() {
+    handleFilter(channelId = '') {
       this.listQuery = {
         page: 1,
         limit: 20
       }
+      if (channelId !== '') {
+        this.listQuery.channelId = channelId
+      }
       this.getList()
     },
-    delProgram(id, idx) {
-      deleteProgram({ id: id }).then(response => {
+    delEpg(id, idx) {
+      deleteEpg({ id: id }).then(response => {
         this.$message({
           message: '删除成功！',
           type: 'success'

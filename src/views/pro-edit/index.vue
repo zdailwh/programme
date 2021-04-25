@@ -2,8 +2,8 @@
   <div class="container">
     <div class="channelTabs">
       <el-radio-group v-model="currChannel">
-        <!-- <el-radio-button v-for="item in options" :key="item.value" :label="item.label" :disabled="tempEpg !== null && item.label !== currChannel" /> -->
-        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
+        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" :disabled="tempEpg !== null && item.label !== currChannel" />
+        <!-- <el-radio-button v-for="item in options" :key="item.value" :label="item.label" /> -->
       </el-radio-group>
     </div>
     <el-row :gutter="20">
@@ -39,18 +39,19 @@ import { getAllChannels } from '@/api/channel'
 import Programs from './Programs.vue'
 import Edit from './Edit.vue'
 
-var tempEpgDemo = JSON.stringify([{
-  name: '节目名1',
-  starttime: '2021-04-22 13:45:06.345',
-  endtime: '2021-04-22 13:48:06.345',
-  duration: '180123'
-},
-{
-  name: '节目名2',
-  starttime: '2021-04-22 13:48:06.345',
-  endtime: '2021-04-22 13:53:06.345',
-  duration: '300456'
-}])
+// var tempEpgDemo = JSON.stringify([{
+//   name: '节目名1',
+//   starttime: '2021-04-22 13:45:06.345',
+//   endtime: '2021-04-22 13:48:06.345',
+//   duration: '180123'
+// },
+// {
+//   name: '节目名2',
+//   starttime: '2021-04-22 13:48:06.345',
+//   endtime: '2021-04-22 13:53:06.345',
+//   duration: '300456'
+// }])
+
 export default {
   components: { Programs, Edit },
   beforeRouteLeave(to, from, next) {
@@ -106,17 +107,20 @@ export default {
       }
     },
     currChannel: function(newVal) {
-      var filteredOpt = this.options.filter((item, idx, arr) => {
-        return item.label === newVal
-      })
-      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
+      if (!this.currChannelId) {
+        var filteredOpt = this.options.filter((item, idx, arr) => {
+          return item.label === newVal
+        })
+        this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
+      }
       // 获取指定频道下的节目列表
       this.$refs.programs.handleFilter(this.currChannel, this.currChannelId)
     }
   },
   mounted() {
-    this.getAllChannels()
-    this.getTempEpg()
+    this.getAllChannels().then(() => {
+      this.getTempEpg()
+    })
   },
   methods: {
     // 获取临时节目单
@@ -127,9 +131,10 @@ export default {
         console.log('已保存的编单记录')
         console.log(this.tempEpg)
         if (this.tempEpg !== null) {
-          this.currChannel = this.tempEpg.name
-          // this.listCurr = JSON.parse(this.tempEpg.epg)
-          this.listCurr = JSON.parse(tempEpgDemo)
+          this.currChannel = this.tempEpg.channel.name
+          this.currChannelId = this.tempEpg.channel.id
+          this.listCurr = JSON.parse(this.tempEpg.epg)
+          // this.listCurr = JSON.parse(tempEpgDemo)
         }
 
         this.listLoading = false
@@ -137,8 +142,8 @@ export default {
         this.listLoading = false
       })
     },
-    getAllChannels() {
-      getAllChannels().then(data => {
+    async getAllChannels() {
+      await getAllChannels().then(data => {
         this.allChannels = data.items
       })
     },
@@ -186,7 +191,7 @@ export default {
           name: item.name,
           starttime: item.starttime,
           endtime: item.endtime,
-          duration: item.duration
+          duration: parseInt(item.duration)
         }
       })
       console.log(epg)
@@ -219,7 +224,7 @@ export default {
         type: 'warning'
       }).then(() => {
         pend({ id: this.tempEpg.id }).then(data => {
-          console.log(data)
+          this.$router.push({ path: '/examine/index' })
         })
       }).catch(() => {
         console.log('已取消')
@@ -236,7 +241,7 @@ export default {
             name: item.name,
             starttime: item.starttime,
             endtime: item.endtime,
-            duration: item.duration
+            duration: parseInt(item.duration)
           }
         })
         console.log(epg)
