@@ -16,7 +16,7 @@
             </template>
             <template v-else>
               <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
-              <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">确认修改</el-button>
+              <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
           </div>
           <Edit ref="editlist" :list-curr="listCurr" @remove-pro="removePro" @copy-pro="copyPro" @update-start-time="updateStartTime" />
@@ -34,10 +34,23 @@
   </div>
 </template>
 <script>
-import { fetchList, createTempEpg, pend } from '@/api/temp-epg'
+import { fetchList, createTempEpg, pend, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
 import Programs from './Programs.vue'
 import Edit from './Edit.vue'
+
+var tempEpgDemo = [{
+  name: '节目名1',
+  starttime: '2021-04-22 13:45:06.345',
+  endtime: '2021-04-22 13:48:06.345',
+  duration: '180000'
+},
+{
+  name: '节目名2',
+  starttime: '2021-04-22 13:48:06.345',
+  endtime: '2021-04-22 13:53:06.345',
+  duration: '300000'
+}]
 export default {
   components: { Programs, Edit },
   beforeRouteLeave(to, from, next) {
@@ -199,9 +212,33 @@ export default {
       })
     },
     pendHandler() {
-      console.log(this.listCurr)
-      pend().then(data => {
-        console.log(data)
+      this.$confirm(`确定要将在编节目单提交审核吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        pend({ id: this.tempEpg.id }).then(data => {
+          console.log(data)
+        })
+      }).catch(() => {
+        console.log('已取消')
+      })
+    },
+    updateHandler() {
+      this.$confirm(`确定要保存对在编节目单的修改吗?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        var params = {
+          id: this.tempEpg.id,
+          epg: JSON.stringify(this.listCurr)
+        }
+        updateTempEpg(params).then(data => {
+          console.log(data)
+        })
+      }).catch(() => {
+        console.log('已取消')
       })
     }
   }
