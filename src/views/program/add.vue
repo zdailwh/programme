@@ -306,7 +306,7 @@ export default {
         name: fileItem.file.name,
         md5: md5,
         ext: fileItem.ext,
-        duration: 123,
+        duration: 1200000,
         coderate: 1234
       }
       return new Promise((resolve, reject) => {

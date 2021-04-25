@@ -3,7 +3,9 @@ import request from '@/utils/request'
 export function fetchList(query) {
   var params = {
     page: query.page - 1,
-    per_page: query.limit
+    per_page: query.limit,
+    channelId: query.channelId,
+    status: query.status
   }
 
   return request({
@@ -48,6 +50,13 @@ export function pass(query) {
 export function fail(query) {
   return request({
     url: '/admin/programme/v1/tempepgs/' + query.id + '/fail',
+    method: 'put'
+  })
+}
+
+export function uploaded(query) {
+  return request({
+    url: '/admin/programme/v1/tempepgs/' + query.id + '/uploaded',
     method: 'put'
   })
 }

@@ -2,7 +2,7 @@
   <div class="container">
     <div class="channelTabs">
       <el-radio-group v-model="currChannel">
-        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" :disabled="tempEpg !== null && item.label !== currChannel" />
+        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
       </el-radio-group>
     </div>
     <el-row :gutter="20">
@@ -10,8 +10,10 @@
         <el-card shadow="always">
           <div slot="header" class="clearfix">
             <span>新编节目单</span>
-            <el-button type="text" icon="el-icon-finished" class="cardBtn" @click="passHandler">提交播出</el-button>
-            <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
+            <template v-if="tempEpg !== null">
+              <el-button type="text" icon="el-icon-finished" class="cardBtn" @click="passHandler">审核通过</el-button>
+              <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
+            </template>
           </div>
           <Waiting :list-curr="listCurr" />
         </el-card>
@@ -21,15 +23,16 @@
           <div slot="header">
             <span>在播节目单</span>
           </div>
-          <Online ref="epgs" />
+          <Online ref="epgs" :channel-id="currChannelId" />
         </el-card>
       </el-col>
     </el-row>
   </div>
 </template>
 <script>
-import { fetchList, pass, fail } from '@/api/temp-epg'
+import { fetchList, pass, fail, uploaded } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
+import { getLastEpg } from '@/api/epg'
 import Online from './Online.vue'
 import Waiting from './Waiting.vue'
 
@@ -57,30 +60,31 @@ export default {
       }
     },
     currChannel: function(newVal) {
-      if (!this.currChannelId) {
-        var filteredOpt = this.options.filter((item, idx, arr) => {
-          return item.label === newVal
-        })
-        this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
-      }
-      this.$refs.epgs.handleFilter(this.currChannelId)
+      var filteredOpt = this.options.filter((item, idx, arr) => {
+        return item.label === newVal
+      })
+      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
+
+      this.listCurr = []
+      // 获取指定频道下的最后一条在播节目
+      this.getLastEpg().then(() => {
+        // 获取指定频道下的临时节目单
+        this.getTempEpg()
+        // 获取指定频道下的在播节目单
+        this.$refs.epgs.handleFilter()
+      })
     }
   },
   mounted() {
-    this.getAllChannels().then(() => {
-      this.getTempEpg()
-    })
+    this.getAllChannels()
   },
   methods: {
     getTempEpg() {
       this.listLoading = true
-      fetchList({ page: 1, limit: 20 }).then(data => {
+      fetchList({ page: 1, limit: 20, channelId: this.currChannelId, status: [1] }).then(data => {
         this.tempEpg = data.items ? data.items[0] : null
-        console.log(this.tempEpg)
         if (this.tempEpg !== null) {
-          this.currChannel = this.tempEpg.channel.name
-          this.currChannelId = this.tempEpg.channel.id
-          this.listCurr = JSON.parse(this.tempEpg.epg)
+          this.listCurr = this.listCurr.concat(JSON.parse(this.tempEpg.epg))
         }
 
         this.listLoading = false
@@ -88,19 +92,21 @@ export default {
         this.listLoading = false
       })
     },
-    async getAllChannels() {
-      await getAllChannels().then(data => {
+    getAllChannels() {
+      getAllChannels().then(data => {
         this.allChannels = data.items
+        this.currChannel = this.allChannels[0].name || ''
+        this.currChannelId = this.allChannels[0].id || ''
       })
     },
     passHandler() {
-      this.$confirm(`确定要将此节目单通过审核吗?`, '提示', {
+      this.$confirm(`确定要将此节目单通过审核并提交播出吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         pass({ id: this.tempEpg.id }).then(data => {
-          console.log(data)
+          uploaded({ id: this.tempEpg.id })
         })
       }).catch(() => {
         console.log('已取消')
@@ -117,6 +123,14 @@ export default {
         })
       }).catch(() => {
         console.log('已取消')
+      })
+    },
+    async getLastEpg() {
+      await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
+        this.lastEpg = data.items ? data.items[0] : null
+        if (this.lastEpg) {
+          this.listCurr.push(this.lastEpg)
+        }
       })
     }
   }

@@ -56,8 +56,8 @@ module.exports = [
     }
   },
   {
-    url: '/admin/programme/v1/epgs/[0-9]',
-    type: 'delete',
+    url: '/admin/programme/v1/epgs/batchdelete',
+    type: 'put',
     response: config => {
       return tempEpg
     }

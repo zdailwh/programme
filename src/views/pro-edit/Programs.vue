@@ -87,6 +87,16 @@ export default {
       return result
     }
   },
+  props: {
+    channel: {
+      type: String,
+      default: ''
+    },
+    channelId: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       list: null,
@@ -104,7 +114,6 @@ export default {
     }
   },
   created() {
-    this.handleFilter()
   },
   methods: {
     getList() {
@@ -128,7 +137,7 @@ export default {
         this.listLoading = false
       })
     },
-    handleFilter(channel = '', channelId = '') {
+    handleFilter() {
       this.listQuery = {
         page: 1,
         limit: 20
@@ -136,11 +145,11 @@ export default {
       if (this.filterForm.showname !== '') {
         this.listQuery.showname = this.filterForm.showname
       }
-      if (channel !== '') {
-        this.listQuery.channel = channel
+      if (this.channel !== '') {
+        this.listQuery.channel = this.channel
       }
-      if (channelId !== '') {
-        this.listQuery.channelId = channelId
+      if (this.channelId !== '') {
+        this.listQuery.channelId = this.channelId
       }
       if (this.filterForm.finishtime_range && this.filterForm.finishtime_range.length) {
         this.listQuery.finishtime_range = this.filterForm.finishtime_range

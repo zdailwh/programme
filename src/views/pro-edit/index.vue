@@ -2,8 +2,7 @@
   <div class="container">
     <div class="channelTabs">
       <el-radio-group v-model="currChannel">
-        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" :disabled="tempEpg !== null && item.label !== currChannel" />
-        <!-- <el-radio-button v-for="item in options" :key="item.value" :label="item.label" /> -->
+        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
       </el-radio-group>
     </div>
     <el-row :gutter="20">
@@ -27,7 +26,7 @@
           <div slot="header" class="clearfix">
             <span>节目列表</span>
           </div>
-          <Programs ref="programs" @append-pro="appendPro" />
+          <Programs ref="programs" :channel="currChannel" :channel-id="currChannelId" @append-pro="appendPro" />
         </el-card>
       </el-col>
     </el-row>
@@ -36,6 +35,7 @@
 <script>
 import { fetchList, createTempEpg, pend, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
+import { getLastEpg } from '@/api/epg'
 import Programs from './Programs.vue'
 import Edit from './Edit.vue'
 
@@ -78,7 +78,8 @@ export default {
       allChannels: [],
       listCurr: [],
       firstStartTime: parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000),
-      updateStartIdx: 0
+      updateStartIdx: 0,
+      lastEpg: null
     }
   },
   watch: {
@@ -107,33 +108,32 @@ export default {
       }
     },
     currChannel: function(newVal) {
-      if (!this.currChannelId) {
-        var filteredOpt = this.options.filter((item, idx, arr) => {
-          return item.label === newVal
-        })
-        this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
-      }
-      // 获取指定频道下的节目列表
-      this.$refs.programs.handleFilter(this.currChannel, this.currChannelId)
+      var filteredOpt = this.options.filter((item, idx, arr) => {
+        return item.label === newVal
+      })
+      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
+
+      this.listCurr = []
+      // 获取指定频道下的最后一条在播节目
+      this.getLastEpg().then(() => {
+        // 获取指定频道下的临时节目单
+        this.getTempEpg()
+        // 获取指定频道下的节目列表
+        this.$refs.programs.handleFilter()
+      })
     }
   },
   mounted() {
-    this.getAllChannels().then(() => {
-      this.getTempEpg()
-    })
+    this.getAllChannels()
   },
   methods: {
     // 获取临时节目单
     getTempEpg() {
       this.listLoading = true
-      fetchList({ page: 1, limit: 20 }).then(data => {
+      fetchList({ page: 1, limit: 20, channelId: this.currChannelId, status: [0, 3] }).then(data => {
         this.tempEpg = data.items ? data.items[0] : null
-        console.log('已保存的编单记录')
-        console.log(this.tempEpg)
         if (this.tempEpg !== null) {
-          this.currChannel = this.tempEpg.channel.name
-          this.currChannelId = this.tempEpg.channel.id
-          this.listCurr = JSON.parse(this.tempEpg.epg)
+          this.listCurr = this.listCurr.concat(JSON.parse(this.tempEpg.epg))
           // this.listCurr = JSON.parse(tempEpgDemo)
         }
 
@@ -142,9 +142,11 @@ export default {
         this.listLoading = false
       })
     },
-    async getAllChannels() {
-      await getAllChannels().then(data => {
+    getAllChannels() {
+      getAllChannels().then(data => {
         this.allChannels = data.items
+        this.currChannel = this.allChannels[0].name || ''
+        this.currChannelId = this.allChannels[0].id || ''
       })
     },
     // 向节目单插入记录
@@ -261,6 +263,15 @@ export default {
         })
       }).catch(() => {
         console.log('已取消')
+      })
+    },
+    async getLastEpg() {
+      await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
+        this.lastEpg = data.items ? data.items[0] : null
+        if (this.lastEpg) {
+          this.listCurr.push(this.lastEpg)
+          this.firstStartTime = this.lastEpg.starttime || parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000)
+        }
       })
     }
   }

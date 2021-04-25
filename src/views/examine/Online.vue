@@ -1,5 +1,22 @@
 <template>
   <div class="programListWrap">
+    <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
+      <el-form-item prop="starttime">
+        <el-date-picker
+          v-model="filterForm.starttime"
+          style="width:200px"
+          type="datetime"
+          value-format="yyyy-MM-dd HH:mm:ss"
+          placeholder="起始时间"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+          查找
+        </el-button>
+      </el-form-item>
+    </el-form>
+
     <el-table v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600">
       <el-table-column type="index" width="50" />
       <el-table-column label="开始时间" align="center">
@@ -29,7 +46,7 @@
             width="170"
             trigger="hover"
           >
-            <p>确定要删除此节目吗？</p>
+            <p>确定要删除此节目及之后的所有节目吗？</p>
             <div style="text-align: right; margin: 0">
               <el-button type="danger" size="mini" @click="delEpg(row.id, $index)">确定</el-button>
             </div>
@@ -70,6 +87,12 @@ export default {
       return result
     }
   },
+  props: {
+    channelId: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       list: null,
@@ -80,6 +103,7 @@ export default {
         limit: 20
       },
       filterForm: {
+        starttime: ''
       }
     }
   },
@@ -101,13 +125,16 @@ export default {
         })
       })
     },
-    handleFilter(channelId = '') {
+    handleFilter() {
       this.listQuery = {
         page: 1,
         limit: 20
       }
-      if (channelId !== '') {
-        this.listQuery.channelId = channelId
+      if (this.channelId !== '') {
+        this.listQuery.channelId = this.channelId
+      }
+      if (this.filterForm.starttime) {
+        this.listQuery.starttime = this.filterForm.starttime
       }
       this.getList()
     },

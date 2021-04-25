@@ -9,6 +9,25 @@ export function fetchList(query) {
   if (query.channelId !== '') {
     params.channelId = query.channelId
   }
+  if (query.starttime !== '') {
+    params.starttime = query.starttime
+  }
+
+  return request({
+    url: '/admin/programme/v1/epgs',
+    method: 'get',
+    params
+  })
+}
+
+export function getLastEpg(query) {
+  var params = {
+    per_page: 1
+  }
+
+  if (query.channelId !== '') {
+    params.channelId = query.channelId
+  }
 
   return request({
     url: '/admin/programme/v1/epgs',
@@ -19,7 +38,10 @@ export function fetchList(query) {
 
 export function deleteEpg(query) {
   return request({
-    url: '/admin/programme/v1/epgs/' + query.id,
-    method: 'delete'
+    url: '/admin/programme/v1/epgs/batchdelete',
+    method: 'put',
+    data: {
+      startId: query.id
+    }
   })
 }
