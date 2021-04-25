@@ -19,15 +19,10 @@
           查找
         </el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button class="filter-item" type="primary" icon="el-icon-d-arrow-left" :disabled="!selectedItems.length" @click="handleAddSelected">
-          插入
-        </el-button>
-      </el-form-item>
     </el-form>
 
-    <el-table ref="multipleTable" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" @selection-change="handleSelectionChange" @sort-change="handleSortChange">
-      <el-table-column type="selection" width="50" />
+    <el-table ref="multipleTable" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" @row-dblclick="handleDblclick">
+      <!-- <el-table-column type="selection" width="50" /> -->
       <el-table-column type="index" width="40" />
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
@@ -49,7 +44,7 @@
           <span>{{ row.coderate }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="导入时间" align="center" sortable="custom" prop="finishtime">
+      <el-table-column label="导入时间" align="center">
         <template slot-scope="{row}">
           <span>{{ row.finishtime }}</span>
         </template>
@@ -93,8 +88,8 @@ export default {
       default: ''
     },
     channelId: {
-      type: String,
-      default: ''
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -109,8 +104,7 @@ export default {
       filterForm: {
         showname: '',
         finishtime_range: []
-      },
-      selectedItems: []
+      }
     }
   },
   created() {
@@ -148,7 +142,7 @@ export default {
       if (this.channel !== '') {
         this.listQuery.channel = this.channel
       }
-      if (this.channelId !== '') {
+      if (this.channelId) {
         this.listQuery.channelId = this.channelId
       }
       if (this.filterForm.finishtime_range && this.filterForm.finishtime_range.length) {
@@ -156,15 +150,9 @@ export default {
       }
       this.getList()
     },
-    handleSelectionChange(val) {
-      this.selectedItems = val
-    },
-    handleSortChange(val) {
-      console.log(val)
-    },
-    handleAddSelected() {
-      this.$emit('append-pro', { items: this.selectedItems })
-      this.$refs.multipleTable.clearSelection()
+    // 双击插入
+    handleDblclick(item) {
+      this.$emit('append-pro', { items: [item] })
     }
   }
 }

@@ -89,8 +89,8 @@ export default {
   },
   props: {
     channelId: {
-      type: String,
-      default: ''
+      type: Number,
+      default: 0
     }
   },
   data() {
@@ -130,7 +130,7 @@ export default {
         page: 1,
         limit: 20
       }
-      if (this.channelId !== '') {
+      if (this.channelId) {
         this.listQuery.channelId = this.channelId
       }
       if (this.filterForm.starttime) {

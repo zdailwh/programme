@@ -73,7 +73,7 @@ export default {
     return {
       tempEpg: null,
       currChannel: '',
-      currChannelId: '',
+      currChannelId: 0,
       options: [],
       allChannels: [],
       listCurr: [],
@@ -111,7 +111,7 @@ export default {
       var filteredOpt = this.options.filter((item, idx, arr) => {
         return item.label === newVal
       })
-      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : ''
+      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : 0
 
       this.listCurr = []
       // 获取指定频道下的最后一条在播节目
@@ -146,7 +146,7 @@ export default {
       getAllChannels().then(data => {
         this.allChannels = data.items
         this.currChannel = this.allChannels[0].name || ''
-        this.currChannelId = this.allChannels[0].id || ''
+        this.currChannelId = this.allChannels[0].id || 0
       })
     },
     // 向节目单插入记录
