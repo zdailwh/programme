@@ -39,18 +39,18 @@ import { getAllChannels } from '@/api/channel'
 import Programs from './Programs.vue'
 import Edit from './Edit.vue'
 
-var tempEpgDemo = [{
+var tempEpgDemo = JSON.stringify([{
   name: '节目名1',
   starttime: '2021-04-22 13:45:06.345',
   endtime: '2021-04-22 13:48:06.345',
-  duration: '180000'
+  duration: '180123'
 },
 {
   name: '节目名2',
   starttime: '2021-04-22 13:48:06.345',
   endtime: '2021-04-22 13:53:06.345',
-  duration: '300000'
-}]
+  duration: '300456'
+}])
 export default {
   components: { Programs, Edit },
   beforeRouteLeave(to, from, next) {
@@ -90,7 +90,7 @@ export default {
           } else if (idx > this.updateStartIdx) {
             item.starttime = arr[idx - 1].endtime
           }
-          item.endtime = parseTime(new Date(item.starttime).getTime() + item.duration * 1000)
+          item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
         })
       },
       deep: true
@@ -128,7 +128,8 @@ export default {
         console.log(this.tempEpg)
         if (this.tempEpg !== null) {
           this.currChannel = this.tempEpg.name
-          this.listCurr = JSON.parse(this.tempEpg.epg)
+          // this.listCurr = JSON.parse(this.tempEpg.epg)
+          this.listCurr = JSON.parse(tempEpgDemo)
         }
 
         this.listLoading = false
@@ -148,7 +149,7 @@ export default {
       if (insertIdx !== -1) {
         // 插入到指定节目之后
         pros.map((item, idx, arr) => {
-          this.listCurr.splice(insertIdx + 1, 0, item)
+          this.listCurr.splice(insertIdx + 1 + idx, 0, item)
         })
       } else {
         // 插入到尾部
@@ -182,7 +183,7 @@ export default {
     createHandler() {
       var epg = this.listCurr.map((item, idx, arr) => {
         return {
-          name: item.showname,
+          name: item.name,
           starttime: item.starttime,
           endtime: item.endtime,
           duration: item.duration
@@ -230,9 +231,25 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        var epg = this.listCurr.map((item, idx, arr) => {
+          return {
+            name: item.name,
+            starttime: item.starttime,
+            endtime: item.endtime,
+            duration: item.duration
+          }
+        })
+        console.log(epg)
+        if (!epg.length) {
+          this.$message({
+            message: '编单不能为空！',
+            type: 'warning'
+          })
+          return
+        }
         var params = {
           id: this.tempEpg.id,
-          epg: JSON.stringify(this.listCurr)
+          epg: JSON.stringify(epg)
         }
         updateTempEpg(params).then(data => {
           console.log(data)
@@ -248,15 +265,6 @@ function deepClone2(obj) {
   var objClone = JSON.parse(_obj)
   return objClone
 }
-function toDub(n) {
-  if (n < 10) return '0' + n
-  else return n
-}
-function toThr(n) {
-  if (n < 10) return '00' + n
-  else if (n < 100) return '0' + n
-  else return n
-}
 function parseTime(time) {
   const date = new Date(time)
 
@@ -270,7 +278,8 @@ function parseTime(time) {
     a: date.getDay(),
     ms: date.getMilliseconds()
   }
-  return `${formatObj.y}-${toDub(formatObj.m)}-${toDub(formatObj.d)} ${toDub(formatObj.h)}:${toDub(formatObj.i)}:${toDub(formatObj.s)}.${toThr(formatObj.ms)}`
+
+  return `${formatObj.y}-${formatObj.m.toString().padStart(2, '0')}-${formatObj.d.toString().padStart(2, '0')} ${formatObj.h.toString().padStart(2, '0')}:${formatObj.i.toString().padStart(2, '0')}:${formatObj.s.toString().padStart(2, '0')}.${formatObj.ms.toString().padStart(3, '0')}`
 }
 </script>
 <style scoped>

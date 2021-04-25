@@ -11,7 +11,7 @@ for (let i = 0; i < count; i++) {
     chnids: '所属频道ID',
     chnnames: '所属频道',
     name: '文件名称',
-    'duration|300-1800': 100, // 秒 5分钟-30分钟
+    'duration|300000-1800000': 100, // 毫秒 5分钟-30分钟
     finishtime: '@date',
     size: 12345,
     coderate: 801846,
@@ -31,7 +31,7 @@ const program = Mock.mock({
   chnids: '所属频道ID',
   chnnames: '所属频道',
   name: '文件名称',
-  'duration|300-1800': 100, // 秒 5分钟-30分钟
+  'duration|300000-1800000': 100, // 毫秒 5分钟-30分钟
   finishtime: '@date',
   size: 12345,
   coderate: 801846,
