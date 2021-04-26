@@ -192,6 +192,9 @@ export default {
       this.listCurr = this.listCurr.concat(pros)
     },
     updateStartTime({ index, starttime }) {
+      if (this.lastEpg !== null) {
+        index = index - 1
+      }
       this.updateStartIdx = index
       this.firstStartTime = starttime
       this.listCurr[index].starttime = starttime

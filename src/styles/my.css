@@ -28,6 +28,9 @@
 .el-card__body {
   padding: 10px !important;
 }
+.programListWrap {
+  user-select: none
+}
 .programListWrap .pagination-container {
   padding: 15px 0 !important;
 }

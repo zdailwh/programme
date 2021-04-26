@@ -94,10 +94,25 @@ export default {
     return {
       selectedItems: [],
       currentRow: null,
-      myStartTime: ''
+      myStartTime: '',
+      pin: false
     }
   },
   created() {
+  },
+  mounted() {
+    window.addEventListener('keydown', code => {
+      if (code.keyCode === 16 && code.shiftKey) {
+        // 判断是否按住shift键，是就把pin赋值为true
+        this.pin = true
+      }
+    })
+    window.addEventListener('keyup', code => {
+      if (code.keyCode === 16) {
+        // 判断是否松开shift键，是就把pin赋值为false
+        this.pin = false
+      }
+    })
   },
   methods: {
     setDefaultStartTime(starttime) {
@@ -117,11 +132,27 @@ export default {
     handleSelectionChange(val) {
       this.selectedItems = val
     },
-    handleCurrentChange(val) {
+    handleCurrentChange(val, oldVal) {
       this.currentRow = val
+      // checkbox选中逻辑
       this.$refs.multipleTable.clearSelection()
-      if (val && !val.isTheLastEpg) {
-        this.$refs.multipleTable.toggleRowSelection(val)
+      var startIdx = this.listCurr.indexOf(oldVal)
+      var endIdx = this.listCurr.indexOf(val)
+      if (startIdx !== -1 && this.pin) {
+        const sum = Math.abs(startIdx - endIdx) + 1
+        const min = Math.min(startIdx, endIdx)
+        let i = 0
+        while (i < sum) {
+          const index = min + i
+          if (this.listCurr[index] && !this.listCurr[index].isTheLastEpg) {
+            this.$refs.multipleTable.toggleRowSelection(this.listCurr[index], true)
+          }
+          i++
+        }
+      } else {
+        if (val && !val.isTheLastEpg) {
+          this.$refs.multipleTable.toggleRowSelection(val)
+        }
       }
     },
     selectable(row) {
