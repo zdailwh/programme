@@ -77,7 +77,7 @@ export default {
       options: [],
       allChannels: [],
       listCurr: [],
-      firstStartTime: parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000),
+      firstStartTime: '',
       updateStartIdx: 0,
       lastEpg: null
     }
@@ -208,7 +208,6 @@ export default {
           duration: parseInt(item.duration)
         }
       })
-      console.log(epg)
       if (!this.currChannelId) {
         this.$message({
           message: '请选择频道！',
@@ -260,7 +259,6 @@ export default {
             duration: parseInt(item.duration)
           }
         })
-        console.log(epg)
         if (!epg.length) {
           this.$message({
             message: '编单不能为空！',
@@ -287,7 +285,9 @@ export default {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
-          this.firstStartTime = this.lastEpg.endtime || parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000)
+          this.firstStartTime = this.lastEpg.endtime
+        } else {
+          this.firstStartTime = parseTime((new Date(new Date().toLocaleDateString()).getTime()) + 24 * 60 * 60 * 1000)
         }
       })
     }
