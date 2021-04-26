@@ -16,7 +16,7 @@
     <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
       <el-table-column type="selection" width="50" :selectable="selectable" />
       <el-table-column type="index" width="40" />
-      <el-table-column label="开始时间" align="center">
+      <el-table-column label="开始时间" align="center" class-name="start-time">
         <template slot-scope="{row}">
           <span>{{ row.starttime }}</span>
         </template>
@@ -39,6 +39,7 @@
       <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-popover
+            v-if="!row.isTheLastEpg"
             title="节目开始时间"
             placement="top"
             width="190"
@@ -165,6 +166,13 @@ export default {
     tableRowClassName({ row, rowIndex }) {
       if (row && row.isTheLastEpg) {
         return 'bg-gray'
+      }
+      if (rowIndex) {
+        var startT = new Date(this.listCurr[rowIndex].starttime).getTime()
+        var prevEndT = new Date(this.listCurr[rowIndex - 1].endtime).getTime()
+        if (startT > prevEndT) {
+          return 'bg-orange'
+        }
       }
     }
   }

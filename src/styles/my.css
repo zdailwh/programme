@@ -42,4 +42,7 @@
 }
 tr.bg-gray {
   background-color: #DCDFE6 !important;
-} 
+}
+tr.bg-orange .start-time {
+  background-color: #E6A23C !important;
+}

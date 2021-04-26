@@ -2,7 +2,7 @@
   <div class="programListWrap">
     <el-table :data="listCurr" size="mini" fit style="width: 100%;" height="600" :row-class-name="tableRowClassName">
       <el-table-column type="index" width="50" />
-      <el-table-column label="开始时间" align="center">
+      <el-table-column label="开始时间" align="center" class-name="start-time">
         <template slot-scope="{row}">
           <span>{{ row.starttime }}</span>
         </template>
@@ -69,6 +69,13 @@ export default {
     tableRowClassName({ row, rowIndex }) {
       if (row && row.isTheLastEpg) {
         return 'bg-gray'
+      }
+      if (rowIndex) {
+        var startT = new Date(this.listCurr[rowIndex].starttime).getTime()
+        var prevEndT = new Date(this.listCurr[rowIndex - 1].endtime).getTime()
+        if (startT > prevEndT) {
+          return 'bg-orange'
+        }
       }
     }
   }

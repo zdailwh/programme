@@ -17,9 +17,9 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600">
+    <el-table v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" :row-class-name="tableRowClassName">
       <el-table-column type="index" width="50" />
-      <el-table-column label="开始时间" align="center">
+      <el-table-column label="开始时间" align="center" class-name="start-time">
         <template slot-scope="{row}">
           <span>{{ row.starttime }}</span>
         </template>
@@ -141,7 +141,7 @@ export default {
     delEpg(id, idx) {
       deleteEpg({ id: id }).then(response => {
         this.$message({
-          message: '删除成功！',
+          message: `${response.delcnt}条节目被成功删除！`,
           type: 'success'
         })
         this.getList()
@@ -151,6 +151,15 @@ export default {
           type: 'error'
         })
       })
+    },
+    tableRowClassName({ row, rowIndex }) {
+      // if (rowIndex) {
+      //   var startT = new Date(this.list[rowIndex].starttime).getTime()
+      //   var prevEndT = new Date(this.list[rowIndex - 1].endtime).getTime()
+      //   if (startT > prevEndT) {
+      //     return 'bg-orange'
+      //   }
+      // }
     }
   }
 }
