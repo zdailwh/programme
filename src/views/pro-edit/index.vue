@@ -228,7 +228,8 @@ export default {
         epg: JSON.stringify(epg)
       }
       createTempEpg(params).then(data => {
-        this.$router.go(0)
+        this.listCurr = []
+        this.getTempEpg()
       })
     },
     pendHandler() {

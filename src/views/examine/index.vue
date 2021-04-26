@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-import { fetchList, pass, fail, upload } from '@/api/temp-epg'
+import { fetchList, pass, fail, upload, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
 import { getLastEpg } from '@/api/epg'
 import Online from './Online.vue'
@@ -115,13 +115,22 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        pass({ id: this.tempEpg.id }).then(data => {
-          upload({ id: this.tempEpg.id }).then(() => {
-            this.$message({
-              message: '节目单已通过审核并提交播出！',
-              type: 'success'
+        updateTempEpg({ id: this.tempEpg.id }).then(() => {
+          pass({ id: this.tempEpg.id }).then(data => {
+            upload({ id: this.tempEpg.id }).then(() => {
+              this.$message({
+                message: '节目单已通过审核并提交播出！',
+                type: 'success'
+              })
+              // 获取指定频道下的最后一条在播节目
+              this.getLastEpg().then(() => {
+                // 获取指定频道下的临时节目单
+                this.listCurr = []
+                this.getTempEpg()
+                // 获取指定频道下的在播节目单
+                this.$refs.epgs.handleFilter()
+              })
             })
-            this.$router.go(0)
           })
         })
       }).catch(() => {
@@ -134,8 +143,10 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        fail({ id: this.tempEpg.id }).then(data => {
-          this.$router.push({ name: 'ProEditMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
+        updateTempEpg({ id: this.tempEpg.id }).then(() => {
+          fail({ id: this.tempEpg.id }).then(data => {
+            this.$router.push({ name: 'ProEditMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
+          })
         })
       }).catch(() => {
         console.log('已取消')

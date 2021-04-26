@@ -24,12 +24,14 @@ export function createTempEpg(data) {
 }
 
 export function updateTempEpg(data) {
+  var params = {}
+  if (data.epg) {
+    params.epg = data.epg
+  }
   return request({
     url: '/admin/programme/v1/tempepgs/' + data.id,
     method: 'put',
-    data: {
-      epg: data.epg
-    }
+    data: params
   })
 }
 
