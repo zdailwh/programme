@@ -54,9 +54,9 @@ export function fail(query) {
   })
 }
 
-export function uploaded(query) {
+export function upload(query) {
   return request({
-    url: '/admin/programme/v1/tempepgs/' + query.id + '/uploaded',
+    url: '/admin/programme/v1/tempepgs/' + query.id + '/upload',
     method: 'put'
   })
 }

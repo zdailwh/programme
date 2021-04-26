@@ -1,6 +1,6 @@
 <template>
   <div class="programListWrap">
-    <el-table :data="listCurr" size="mini" fit style="width: 100%;" height="600">
+    <el-table :data="listCurr" size="mini" fit style="width: 100%;" height="600" :row-class-name="tableRowClassName">
       <el-table-column type="index" width="50" />
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
@@ -66,6 +66,11 @@ export default {
   created() {
   },
   methods: {
+    tableRowClassName({ row, rowIndex }) {
+      if (row && row.isTheLastEpg) {
+        return 'bg-gray'
+      }
+    }
   }
 }
 </script>

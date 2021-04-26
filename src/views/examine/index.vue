@@ -9,13 +9,13 @@
       <el-col :span="12">
         <el-card shadow="always">
           <div slot="header" class="clearfix">
-            <span>新编节目单</span>
+            <span>新编节目单 <span v-if="tempEpg !== null" style="color: #F56C6C;">（{{ tempEpg.statusstr }}）</span></span>
             <template v-if="tempEpg !== null">
               <el-button type="text" icon="el-icon-finished" class="cardBtn" @click="passHandler">审核通过</el-button>
               <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
             </template>
           </div>
-          <Waiting :list-curr="listCurr" />
+          <Waiting :list-curr="listCurrComp" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-import { fetchList, pass, fail, uploaded } from '@/api/temp-epg'
+import { fetchList, pass, fail, upload } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
 import { getLastEpg } from '@/api/epg'
 import Online from './Online.vue'
@@ -45,7 +45,17 @@ export default {
       currChannelId: 0,
       options: [],
       allChannels: [],
-      listCurr: []
+      listCurr: [],
+      lastEpg: null
+    }
+  },
+  computed: {
+    listCurrComp: function() {
+      if (this.lastEpg !== null) {
+        return [this.lastEpg].concat(this.listCurr)
+      } else {
+        return this.listCurr
+      }
     }
   },
   watch: {
@@ -95,8 +105,8 @@ export default {
     getAllChannels() {
       getAllChannels().then(data => {
         this.allChannels = data.items
-        this.currChannel = this.allChannels[0].name || ''
-        this.currChannelId = this.allChannels[0].id || 0
+        this.currChannel = this.$route.query.currChannel || this.allChannels[0].name || ''
+        this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
       })
     },
     passHandler() {
@@ -106,7 +116,13 @@ export default {
         type: 'warning'
       }).then(() => {
         pass({ id: this.tempEpg.id }).then(data => {
-          uploaded({ id: this.tempEpg.id })
+          upload({ id: this.tempEpg.id }).then(() => {
+            this.$message({
+              message: '节目单已通过审核并提交播出！',
+              type: 'success'
+            })
+            this.$router.go(0)
+          })
         })
       }).catch(() => {
         console.log('已取消')
@@ -119,7 +135,7 @@ export default {
         type: 'warning'
       }).then(() => {
         fail({ id: this.tempEpg.id }).then(data => {
-          this.$router.push({ path: '/proEdit/index' })
+          this.$router.push({ name: 'ProEditMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
         })
       }).catch(() => {
         console.log('已取消')
@@ -129,7 +145,7 @@ export default {
       await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
-          this.listCurr.push(this.lastEpg)
+          this.lastEpg.isTheLastEpg = true
         }
       })
     }

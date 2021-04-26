@@ -18,7 +18,7 @@
               <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
           </div>
-          <Edit ref="editlist" :list-curr="listCurr" @remove-pro="removePro" @copy-pro="copyPro" @update-start-time="updateStartTime" />
+          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @update-start-time="updateStartTime" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -80,6 +80,15 @@ export default {
       firstStartTime: parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000),
       updateStartIdx: 0,
       lastEpg: null
+    }
+  },
+  computed: {
+    listCurrComp: function() {
+      if (this.lastEpg !== null) {
+        return [this.lastEpg].concat(this.listCurr)
+      } else {
+        return this.listCurr
+      }
     }
   },
   watch: {
@@ -145,8 +154,8 @@ export default {
     getAllChannels() {
       getAllChannels().then(data => {
         this.allChannels = data.items
-        this.currChannel = this.allChannels[0].name || ''
-        this.currChannelId = this.allChannels[0].id || 0
+        this.currChannel = this.$route.query.currChannel || this.allChannels[0].name || ''
+        this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
       })
     },
     // 向节目单插入记录
@@ -164,7 +173,7 @@ export default {
       }
 
       // 表格单选行取消选择
-      this.$refs.editlist.$refs.multipleTable.setCurrentRow()
+      // this.$refs.editlist.$refs.multipleTable.setCurrentRow()
     },
     // 删除节目单中的记录
     removePro(params) {
@@ -216,7 +225,7 @@ export default {
         epg: JSON.stringify(epg)
       }
       createTempEpg(params).then(data => {
-        console.log(data)
+        this.$router.go(0)
       })
     },
     pendHandler() {
@@ -226,7 +235,8 @@ export default {
         type: 'warning'
       }).then(() => {
         pend({ id: this.tempEpg.id }).then(data => {
-          this.$router.push({ path: '/examine/index' })
+          this.listCurr = []
+          this.$router.push({ name: 'ExamineMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
         })
       }).catch(() => {
         console.log('已取消')
@@ -259,7 +269,10 @@ export default {
           epg: JSON.stringify(epg)
         }
         updateTempEpg(params).then(data => {
-          console.log(data)
+          this.$message({
+            message: '编单修改成功！',
+            type: 'success'
+          })
         })
       }).catch(() => {
         console.log('已取消')
@@ -269,8 +282,8 @@ export default {
       await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
-          this.listCurr.push(this.lastEpg)
-          this.firstStartTime = this.lastEpg.starttime || parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000)
+          this.lastEpg.isTheLastEpg = true
+          this.firstStartTime = this.lastEpg.endtime || parseTime((new Date().getTime()) - 24 * 60 * 60 * 1000)
         }
       })
     }

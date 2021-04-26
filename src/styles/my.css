@@ -34,3 +34,9 @@
 .programListWrap .el-table .el-button {
   padding: 0 !important;
 }
+.programListWrap .el-table__body tr.current-row>td {
+  background-color: #a0dbfb;
+}
+tr.bg-gray {
+  background-color: #DCDFE6 !important;
+} 

@@ -91,7 +91,7 @@ module.exports = [
     }
   },
   {
-    url: '/admin/programme/v1/tempepgs/[0-9]/uploaded',
+    url: '/admin/programme/v1/tempepgs/[0-9]/upload',
     type: 'put',
     response: config => {
       return tempEpg

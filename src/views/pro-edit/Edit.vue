@@ -13,8 +13,8 @@
       </el-form-item>
     </el-form>
 
-    <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
-      <el-table-column type="selection" width="50" />
+    <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
+      <el-table-column type="selection" width="50" :selectable="selectable" />
       <el-table-column type="index" width="40" />
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
@@ -119,6 +119,22 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentRow = val
+      this.$refs.multipleTable.clearSelection()
+      if (val && !val.isTheLastEpg) {
+        this.$refs.multipleTable.toggleRowSelection(val)
+      }
+    },
+    selectable(row) {
+      if (row && row.isTheLastEpg) {
+        return false
+      } else {
+        return true
+      }
+    },
+    tableRowClassName({ row, rowIndex }) {
+      if (row && row.isTheLastEpg) {
+        return 'bg-gray'
+      }
     }
   }
 }
