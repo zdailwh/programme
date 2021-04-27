@@ -15,7 +15,7 @@
 
     <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
       <el-table-column type="selection" width="50" :selectable="selectable" />
-      <el-table-column type="index" width="40" />
+      <!-- <el-table-column type="index" width="40" /> -->
       <el-table-column label="开始时间" align="center" class-name="start-time">
         <template slot-scope="{row}">
           <span>{{ row.starttime }}</span>
@@ -29,6 +29,11 @@
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="文件名" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.filename }}</span>
         </template>
       </el-table-column>
       <el-table-column label="时长" align="center">

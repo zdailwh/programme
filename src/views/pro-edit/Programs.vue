@@ -29,6 +29,11 @@
           <span>{{ row.showname }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="文件名" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.name }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="文件大小" align="center">
         <template slot-scope="{row}">
           <span>{{ row.size }}</span>
@@ -118,6 +123,7 @@ export default {
             item.starttime = ''
             item.endtime = ''
             item.name = item.showname
+            item.filename = item.name
           })
           this.list = data.items
         } else {
