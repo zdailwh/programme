@@ -33,6 +33,7 @@
   </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, createTempEpg, pend, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
 import { getLastEpg } from '@/api/epg'
@@ -61,6 +62,9 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
+        // 保存频道信息和临时节目信息到cookie
+        Cookies.set('programme_lasted_tempepgs', this.listCurr)
+        Cookies.set('programme_lasted_channel', this.currChannel)
         next()
       }).catch(() => {
         next(false)
@@ -116,12 +120,18 @@ export default {
         })
       }
     },
-    currChannel: function(newVal) {
+    currChannel: function(newVal, oldVal) {
       var filteredOpt = this.options.filter((item, idx, arr) => {
         return item.label === newVal
       })
       this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : 0
 
+      if (this.listCurr.length) {
+        console.log('更新cookie')
+        // 保存频道信息和临时节目信息到cookie
+        Cookies.set('programme_lasted_tempepgs', this.listCurr)
+        Cookies.set('programme_lasted_channel', oldVal)
+      }
       this.listCurr = []
       // 获取指定频道下的最后一条在播节目
       this.getLastEpg().then(() => {
@@ -144,6 +154,18 @@ export default {
         if (this.tempEpg !== null) {
           this.listCurr = this.listCurr.concat(JSON.parse(this.tempEpg.epg))
           // this.listCurr = JSON.parse(tempEpgDemo)
+        } else {
+          console.log('没有临时节目单')
+          // console.log(Cookies.get('programme_lasted_channel'))
+          console.log(Cookies.get('programme_lasted_channel'))
+          console.log(this.currChannel)
+          // console.log(Cookies.get('programme_lasted_tempepgs'))
+          console.log(JSON.parse(Cookies.get('programme_lasted_tempepgs')))
+          if (Cookies.get('programme_lasted_channel') && Cookies.get('programme_lasted_channel') === this.currChannel) {
+            if (Cookies.get('programme_lasted_tempepgs')) {
+              this.listCurr = this.listCurr.concat(JSON.parse(Cookies.get('programme_lasted_tempepgs')))
+            }
+          }
         }
 
         this.listLoading = false
@@ -154,8 +176,8 @@ export default {
     getAllChannels() {
       getAllChannels().then(data => {
         this.allChannels = data.items
-        this.currChannel = this.$route.query.currChannel || this.allChannels[0].name || ''
-        this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
+        this.currChannel = this.$route.query.currChannel || Cookies.get('programme_lasted_channel') || this.allChannels[0].name || ''
+        // this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
       })
     },
     // 向节目单插入记录
@@ -203,6 +225,7 @@ export default {
       var epg = this.listCurr.map((item, idx, arr) => {
         return {
           name: item.name,
+          filename: item.filename,
           starttime: item.starttime,
           endtime: item.endtime,
           duration: parseInt(item.duration)
@@ -228,6 +251,7 @@ export default {
       }
       createTempEpg(params).then(data => {
         this.listCurr = []
+        Cookies.remove('programme_lasted_tempepgs')
         this.getTempEpg()
       })
     },
@@ -239,6 +263,7 @@ export default {
       }).then(() => {
         pend({ id: this.tempEpg.id }).then(data => {
           this.listCurr = []
+          Cookies.remove('programme_lasted_tempepgs')
           this.$router.push({ name: 'ExamineMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
         })
       }).catch(() => {
@@ -254,6 +279,7 @@ export default {
         var epg = this.listCurr.map((item, idx, arr) => {
           return {
             name: item.name,
+            filename: item.filename,
             starttime: item.starttime,
             endtime: item.endtime,
             duration: parseInt(item.duration)
