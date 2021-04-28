@@ -4,12 +4,12 @@
       <!-- <el-table-column type="index" width="50" /> -->
       <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.starttime }}</span>
+          <span>{{ row.starttime.substring(0, row.starttime.length - 4) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.endtime }}</span>
+          <span>{{ row.endtime.substring(0, row.endtime.length - 4) }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目名称" align="center">
@@ -40,7 +40,7 @@ export default {
   filters: {
     formateSeconds(second) {
       let secondTime = parseInt(second / 1000)
-      var haomiao = parseInt(second % 1000)
+      // var haomiao = parseInt(second % 1000)
       let min = 0 // 初始化分
       let h = 0 // 初始化小时
       let result = ''
@@ -52,7 +52,7 @@ export default {
           min = parseInt(min % 60) // 获取小时后取佘的分，获取分钟除以60取佘的分
         }
       }
-      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}.${haomiao.toString().padStart(3, '0')}`
+      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}`
       return result
     }
   },

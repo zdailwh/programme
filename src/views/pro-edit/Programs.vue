@@ -71,7 +71,7 @@ export default {
   filters: {
     formateSeconds(second) {
       let secondTime = parseInt(second / 1000)
-      var haomiao = parseInt(second % 1000)
+      // var haomiao = parseInt(second % 1000)
       let min = 0 // 初始化分
       let h = 0 // 初始化小时
       let result = ''
@@ -83,7 +83,7 @@ export default {
           min = parseInt(min % 60) // 获取小时后取佘的分，获取分钟除以60取佘的分
         }
       }
-      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}.${haomiao.toString().padStart(3, '0')}`
+      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}`
       return result
     }
   },
