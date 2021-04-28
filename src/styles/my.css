@@ -37,12 +37,37 @@
 .programListWrap .el-table .el-button {
   padding: 0 !important;
 }
-.programListWrap .el-table__body tr.current-row>td {
-  background-color: #a0dbfb;
+.programListWrap .el-table .cell {
+  padding: 0 3px;
+}
+.programListWrap .el-table td {
+  padding: 3px 0;
+}
+.programListWrap.tempEpgTableWrap .el-table__body tr.current-row>td {
+  border-top: 1px solid red;
+  border-bottom: 1px solid red;
+  background-color: transparent !important;
+}
+.programListWrap.tempEpgTableWrap .el-table__body tr.current-row>td:first-child {
+  border-left: 1px solid red;
+}
+.programListWrap.tempEpgTableWrap .el-table__body tr.current-row>td:last-child {
+  border-right: 1px solid red;
+}
+.programListWrap.tempEpgTableWrap .el-table tbody tr:hover>td { 
+    background-color: transparent !important;
 }
 tr.bg-gray {
   background-color: #DCDFE6 !important;
 }
-tr.bg-orange .start-time {
-  background-color: #E6A23C !important;
+tr.bg-red {
+  background-color: #F56C6C !important;
+  color: #fff;
+}
+tr.bg-blue {
+  background-color: #409EFF !important;
+  color: #fff;
+}
+tr.bg-red .el-button--text, tr.bg-blue .el-button--text {
+  color: #fff;
 }

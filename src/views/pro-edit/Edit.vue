@@ -1,5 +1,5 @@
 <template>
-  <div class="programListWrap">
+  <div class="programListWrap tempEpgTableWrap">
     <el-form ref="filterForm" :inline="true" size="mini" class="filter-form">
       <el-form-item>
         <el-button class="filter-item" type="primary" icon="el-icon-document-copy" :disabled="!selectedItems.length" @click="handleCopySelected">
@@ -14,9 +14,28 @@
     </el-form>
 
     <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
-      <el-table-column type="selection" width="50" :selectable="selectable" />
+      <el-table-column type="selection" width="50" align="center" :selectable="selectable" />
       <!-- <el-table-column type="index" width="40" /> -->
-      <el-table-column label="开始时间" align="center" class-name="start-time">
+      <el-table-column label="操作" align="center" width="50">
+        <template slot-scope="{row, $index}">
+          <el-popover
+            v-if="!row.isTheLastEpg"
+            title="节目开始时间"
+            placement="top"
+            width="220"
+            trigger="click"
+            @show="setDefaultStartTime(row.starttime)"
+          >
+            <el-input v-model="myStartTime" size="small" placeholder="请输入节目开始时间" style="margin-bottom: 10px;" />
+            <div style="text-align: right; margin: 0">
+              <el-button type="danger" size="mini" @click="fixedTime(row, $index)">定时播</el-button>
+              <el-button type="primary" size="mini" @click="turnTime(row, $index)">顺播</el-button>
+            </div>
+            <el-button slot="reference" type="text" size="small">{{ row.flag ? '定时播' : '顺播' }}</el-button>
+          </el-popover>
+        </template>
+      </el-table-column>
+      <el-table-column label="开始时间" align="center">
         <template slot-scope="{row}">
           <span>{{ row.starttime }}</span>
         </template>
@@ -38,25 +57,7 @@
       </el-table-column>
       <el-table-column label="时长" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.duration | formateSeconds }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" align="center">
-        <template slot-scope="{row, $index}">
-          <el-popover
-            v-if="!row.isTheLastEpg"
-            title="节目开始时间"
-            placement="top"
-            width="190"
-            trigger="hover"
-            @show="setDefaultStartTime(row.starttime)"
-          >
-            <el-input v-model="myStartTime" size="small" placeholder="请输入节目开始时间" style="margin-bottom: 10px;" />
-            <div style="text-align: right; margin: 0">
-              <el-button type="danger" size="mini" @click="updateStartTime(row, $index)">确定</el-button>
-            </div>
-            <el-button slot="reference" type="text" size="small">编辑</el-button>
-          </el-popover>
+          <span>{{ row.playDuration | formateSeconds }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -124,7 +125,25 @@ export default {
     setDefaultStartTime(starttime) {
       this.myStartTime = starttime
     },
+    fixedTime(row, idx) {
+      var popNodes = document.querySelectorAll('.el-popover.el-popper')
+      popNodes.forEach((item) => {
+        item.style.display = 'none'
+      })
+      this.$emit('fixed-time', { index: idx, starttime: this.myStartTime })
+    },
+    turnTime(row, idx) {
+      var popNodes = document.querySelectorAll('.el-popover.el-popper')
+      popNodes.forEach((item) => {
+        item.style.display = 'none'
+      })
+      this.$emit('turn-time', { index: idx, starttime: this.myStartTime })
+    },
     updateStartTime(row, idx) {
+      var popNodes = document.querySelectorAll('.el-popover.el-popper')
+      popNodes.forEach((item) => {
+        item.style.display = 'none'
+      })
       this.$emit('update-start-time', { index: idx, starttime: this.myStartTime })
     },
     handleDelSelected() {
@@ -170,13 +189,19 @@ export default {
     },
     tableRowClassName({ row, rowIndex }) {
       if (row && row.isTheLastEpg) {
+        // 在播单最后一条节目
         return 'bg-gray'
       }
-      if (rowIndex) {
-        var startT = new Date(this.listCurr[rowIndex].starttime).getTime()
-        var prevEndT = new Date(this.listCurr[rowIndex - 1].endtime).getTime()
-        if (startT > prevEndT) {
-          return 'bg-orange'
+      if (row && row.flag) {
+        // 定时播节目
+        return 'bg-blue'
+      }
+      if (this.listCurr[rowIndex + 1]) {
+        // 下一条节目和上一条节目直接有间断
+        var endT = new Date(this.listCurr[rowIndex].endtime).getTime()
+        var nextStartT = new Date(this.listCurr[rowIndex + 1].starttime).getTime()
+        if (nextStartT > endT) {
+          return 'bg-red'
         }
       }
     }

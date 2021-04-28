@@ -18,7 +18,7 @@
               <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
           </div>
-          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @update-start-time="updateStartTime" />
+          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @fixed-time="fixedTime" @turn-time="turnTime" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -191,6 +191,28 @@ export default {
       var pros = deepClone2(params.items)
       this.listCurr = this.listCurr.concat(pros)
     },
+    // 定时播
+    fixedTime({ index, starttime }) {
+      if (this.lastEpg !== null) {
+        index = index - 1
+      }
+      this.updateStartIdx = index
+      this.firstStartTime = starttime
+      this.listCurr[index].starttime = starttime
+
+      this.listCurr[index].flag = 1
+    },
+    // 顺时播
+    turnTime({ index, starttime }) {
+      if (this.lastEpg !== null) {
+        index = index - 1
+      }
+      this.updateStartIdx = index
+      this.firstStartTime = starttime
+      this.listCurr[index].starttime = starttime
+
+      this.listCurr[index].flag = 0
+    },
     updateStartTime({ index, starttime }) {
       if (this.lastEpg !== null) {
         index = index - 1
@@ -206,7 +228,8 @@ export default {
           filename: item.filename,
           starttime: item.starttime,
           endtime: item.endtime,
-          duration: parseInt(item.duration)
+          duration: parseInt(item.playDuration),
+          flag: item.flag
         }
       })
       if (!this.currChannelId) {
@@ -258,7 +281,8 @@ export default {
             filename: item.filename,
             starttime: item.starttime,
             endtime: item.endtime,
-            duration: parseInt(item.duration)
+            duration: parseInt(item.playDuration),
+            flag: item.flag
           }
         })
         if (!epg.length) {
@@ -287,9 +311,10 @@ export default {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
+          this.lastEpg.playDuration = this.lastEpg.duration
           this.firstStartTime = this.lastEpg.endtime
         } else {
-          this.firstStartTime = parseTime((new Date(new Date().toLocaleDateString()).getTime()) + 24 * 60 * 60 * 1000)
+          this.firstStartTime = parseTime(new Date().getTime())
         }
       })
     }

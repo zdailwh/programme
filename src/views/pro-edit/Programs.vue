@@ -124,6 +124,8 @@ export default {
             item.endtime = ''
             item.name = item.showname
             item.filename = item.name
+            item.flag = 0
+            item.playDuration = item.duration
           })
           this.list = data.items
         } else {
