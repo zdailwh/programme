@@ -14,8 +14,8 @@
               <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">保存编单</el-button>
             </template>
             <template v-else>
-              <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
-              <el-button v-if="tempEpg.status === 0 || tempEpg.status === 3" type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
+              <el-button type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
+              <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
           </div>
           <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @fixed-time="fixedTime" @turn-time="turnTime" />
@@ -56,11 +56,17 @@ export default {
   components: { Programs, Edit },
   beforeRouteLeave(to, from, next) {
     if (this.listCurr.length) {
-      this.$confirm('您还没有提交编单, 是否继续?', '提示', {
+      this.$confirm(`${this.currChannel}编单还没有保存, 是否继续?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(async() => {
+        // 保存
+        if (this.tempEpg === null) {
+          await this.createHandler()
+        } else {
+          await this.updateHandler()
+        }
         next()
       }).catch(() => {
         next(false)
@@ -116,9 +122,44 @@ export default {
         })
       }
     },
-    currChannel: function(newVal) {
+    currChannel: async function(newVal, oldVal) {
+      // 先保存上一频道的编单
+      if (this.listCurr.length) {
+        // 保存
+        if (this.tempEpg === null) {
+          await this.createHandler()
+        } else {
+          await this.updateHandler()
+        }
+        this.pageinit(newVal)
+        // -------------如果 确定-》保存，取消-》返回上一频道 会在弹窗提示这块死循环----------------------
+        // this.$confirm(`${oldVal}编单还没有保存, 是否继续?`, '提示', {
+        //   confirmButtonText: '确定',
+        //   cancelButtonText: '取消',
+        //   type: 'warning'
+        // }).then(async() => {
+        //   // 保存
+        //   if (this.tempEpg === null) {
+        //     await this.createHandler()
+        //   } else {
+        //     await this.updateHandler()
+        //   }
+        //   this.pageinit(newVal)
+        // }).catch(() => {
+        //   this.currChannel = oldVal
+        // })
+      } else {
+        this.pageinit(newVal)
+      }
+    }
+  },
+  mounted() {
+    this.getAllChannels()
+  },
+  methods: {
+    pageinit(channel) {
       var filteredOpt = this.options.filter((item, idx, arr) => {
-        return item.label === newVal
+        return item.label === channel
       })
       this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : 0
 
@@ -130,12 +171,7 @@ export default {
         // 获取指定频道下的节目列表
         this.$refs.programs.handleFilter()
       })
-    }
-  },
-  mounted() {
-    this.getAllChannels()
-  },
-  methods: {
+    },
     // 获取临时节目单
     getTempEpg() {
       this.listLoading = true
@@ -221,7 +257,7 @@ export default {
       this.firstStartTime = starttime
       this.listCurr[index].starttime = starttime
     },
-    createHandler() {
+    async createHandler() {
       var epg = this.listCurr.map((item, idx, arr) => {
         return {
           name: item.name,
@@ -248,9 +284,10 @@ export default {
       }
       var params = {
         channelId: this.currChannelId,
+        starttime: epg[0] && epg[0].starttime,
         epg: JSON.stringify(epg)
       }
-      createTempEpg(params).then(data => {
+      await createTempEpg(params).then(data => {
         this.listCurr = []
         this.getTempEpg()
       })
@@ -269,41 +306,34 @@ export default {
         console.log('已取消')
       })
     },
-    updateHandler() {
-      this.$confirm(`确定要保存对在编节目单的修改吗?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        var epg = this.listCurr.map((item, idx, arr) => {
-          return {
-            name: item.name,
-            filename: item.filename,
-            starttime: item.starttime,
-            endtime: item.endtime,
-            duration: parseInt(item.playDuration),
-            flag: item.flag
-          }
-        })
-        if (!epg.length) {
-          this.$message({
-            message: '编单不能为空！',
-            type: 'warning'
-          })
-          return
+    async updateHandler() {
+      var epg = this.listCurr.map((item, idx, arr) => {
+        return {
+          name: item.name,
+          filename: item.filename,
+          starttime: item.starttime,
+          endtime: item.endtime,
+          duration: parseInt(item.playDuration),
+          flag: item.flag
         }
-        var params = {
-          id: this.tempEpg.id,
-          epg: JSON.stringify(epg)
-        }
-        updateTempEpg(params).then(data => {
-          this.$message({
-            message: '编单修改成功！',
-            type: 'success'
-          })
+      })
+      if (!epg.length) {
+        this.$message({
+          message: '编单不能为空！',
+          type: 'warning'
         })
-      }).catch(() => {
-        console.log('已取消')
+        return
+      }
+      var params = {
+        id: this.tempEpg.id,
+        starttime: epg[0] && epg[0].starttime,
+        epg: JSON.stringify(epg)
+      }
+      await updateTempEpg(params).then(data => {
+        this.$message({
+          message: '编单修改成功！',
+          type: 'success'
+        })
       })
     },
     async getLastEpg() {
