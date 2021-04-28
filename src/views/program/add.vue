@@ -13,7 +13,7 @@
           <el-button v-else class="button-new-tag" size="small" @click="showInputExt">+ 其他类型</el-button>
         </el-form-item>
         <el-form-item label="选择文件：">
-          <el-button class="filter-item" icon="el-icon-folder-opened" @click="folderCheck">
+          <el-button class="filter-item" icon="el-icon-folder-opened" @click="folderCheckConfirm">
             选择文件所属目录
           </el-button>
           <!-- <span style="color: #909399;margin-left: 10px;">目前支持的文件格式有：{{ enableFile.join('、') }}</span> -->
@@ -43,10 +43,10 @@
           </el-checkbox-group>
         </el-form-item>
       </el-form>
-      <el-table ref="multipleTable" v-loading="listLoading" :data="filterList" border fit highlight-current-row size="small" style="width: 800px;" height="500" @selection-change="handleSelectionChange">
+      <el-table ref="multipleTable" v-loading="listLoading" :data="filterList" border fit highlight-current-row size="small" style="width: 900px;" height="500" @selection-change="handleSelectionChange">
         <el-table-column type="selection" />
         <el-table-column fixed lable="序号" type="index" width="50" />
-        <el-table-column label="文件名" align="center" width="120">
+        <el-table-column label="文件名" align="center" width="150">
           <template slot-scope="{row}">
             <span>{{ row.file.name }}</span>
           </template>
@@ -66,15 +66,16 @@
             <span>{{ row.file.path }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="计算hash进度" align="center" width="120">
+        <el-table-column label="计算hash进度" align="center" width="150">
           <template slot-scope="{row}">
             <el-progress :percentage="row.percentageHash" />
             <!-- <span>{{ row.percentage }}</span> -->
           </template>
         </el-table-column>
-        <el-table-column label="上传进度" align="center" width="120">
+        <el-table-column label="上传进度" align="center" width="150">
           <template slot-scope="{row}">
-            <el-progress :percentage="row.percentage" />
+            <span v-if="row.createRes" style="color: #f00;">{{ row.createRes }}</span>
+            <el-progress v-else :percentage="row.percentage" />
             <!-- <span>{{ row.percentage }}</span> -->
           </template>
         </el-table-column>
@@ -94,6 +95,21 @@ import { getAllChannels } from '@/api/channel'
 const SIZE = 32 * 1024 * 1024 // 切片大小
 
 export default {
+  beforeRouteLeave(to, from, next) {
+    if (!this.uploadCompleted) {
+      this.$confirm('还有文件上传中, 确定要离开吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        next()
+      }).catch(() => {
+        next(false)
+      })
+    } else {
+      next()
+    }
+  },
   filters: {
     change(limit) {
       var size = ''
@@ -141,7 +157,8 @@ export default {
       enableFile: ['TS', 'MXF', 'MP4', 'MPG', 'MOV', 'AVI', 'MPEG', 'M2TS', 'WMV', 'FLV', 'RMVB', 'M4V', 'MP2', 'MP3', 'AAC', 'AC3'],
       inputExtVisible: false,
       inputExtValue: '',
-      listLoading: false
+      listLoading: false,
+      uploadCompleted: true // 当前页文件是否已经全部上传
     }
   },
   watch: {
@@ -184,6 +201,19 @@ export default {
       this.extsArr = []
       this.checkedExts = []
     },
+    folderCheckConfirm() {
+      if (!this.uploadCompleted) {
+        this.$confirm('还有文件上传中, 确定要重新选择文件吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.folderCheck()
+        })
+      } else {
+        this.folderCheck()
+      }
+    },
     async folderCheck() {
       if (!this.enableFile.length) {
         this.$message({
@@ -225,7 +255,7 @@ export default {
           file.path = this.rootDirectory + '/' + (await that.rootHandle.resolve(entry)).join('/')
           var ext = file.name.substring(file.name.lastIndexOf('.') + 1)
           if (this.enableFile.includes(ext) || this.enableFile.includes(ext.toUpperCase()) || this.enableFile.includes(ext.toLowerCase())) {
-            that.list.push({ file: file, ext: ext, percentage: 0, percentageHash: 0 })
+            that.list.push({ file: file, ext: ext, percentage: 0, percentageHash: 0, createRes: '' })
           }
         }
       }
@@ -274,6 +304,8 @@ export default {
       await this.createTasks(this.checkedList, 0)
     },
     async createTasks(filelist, startIdx) {
+      this.uploadCompleted = false
+
       const listItem = filelist[startIdx]
       const fileChunkList = this.createFileChunk(listItem.file)
       filelist[startIdx].fileChunkList = fileChunkList
@@ -283,31 +315,25 @@ export default {
         console.log('创建节目返回' + startIdx + '/' + response.id)
         filelist[startIdx].programid = response.id
 
-        this.uploadFiles(filelist, startIdx)
-      }).catch({
-        // console.log(error)
+        await this.uploadFiles(filelist, startIdx)
+      }).catch((error) => {
+        filelist[startIdx].createRes = (error.response && error.response.data) || '节目创建执行失败'
       })
 
       if (startIdx < filelist.length - 1) {
         await this.createTasks(filelist, startIdx + 1)
       } else {
-        this.$message({
-          message: '文件已全部上传！',
-          type: 'success'
-        })
+        this.uploadCompleted = true
       }
     },
     async createTask(fileItem, idx) {
-      console.log('开始创建节目' + idx)
       var md5 = fileItem.hash
       var params = {
         chnids: this.addForm.chnids.join('#'),
         chnnames: this.addForm.chnnames.join('#'),
         name: fileItem.file.name,
         md5: md5,
-        ext: fileItem.ext,
-        duration: 1200000,
-        coderate: 1234
+        ext: fileItem.ext
       }
       return new Promise((resolve, reject) => {
         createProgram(params).then(response => {
@@ -532,7 +558,7 @@ export default {
 </script>
 <style scoped>
 .formWrap {
-  width: 800px;
+  width: 900px;
   padding: 20px;
   border: 1px solid #DCDFE6;
   border-radius: 10px;

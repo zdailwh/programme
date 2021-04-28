@@ -73,17 +73,21 @@ service.interceptors.response.use(
     // }
   },
   error => {
-    console.log('err' + error) // for debug
+    // console.log(error.response) // for debug
     if (error.response.status === 401) {
       store.dispatch('user/resetToken').then(() => {
         location.reload()
       })
     } else {
-      Message({
-        message: error.response.data,
-        type: 'error',
-        duration: 5 * 1000
-      })
+      if (error.response.config.url === '/api/admin/programme/v1/programmes' && error.response.config.method === 'post') {
+        console.log('上传文件出错')
+      } else {
+        Message({
+          message: error.response.data,
+          type: 'error',
+          duration: 5 * 1000
+        })
+      }
     }
     return Promise.reject(error)
   }

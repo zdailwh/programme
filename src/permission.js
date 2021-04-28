@@ -29,7 +29,16 @@ router.beforeEach(async(to, from, next) => {
       // determine whether the user has obtained his permission roles through getInfo
       const hasRoles = store.getters.roles && store.getters.roles.length > 0
       if (hasRoles) {
-        next()
+        if (to.name === 'ProgramAdd' && to.path !== from.path && from.path !== '/') {
+          // 上载页面 在新窗口打开
+          var newHash = to.path
+          var oldHash = window.location.hash
+          var url = window.location.href.replace(oldHash, '#' + newHash)
+          window.open(url, '_blank')
+          next(false)
+        } else {
+          next()
+        }
       } else {
         try {
           const roles = ['admin']
