@@ -26,6 +26,7 @@ export function createTempEpg(data) {
 export function updateTempEpg(data) {
   var params = {}
   if (data.epg) {
+    params.starttime = data.starttime
     params.epg = data.epg
   }
   return request({

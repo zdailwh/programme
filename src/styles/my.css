@@ -71,3 +71,12 @@ tr.bg-blue {
 tr.bg-red .el-button--text, tr.bg-blue .el-button--text {
   color: #fff;
 }
+
+.channelTabs.routerTabs .el-radio-button__inner {
+  padding: 0 !important;
+}
+
+.channelTabs.routerTabs .el-radio-button__inner .radioRouter {
+  display: inline-block;
+  padding: 10px 20px;
+}

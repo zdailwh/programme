@@ -1,8 +1,10 @@
 <template>
   <div class="container">
-    <div class="channelTabs">
+    <div class="channelTabs routerTabs">
       <el-radio-group v-model="currChannel">
-        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
+        <el-radio-button v-for="item in options" :key="item.value" :label="item.label">
+          <router-link :to="{ name: 'ProEditMain', query: {currChannel: item.label, currChannelId: item.value}}" class="radioRouter">{{ item.label }}</router-link>
+        </el-radio-button>
       </el-radio-group>
     </div>
     <el-row :gutter="20">
@@ -54,11 +56,37 @@ import Edit from './Edit.vue'
 
 export default {
   components: { Programs, Edit },
+  beforeRouteUpdate(to, from, next) {
+    if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
+      this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
+        confirmButtonText: '保存离开',
+        cancelButtonText: '留下',
+        type: 'warning'
+      }).then(async() => {
+        // 保存
+        if (this.tempEpg === null) {
+          await this.createHandler()
+        } else {
+          await this.updateHandler()
+        }
+
+        this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
+        this.currChannelId = parseInt(to.query.currChannelId) || this.allChannels[0].id || 0
+        next()
+      }).catch(() => {
+        next(false)
+      })
+    } else {
+      this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
+      this.currChannelId = parseInt(to.query.currChannelId) || this.allChannels[0].id || 0
+      next()
+    }
+  },
   beforeRouteLeave(to, from, next) {
-    if (this.listCurr.length) {
-      this.$confirm(`${this.currChannel}编单还没有保存, 是否继续?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+    if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
+      this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
+        confirmButtonText: '保存离开',
+        cancelButtonText: '留下',
         type: 'warning'
       }).then(async() => {
         // 保存
@@ -114,46 +142,6 @@ export default {
       }
     },
     currChannel: async function(newVal, oldVal) {
-      // 先保存上一频道的编单
-      if (this.listCurr.length) {
-        // 保存
-        if (this.tempEpg === null) {
-          await this.createHandler()
-        } else {
-          await this.updateHandler()
-        }
-        this.pageinit(newVal)
-        // -------------如果 确定-》保存，取消-》返回上一频道 会在弹窗提示这块死循环----------------------
-        // this.$confirm(`${oldVal}编单还没有保存, 是否继续?`, '提示', {
-        //   confirmButtonText: '确定',
-        //   cancelButtonText: '取消',
-        //   type: 'warning'
-        // }).then(async() => {
-        //   // 保存
-        //   if (this.tempEpg === null) {
-        //     await this.createHandler()
-        //   } else {
-        //     await this.updateHandler()
-        //   }
-        //   this.pageinit(newVal)
-        // }).catch(() => {
-        //   this.currChannel = oldVal
-        // })
-      } else {
-        this.pageinit(newVal)
-      }
-    }
-  },
-  mounted() {
-    this.getAllChannels()
-  },
-  methods: {
-    pageinit(channel) {
-      var filteredOpt = this.options.filter((item, idx, arr) => {
-        return item.label === channel
-      })
-      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : 0
-
       this.listCurr = []
       // 获取指定频道下的最后一条在播节目
       this.getLastEpg().then(() => {
@@ -162,7 +150,12 @@ export default {
         // 获取指定频道下的节目列表
         this.$refs.programs.handleFilter()
       })
-    },
+    }
+  },
+  mounted() {
+    this.getAllChannels()
+  },
+  methods: {
     // 获取临时节目单
     getTempEpg() {
       this.listLoading = true
@@ -182,7 +175,7 @@ export default {
       getAllChannels().then(data => {
         this.allChannels = data.items
         this.currChannel = this.$route.query.currChannel || this.allChannels[0].name || ''
-        this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
+        this.currChannelId = parseInt(this.$route.query.currChannelId) || this.allChannels[0].id || 0
       })
     },
     // 向节目单插入记录(可以不用pros.map 因为只有1条)

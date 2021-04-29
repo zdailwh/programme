@@ -1,8 +1,10 @@
 <template>
   <div class="container">
-    <div class="channelTabs">
+    <div class="channelTabs routerTabs">
       <el-radio-group v-model="currChannel">
-        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
+        <el-radio-button v-for="item in options" :key="item.value" :label="item.label">
+          <router-link :to="{ name: 'ExamineMain', query: {currChannel: item.label, currChannelId: item.value}}" class="radioRouter">{{ item.label }}</router-link>
+        </el-radio-button>
       </el-radio-group>
     </div>
     <el-row :gutter="20">
@@ -38,6 +40,11 @@ import Waiting from './Waiting.vue'
 
 export default {
   components: { Online, Waiting },
+  beforeRouteUpdate(to, from, next) {
+    this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
+    this.currChannelId = parseInt(to.query.currChannelId) || this.allChannels[0].id || 0
+    next()
+  },
   data() {
     return {
       tempEpg: null,
@@ -70,11 +77,6 @@ export default {
       }
     },
     currChannel: function(newVal) {
-      var filteredOpt = this.options.filter((item, idx, arr) => {
-        return item.label === newVal
-      })
-      this.currChannelId = filteredOpt[0] ? filteredOpt[0].value : 0
-
       this.listCurr = []
       // 获取指定频道下的最后一条在播节目
       this.getLastEpg().then(() => {
@@ -106,7 +108,7 @@ export default {
       getAllChannels().then(data => {
         this.allChannels = data.items
         this.currChannel = this.$route.query.currChannel || this.allChannels[0].name || ''
-        this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
+        this.currChannelId = parseInt(this.$route.query.currChannelId) || this.allChannels[0].id || 0
       })
     },
     passHandler() {
