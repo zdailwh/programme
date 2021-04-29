@@ -50,24 +50,19 @@
             <div style="text-align: right; margin: 0">
               <el-button type="danger" size="mini" @click="delEpg(row.id, $index)">确定</el-button>
             </div>
-            <el-button slot="reference" type="text" size="small" style="margin-left: 10px;">删除</el-button>
+            <el-button v-if="new Date(row.starttime).getTime() > new Date().getTime()" slot="reference" type="text" size="small" style="margin-left: 10px;">删除</el-button>
           </el-popover>
         </template>
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" :layout="'total, prev, pager, next, sizes'" @pagination="getList" />
   </div>
 </template>
 
 <script>
-import { fetchList, deleteEpg } from '@/api/epg'
-import waves from '@/directive/waves' // waves directive
-import Pagination from '@/components/Pagination' // secondary package based on el-pagination
+import { fetchListByDate, deleteEpg } from '@/api/epg'
 
 export default {
-  components: { Pagination },
-  directives: { waves },
   filters: {
     formateSeconds(second) {
       let secondTime = parseInt(second / 1000)
@@ -96,14 +91,11 @@ export default {
   data() {
     return {
       list: null,
-      total: 0,
       listLoading: true,
       listQuery: {
-        page: 1,
-        limit: 20
       },
       filterForm: {
-        starttime: ''
+        starttime: parseTime(new Date(new Date().toLocaleDateString()).getTime())
       }
     }
   },
@@ -112,9 +104,8 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchList(this.listQuery).then(data => {
+      fetchListByDate(this.listQuery).then(data => {
         this.list = data.items
-        this.total = data.total
 
         this.listLoading = false
       }).catch(error => {
@@ -126,10 +117,6 @@ export default {
       })
     },
     handleFilter() {
-      this.listQuery = {
-        page: 1,
-        limit: 20
-      }
       if (this.channelId) {
         this.listQuery.channelId = this.channelId
       }
@@ -153,14 +140,30 @@ export default {
       })
     },
     tableRowClassName({ row, rowIndex }) {
-      // if (rowIndex) {
-      //   var startT = new Date(this.list[rowIndex].starttime).getTime()
-      //   var prevEndT = new Date(this.list[rowIndex - 1].endtime).getTime()
-      //   if (startT > prevEndT) {
-      //     return 'bg-orange'
-      //   }
-      // }
+      if (new Date(row.starttime).getTime() <= new Date().getTime() && new Date(row.endtime).getTime() >= new Date().getTime()) {
+        // 当前在播节目
+        return 'bg-blue'
+      } else if (new Date(row.endtime).getTime() < new Date().getTime()) {
+        // 已播节目
+        return 'bg-gray'
+      }
     }
   }
+}
+function parseTime(time) {
+  const date = new Date(time)
+
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay(),
+    ms: date.getMilliseconds()
+  }
+
+  return `${formatObj.y}-${formatObj.m.toString().padStart(2, '0')}-${formatObj.d.toString().padStart(2, '0')} ${formatObj.h.toString().padStart(2, '0')}:${formatObj.i.toString().padStart(2, '0')}:${formatObj.s.toString().padStart(2, '0')}`
 }
 </script>

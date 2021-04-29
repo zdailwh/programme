@@ -14,6 +14,7 @@
             <span>在编节目单 <span v-if="tempEpg !== null" style="color: #F56C6C;">（{{ tempEpg.statusstr }}）</span></span>
             <template v-if="tempEpg === null">
               <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">保存编单</el-button>
+              <el-button type="text" icon="el-icon-download" class="cardBtn" :disabled="!!listCurr.length" @click="getEpgsOfDay">读取在播单</el-button>
             </template>
             <template v-else>
               <el-button type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
@@ -37,7 +38,7 @@
 <script>
 import { fetchList, createTempEpg, pend, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
-import { getLastEpg } from '@/api/epg'
+import { fetchListByDate, getLastEpg } from '@/api/epg'
 import Programs from './Programs.vue'
 import Edit from './Edit.vue'
 
@@ -57,7 +58,7 @@ import Edit from './Edit.vue'
 export default {
   components: { Programs, Edit },
   beforeRouteUpdate(to, from, next) {
-    if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
+    if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && this.listCurr.length && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
       this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
         confirmButtonText: '保存离开',
         cancelButtonText: '留下',
@@ -65,9 +66,9 @@ export default {
       }).then(async() => {
         // 保存
         if (this.tempEpg === null) {
-          await this.createHandler()
+          await this.createHandler(false)
         } else {
-          await this.updateHandler()
+          await this.updateHandler(false)
         }
 
         this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
@@ -83,7 +84,7 @@ export default {
     }
   },
   beforeRouteLeave(to, from, next) {
-    if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
+    if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && this.listCurr.length && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
       this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
         confirmButtonText: '保存离开',
         cancelButtonText: '留下',
@@ -91,9 +92,9 @@ export default {
       }).then(async() => {
         // 保存
         if (this.tempEpg === null) {
-          await this.createHandler()
+          await this.createHandler(false)
         } else {
-          await this.updateHandler()
+          await this.updateHandler(false)
         }
         next()
       }).catch(() => {
@@ -112,12 +113,15 @@ export default {
       allChannels: [],
       listCurr: [],
       firstStartTime: '',
-      lastEpg: null
+      lastEpg: null,
+      epgsBefore: null
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.lastEpg !== null) {
+      if (this.epgsBefore !== null) {
+        return this.epgsBefore.concat(this.listCurr)
+      } else if (this.lastEpg !== null) {
         return [this.lastEpg].concat(this.listCurr)
       } else {
         return this.listCurr
@@ -250,7 +254,7 @@ export default {
 
       this.listCurr[index].flag = 0
     },
-    async createHandler() {
+    async createHandler(ifRefresh = true) {
       var epg = this.listCurr.map((item, idx, arr) => {
         return {
           name: item.name,
@@ -281,8 +285,10 @@ export default {
         epg: JSON.stringify(epg)
       }
       await createTempEpg(params).then(data => {
-        this.listCurr = []
-        this.getTempEpg()
+        if (ifRefresh) {
+          this.listCurr = []
+          this.getTempEpg()
+        }
       })
     },
     pendHandler() {
@@ -299,7 +305,7 @@ export default {
         console.log('已取消')
       })
     },
-    async updateHandler() {
+    async updateHandler(ifRefresh = true) {
       var epg = this.listCurr.map((item, idx, arr) => {
         return {
           name: item.name,
@@ -323,18 +329,34 @@ export default {
         epg: JSON.stringify(epg)
       }
       await updateTempEpg(params).then(data => {
+        if (ifRefresh) {
+          this.listCurr = []
+          this.getTempEpg()
+        }
         this.$message({
           message: '编单修改成功！',
           type: 'success'
         })
       })
     },
+    // 获取频道播出单最后一条
     async getLastEpg() {
       await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
           this.firstStartTime = this.lastEpg.endtime
+        } else {
+          this.firstStartTime = parseTime(new Date().getTime())
+        }
+      })
+    },
+    // 获取频道在播单(当前时间之后的)
+    getEpgsOfDay() {
+      fetchListByDate({ channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
+        this.epgsBefore = data.items ? data.items : null
+        if (this.epgsBefore) {
+          this.firstStartTime = this.epgsBefore[this.epgsBefore.length - 1].endtime
         } else {
           this.firstStartTime = parseTime(new Date().getTime())
         }

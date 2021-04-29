@@ -1,10 +1,7 @@
 import request from '@/utils/request'
 
-export function fetchList(query) {
-  var params = {
-    page: query.page - 1,
-    per_page: query.limit
-  }
+export function fetchListByDate(query) {
+  var params = {}
 
   if (query.channelId !== '') {
     params.channelId = query.channelId
