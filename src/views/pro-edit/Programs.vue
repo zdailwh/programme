@@ -125,7 +125,6 @@ export default {
             item.name = item.showname
             item.filename = item.name
             item.flag = 0
-            item.playDuration = item.duration
           })
           this.list = data.items
         } else {
@@ -160,7 +159,7 @@ export default {
     },
     // 双击插入
     handleDblclick(item) {
-      this.$emit('append-pro', { items: [item] })
+      this.$emit('append-pro', { item: item })
     }
   }
 }

@@ -22,7 +22,7 @@
           <span>{{ row.filename }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="时长" align="center">
+      <el-table-column label="播出时长" align="center">
         <template slot-scope="{row}">
           <span>{{ row.duration | formateSeconds }}</span>
         </template>

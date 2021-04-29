@@ -55,9 +55,9 @@
           <span>{{ row.filename }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="时长" align="center">
+      <el-table-column label="播出时长" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.playDuration | formateSeconds }}</span>
+          <span>{{ (new Date(row.endtime).getTime() - new Date(row.starttime).getTime()) | formateSeconds }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -188,6 +188,21 @@ export default {
       }
     },
     tableRowClassName({ row, rowIndex }) {
+      if (this.listCurr[rowIndex - 1]) {
+        var startT = new Date(this.listCurr[rowIndex].starttime).getTime()
+        var prevStartT = new Date(this.listCurr[rowIndex - 1].starttime).getTime()
+        var prevEndT = new Date(this.listCurr[rowIndex - 1].endtime).getTime()
+        if (startT < prevEndT && startT > prevStartT) {
+          // 当前节目占用上一节目部分时间
+          // 修改上一条节目的结束时间
+          this.listCurr[rowIndex - 1].endtime = this.listCurr[rowIndex].starttime
+        } else if (startT < prevStartT) {
+          // 当前节目占用上一节目全部时间
+          // 删除上一条节目
+          this.$emit('cut-pro', { item: this.listCurr[rowIndex - 1] })
+        }
+      }
+
       if (row && row.isTheLastEpg) {
         // 在播单最后一条节目
         return 'bg-gray'
@@ -197,10 +212,10 @@ export default {
         return 'bg-blue'
       }
       if (this.listCurr[rowIndex + 1]) {
-        // 下一条节目和上一条节目直接有间断
         var endT = new Date(this.listCurr[rowIndex].endtime).getTime()
         var nextStartT = new Date(this.listCurr[rowIndex + 1].starttime).getTime()
         if (nextStartT > endT) {
+          // 下一条节目和上一条节目之间有间断
           return 'bg-red'
         }
       }

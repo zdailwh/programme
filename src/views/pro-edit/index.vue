@@ -18,7 +18,7 @@
               <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
           </div>
-          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @fixed-time="fixedTime" @turn-time="turnTime" />
+          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -84,7 +84,6 @@ export default {
       allChannels: [],
       listCurr: [],
       firstStartTime: '',
-      updateStartIdx: 0,
       lastEpg: null
     }
   },
@@ -101,14 +100,6 @@ export default {
     listCurr: {
       handler: function(newVal) {
         if (!newVal.length) return []
-        newVal.map((item, idx, arr) => {
-          if (idx === this.updateStartIdx) {
-            item.starttime = this.firstStartTime
-          } else if (idx > this.updateStartIdx) {
-            item.starttime = arr[idx - 1].endtime
-          }
-          item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
-        })
       },
       deep: true
     },
@@ -194,47 +185,66 @@ export default {
         this.currChannelId = this.$route.query.currChannelId || this.allChannels[0].id || 0
       })
     },
-    // 向节目单插入记录
+    // 向节目单插入记录(可以不用pros.map 因为只有1条)
     appendPro(params) {
-      var pros = deepClone2(params.items)
+      var item = deepClone2(params.item)
       var insertIdx = this.listCurr.indexOf(this.$refs.editlist.currentRow)
       if (insertIdx !== -1) {
         // 插入到指定节目之后
-        pros.map((item, idx, arr) => {
-          this.listCurr.splice(insertIdx + 1 + idx, 0, item)
-        })
+        item.starttime = this.$refs.editlist.currentRow.endtime
+        item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
+        this.listCurr.splice(insertIdx + 1, 0, item)
+
+        this.updatetimeAfterHandle(insertIdx + 1, item.duration)
       } else {
         // 插入到尾部
-        this.listCurr = this.listCurr.concat(pros)
+        insertIdx = this.listCurr.length
+        item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
+        item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
+        this.listCurr.splice(insertIdx, 0, item)
       }
-
-      // 表格单选行取消选择
-      // this.$refs.editlist.$refs.multipleTable.setCurrentRow()
     },
-    // 删除节目单中的记录
+    updatetimeAfterHandle(startIdx, offset) {
+      this.listCurr.map((item, idx, arr) => {
+        if (idx > startIdx) {
+          item.starttime = parseTime(new Date(item.starttime).getTime() + parseInt(offset))
+          item.endtime = parseTime(new Date(item.endtime).getTime() + parseInt(offset))
+        }
+      })
+    },
+    // 正常删除节目单中的记录
     removePro(params) {
       var pros = params.items
-      var removeIdx = pros.map((item, idx, arr) => {
-        return this.listCurr.indexOf(item)
+      pros.map((item) => {
+        var delIdx = this.listCurr.indexOf(item)
+        this.updatetimeAfterHandle(delIdx, -(new Date(item.endtime).getTime() - new Date(item.starttime).getTime()))
+        this.listCurr.splice(delIdx, 1)
       })
-
-      this.listCurr = this.listCurr.filter((item, idx, arr) => {
-        return removeIdx.indexOf(idx) === -1
-      })
+    },
+    // 节目被砍 删除节目单中的记录
+    cutPro(params) {
+      var item = params.item
+      var delIdx = this.listCurr.indexOf(item)
+      this.listCurr.splice(delIdx, 1)
     },
     // 复制节目单记录
     copyPro(params) {
       var pros = deepClone2(params.items)
-      this.listCurr = this.listCurr.concat(pros)
+      pros.map((item) => {
+        var insertIdx = this.listCurr.length
+        // 被复制节目的播出时长
+        var playduration = new Date(item.endtime).getTime() - new Date(item.starttime).getTime()
+        item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
+        item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(playduration))
+        this.listCurr.splice(insertIdx, 0, item)
+      })
     },
     // 定时播
     fixedTime({ index, starttime }) {
       if (this.lastEpg !== null) {
         index = index - 1
       }
-      this.updateStartIdx = index
-      this.firstStartTime = starttime
-      this.listCurr[index].starttime = starttime
+      this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
 
       this.listCurr[index].flag = 1
     },
@@ -243,19 +253,9 @@ export default {
       if (this.lastEpg !== null) {
         index = index - 1
       }
-      this.updateStartIdx = index
-      this.firstStartTime = starttime
-      this.listCurr[index].starttime = starttime
+      this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
 
       this.listCurr[index].flag = 0
-    },
-    updateStartTime({ index, starttime }) {
-      if (this.lastEpg !== null) {
-        index = index - 1
-      }
-      this.updateStartIdx = index
-      this.firstStartTime = starttime
-      this.listCurr[index].starttime = starttime
     },
     async createHandler() {
       var epg = this.listCurr.map((item, idx, arr) => {
@@ -264,7 +264,7 @@ export default {
           filename: item.filename,
           starttime: item.starttime,
           endtime: item.endtime,
-          duration: parseInt(item.playDuration),
+          duration: new Date(item.endtime).getTime() - new Date(item.starttime).getTime(),
           flag: item.flag
         }
       })
@@ -313,7 +313,7 @@ export default {
           filename: item.filename,
           starttime: item.starttime,
           endtime: item.endtime,
-          duration: parseInt(item.playDuration),
+          duration: new Date(item.endtime).getTime() - new Date(item.starttime).getTime(),
           flag: item.flag
         }
       })
@@ -341,7 +341,6 @@ export default {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
-          this.lastEpg.playDuration = this.lastEpg.duration
           this.firstStartTime = this.lastEpg.endtime
         } else {
           this.firstStartTime = parseTime(new Date().getTime())
