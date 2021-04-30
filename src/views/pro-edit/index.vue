@@ -347,7 +347,7 @@ export default {
     // 获取频道播出单最后一条
     async getLastEpg() {
       await getLastEpg({ orderby: 'id', channelId: this.currChannelId }).then(data => {
-        this.lastEpg = data.items ? data.items[0] : null
+        this.lastEpg = data.items ? data.items[data.items.length - 1] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
           this.firstStartTime = this.lastEpg.endtime

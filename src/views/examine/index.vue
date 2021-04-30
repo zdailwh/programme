@@ -156,7 +156,7 @@ export default {
     },
     async getLastEpg() {
       await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
-        this.lastEpg = data.items ? data.items[0] : null
+        this.lastEpg = data.items ? data.items[data.items.length - 1] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
         }
