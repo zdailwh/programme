@@ -184,6 +184,10 @@ export default {
     this.getAllChannels()
   },
   mounted() {
+    window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
+  },
+  destroyed() {
+    window.removeEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
   methods: {
     async fileCheck() {
@@ -552,6 +556,14 @@ export default {
           type: 'error'
         })
       })
+    },
+    beforeunloadFn(e) {
+      // 这个事件只有在鼠标真正和浏览器有了交互，再刷新或者关闭时才会触发, 浏览器事件会弹框确认用户是否要离开页面
+      e = e || window.event
+      if (e) {
+        e.returnValue = '关闭提示'
+      }
+      return '关闭提示'
     }
   }
 }

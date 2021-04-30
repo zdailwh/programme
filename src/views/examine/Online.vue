@@ -19,7 +19,7 @@
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" :row-class-name="tableRowClassName">
-      <el-table-column type="index" width="50" />
+      <el-table-column type="index" align="center" width="50" />
       <el-table-column label="开始时间" align="center" class-name="start-time">
         <template slot-scope="{row}">
           <span>{{ row.starttime.substring(0, row.starttime.length - 4) }}</span>

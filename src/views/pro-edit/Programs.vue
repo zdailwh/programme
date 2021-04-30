@@ -23,7 +23,7 @@
 
     <el-table ref="multipleTable" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" @row-dblclick="handleDblclick">
       <!-- <el-table-column type="selection" width="50" /> -->
-      <el-table-column type="index" width="40" />
+      <el-table-column type="index" align="center" width="40" />
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
           <span>{{ row.showname }}</span>
