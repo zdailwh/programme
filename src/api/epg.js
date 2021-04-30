@@ -3,8 +3,17 @@ import request from '@/utils/request'
 export function fetchListByDate(query) {
   var params = {}
 
+  if (query.orderby) {
+    params.orderby = query.orderby
+  }
+  if (query.op) {
+    params.op = query.op
+  }
   if (query.channelId !== '') {
     params.channelId = query.channelId
+  }
+  if (query.starttime !== '') {
+    params.starttime = query.starttime
   }
   if (query.starttime_range && query.starttime_range.length) {
     params.starttime_range = query.starttime_range
@@ -22,6 +31,9 @@ export function getLastEpg(query) {
     per_page: 1
   }
 
+  if (query.orderby) {
+    params.orderby = query.orderby
+  }
   if (query.channelId !== '') {
     params.channelId = query.channelId
   }

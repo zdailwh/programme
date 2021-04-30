@@ -346,7 +346,7 @@ export default {
     },
     // 获取频道播出单最后一条
     async getLastEpg() {
-      await getLastEpg({ limit: 20, channelId: this.currChannelId }).then(data => {
+      await getLastEpg({ orderby: 'id', channelId: this.currChannelId }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
@@ -358,7 +358,7 @@ export default {
     },
     // 获取频道在播单(当前时间之后的)
     getEpgsOfDay() {
-      fetchListByDate({ channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
+      fetchListByDate({ orderby: 'id', op: 'egt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
         this.epgsBefore = data.items ? data.items : null
         if (this.epgsBefore) {
           this.firstStartTime = this.epgsBefore[this.epgsBefore.length - 1].endtime

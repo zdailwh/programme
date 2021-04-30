@@ -18,7 +18,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" :row-class-name="tableRowClassName">
+    <el-table ref="tableList" v-loading="listLoading" :data="list" size="mini" fit style="width: 100%;" height="600" :row-class-name="tableRowClassName">
       <el-table-column type="index" align="center" width="50" />
       <el-table-column label="开始时间" align="center" class-name="start-time">
         <template slot-scope="{row}">
@@ -94,10 +94,22 @@ export default {
       list: null,
       listLoading: true,
       listQuery: {
+        orderby: 'id'
       },
       filterForm: {
         starttime_range: [parseTime(new Date(new Date().toLocaleDateString()).getTime()), parseTime(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000)]
-      }
+      },
+      currIndex: 0
+    }
+  },
+  watch: {
+    currIndex(val) {
+      this.$nextTick(function() {
+        var currTr = this.$refs.tableList.$el.querySelectorAll('table.el-table__body')[0].querySelectorAll('tr')[val]
+        if (currTr.offsetTop > (600 - 33) / 2) {
+          this.$refs.tableList.bodyWrapper.scrollTop = currTr.offsetTop - ((600 - 33) / 2)
+        }
+      })
     }
   },
   created() {
@@ -143,6 +155,7 @@ export default {
     tableRowClassName({ row, rowIndex }) {
       if (new Date(row.starttime).getTime() <= new Date().getTime() && new Date(row.endtime).getTime() >= new Date().getTime()) {
         // 当前在播节目
+        this.currIndex = rowIndex
         return 'bg-blue'
       } else if (new Date(row.endtime).getTime() < new Date().getTime()) {
         // 已播节目
