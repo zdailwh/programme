@@ -1,14 +1,14 @@
 <template>
   <div class="programListWrap tempEpgTableWrap">
     <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
-      <el-form-item prop="starttime_range">
+      <el-form-item prop="starttime">
         <el-date-picker
-          v-model="filterForm.starttime_range"
-          style="width:330px"
-          type="datetimerange"
+          v-model="filterForm.starttime"
+          align="right"
+          type="datetime"
           value-format="yyyy-MM-dd HH:mm:ss"
-          start-placeholder="播出开始时间"
-          end-placeholder="播出结束时间"
+          placeholder="播出日期"
+          :picker-options="pickerOptions"
         />
       </el-form-item>
       <el-form-item>
@@ -97,9 +97,44 @@ export default {
         orderby: 'id'
       },
       filterForm: {
-        starttime_range: [parseTime(new Date(new Date().toLocaleDateString()).getTime()), parseTime(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000)]
+        starttime: parseTime(new Date(new Date().toLocaleDateString()).getTime())
       },
       currIndex: 0
+    }
+  },
+  computed: {
+    pickerOptions() {
+      var selectedDate = this.filterForm.starttime
+      var opt = {
+        // disabledDate(time) {
+        //   return time.getTime() > Date.now();
+        // },
+        shortcuts: [
+          {
+            text: '前一天',
+            onClick(picker) {
+              const date = new Date(new Date(selectedDate).toLocaleDateString())
+              date.setTime(date.getTime() - 3600 * 1000 * 24)
+              picker.$emit('pick', date)
+            }
+          },
+          {
+            text: '今天',
+            onClick(picker) {
+              picker.$emit('pick', new Date(new Date().toLocaleDateString()))
+            }
+          },
+          {
+            text: '后一天',
+            onClick(picker) {
+              const date = new Date(new Date(selectedDate).toLocaleDateString())
+              date.setTime(date.getTime() + 3600 * 1000 * 24)
+              picker.$emit('pick', date)
+            }
+          }
+        ]
+      }
+      return opt
     }
   },
   watch: {
@@ -133,8 +168,8 @@ export default {
       if (this.channelId) {
         this.listQuery.channelId = this.channelId
       }
-      if (this.filterForm.starttime_range && this.filterForm.starttime_range.length) {
-        this.listQuery.starttime_range = this.filterForm.starttime_range
+      if (this.filterForm.starttime) {
+        this.listQuery.starttime_range = [this.filterForm.starttime, parseTime(new Date(new Date(this.filterForm.starttime).toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000)]
       }
       this.getList()
     },
