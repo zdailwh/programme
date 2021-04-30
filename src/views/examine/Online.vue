@@ -1,13 +1,14 @@
 <template>
   <div class="programListWrap">
     <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
-      <el-form-item prop="starttime">
+      <el-form-item prop="starttime_range">
         <el-date-picker
-          v-model="filterForm.starttime"
-          style="width:200px"
-          type="datetime"
+          v-model="filterForm.starttime_range"
+          style="width:330px"
+          type="datetimerange"
           value-format="yyyy-MM-dd HH:mm:ss"
-          placeholder="起始时间"
+          start-placeholder="播出开始时间"
+          end-placeholder="播出结束时间"
         />
       </el-form-item>
       <el-form-item>
@@ -95,7 +96,7 @@ export default {
       listQuery: {
       },
       filterForm: {
-        starttime: parseTime(new Date(new Date().toLocaleDateString()).getTime())
+        starttime_range: [parseTime(new Date(new Date().toLocaleDateString()).getTime()), parseTime(new Date(new Date().toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000)]
       }
     }
   },
@@ -120,8 +121,8 @@ export default {
       if (this.channelId) {
         this.listQuery.channelId = this.channelId
       }
-      if (this.filterForm.starttime) {
-        this.listQuery.starttime = this.filterForm.starttime
+      if (this.filterForm.starttime_range && this.filterForm.starttime_range.length) {
+        this.listQuery.starttime_range = this.filterForm.starttime_range
       }
       this.getList()
     },

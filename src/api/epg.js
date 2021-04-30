@@ -6,8 +6,8 @@ export function fetchListByDate(query) {
   if (query.channelId !== '') {
     params.channelId = query.channelId
   }
-  if (query.starttime !== '') {
-    params.starttime = query.starttime
+  if (query.starttime_range && query.starttime_range.length) {
+    params.starttime_range = query.starttime_range
   }
 
   return request({
