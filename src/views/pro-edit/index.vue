@@ -303,8 +303,20 @@ export default {
         type: 'warning'
       }).then(() => {
         pend({ id: this.tempEpg.id }).then(data => {
-          this.listCurr = []
-          this.$router.push({ name: 'ExamineMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
+          console.log(data)
+          if (Array.isArray(data)) {
+            var strArr = []
+            strArr = data.map((item) => {
+              return item.showname
+            })
+            this.$message({
+              message: strArr.join('、') + '节目信息不完整',
+              type: 'warning'
+            })
+          } else {
+            this.listCurr = []
+            this.$router.push({ name: 'ExamineMain', query: { currChannel: this.currChannel, currChannelId: this.currChannelId }})
+          }
         })
       }).catch(() => {
         console.log('已取消')
