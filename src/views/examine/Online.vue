@@ -1,5 +1,5 @@
 <template>
-  <div class="programListWrap">
+  <div class="programListWrap tempEpgTableWrap">
     <el-form ref="filterForm" :model="filterForm" :inline="true" size="mini" class="filter-form">
       <el-form-item prop="starttime_range">
         <el-date-picker
