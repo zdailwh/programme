@@ -40,8 +40,8 @@ export function updateProgram(data) {
     method: 'put',
     data: {
       showname: data.showname,
-      chnnames: data.chnnames,
-      chnids: data.chnids
+      chnnames: data.chnnames.join('#'),
+      chnids: data.chnids.join('#')
     }
   })
 }
