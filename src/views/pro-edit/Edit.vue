@@ -22,7 +22,7 @@
             v-if="!row.isTheLastEpg && !row.epgHistory"
             title="节目开始时间"
             placement="top"
-            width="220"
+            width="190"
             trigger="click"
             @show="setDefaultStartTime(row.starttime)"
           >
@@ -102,6 +102,7 @@ export default {
       selectedItems: [],
       currentRow: null,
       myStartTime: '',
+      myStartTimeHaom: '',
       pin: false
     }
   },
@@ -123,21 +124,22 @@ export default {
   },
   methods: {
     setDefaultStartTime(starttime) {
-      this.myStartTime = starttime
+      this.myStartTime = starttime.substring(0, starttime.length - 4)
+      this.myStartTimeHaom = starttime.substring(starttime.indexOf('.'))
     },
     fixedTime(row, idx) {
       var popNodes = document.querySelectorAll('.el-popover.el-popper')
       popNodes.forEach((item) => {
         item.style.display = 'none'
       })
-      this.$emit('fixed-time', { index: idx, starttime: this.myStartTime })
+      this.$emit('fixed-time', { index: idx, starttime: this.myStartTime + this.myStartTimeHaom })
     },
     turnTime(row, idx) {
       var popNodes = document.querySelectorAll('.el-popover.el-popper')
       popNodes.forEach((item) => {
         item.style.display = 'none'
       })
-      this.$emit('turn-time', { index: idx, starttime: this.myStartTime })
+      this.$emit('turn-time', { index: idx, starttime: this.myStartTime + this.myStartTimeHaom })
     },
     updateStartTime(row, idx) {
       var popNodes = document.querySelectorAll('.el-popover.el-popper')
