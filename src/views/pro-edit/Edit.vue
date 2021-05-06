@@ -191,6 +191,12 @@ export default {
       }
     },
     tableRowClassName({ row, rowIndex }) {
+      if (!row.isTheLastEpg && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
+        // 判断在播单中某条是否为当前正在播出的节目
+        this.listCurr[rowIndex].isTheLastEpg = true
+        this.$emit('hide-the-last-epg-online')
+      }
+
       if (this.listCurr[rowIndex - 1]) {
         var startT = new Date(this.listCurr[rowIndex].starttime).getTime()
         var prevStartT = new Date(this.listCurr[rowIndex - 1].starttime).getTime()
@@ -204,11 +210,6 @@ export default {
           // 删除上一条节目
           this.$emit('cut-pro', { item: this.listCurr[rowIndex - 1] })
         }
-      }
-
-      if (new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
-        // 判断在播单中某条是否为当前正在播出的节目
-        this.listCurr[rowIndex].isTheLastEpg = true
       }
 
       if (row && (row.isTheLastEpg)) {

@@ -14,14 +14,14 @@
             <span>在编节目单 <span v-if="tempEpg !== null" style="color: #F56C6C;">（{{ tempEpg.statusstr }}）</span></span>
             <template v-if="tempEpg === null">
               <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">保存编单</el-button>
-              <el-button type="text" icon="el-icon-download" class="cardBtn" :disabled="!!listCurr.length" @click="getEpgsOfDay">读取在播单</el-button>
             </template>
             <template v-else>
               <el-button type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
               <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
+            <el-button type="text" icon="el-icon-download" class="cardBtn" :disabled="!!listCurr.length" @click="getEpgsOfDay">读取在播单</el-button>
           </div>
-          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" />
+          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" @hide-the-last-epg-online="ifHideLastEpgOnline = true" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -113,18 +113,15 @@ export default {
       allChannels: [],
       listCurr: [],
       firstStartTime: '',
-      lastEpg: null
+      lastEpg: null,
+      ifHideLastEpgOnline: false // 是否隐藏在播单中当前时间点节目
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.tempEpg === null) {
-        if (this.lastEpg !== null) {
-          return [this.lastEpg].concat(this.listCurr)
-        } else {
-          return this.listCurr
-        }
-      }else {
+      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
+        return [this.lastEpg].concat(this.listCurr)
+      } else {
         return this.listCurr
       }
     }
@@ -247,7 +244,8 @@ export default {
     },
     // 定时播
     fixedTime({ index, starttime }) {
-      if (this.tempEpg === null && this.lastEpg !== null) {
+      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
+        // 首行为程序插入的 在播单 当前节目
         index = index - 1
       }
       this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
@@ -256,7 +254,8 @@ export default {
     },
     // 顺时播
     turnTime({ index, starttime }) {
-      if (this.tempEpg === null && this.lastEpg !== null) {
+      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
+        // 首行为程序插入的 在播单 当前节目
         index = index - 1
       }
       this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
