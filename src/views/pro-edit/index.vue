@@ -113,17 +113,18 @@ export default {
       allChannels: [],
       listCurr: [],
       firstStartTime: '',
-      lastEpg: null,
-      epgsBefore: null
+      lastEpg: null
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.epgsBefore !== null) {
-        return this.epgsBefore.concat(this.listCurr)
-      } else if (this.lastEpg !== null) {
-        return [this.lastEpg].concat(this.listCurr)
-      } else {
+      if (this.tempEpg === null) {
+        if (this.lastEpg !== null) {
+          return [this.lastEpg].concat(this.listCurr)
+        } else {
+          return this.listCurr
+        }
+      }else {
         return this.listCurr
       }
     }
@@ -218,7 +219,7 @@ export default {
     removePro(params) {
       var pros = params.items
       pros.map((item) => {
-        if (!item.epgHistory && !item.isTheLastEpg) {
+        if (!item.isTheLastEpg) {
           var delIdx = this.listCurr.indexOf(item)
           this.updatetimeAfterHandle(delIdx, -(new Date(item.endtime).getTime() - new Date(item.starttime).getTime()))
           this.listCurr.splice(delIdx, 1)
@@ -240,14 +241,13 @@ export default {
         var playduration = new Date(item.endtime).getTime() - new Date(item.starttime).getTime()
         item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
         item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(playduration))
-        delete item.epgHistory
         delete item.isTheLastEpg
         this.listCurr.splice(insertIdx, 0, item)
       })
     },
     // 定时播
     fixedTime({ index, starttime }) {
-      if (this.lastEpg !== null) {
+      if (this.tempEpg === null && this.lastEpg !== null) {
         index = index - 1
       }
       this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
@@ -256,7 +256,7 @@ export default {
     },
     // 顺时播
     turnTime({ index, starttime }) {
-      if (this.lastEpg !== null) {
+      if (this.tempEpg === null && this.lastEpg !== null) {
         index = index - 1
       }
       this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
@@ -362,7 +362,7 @@ export default {
     },
     // 获取频道播出单最后一条
     async getLastEpg() {
-      await getLastEpg({ orderby: '-id', channelId: this.currChannelId }).then(data => {
+      await getLastEpg({ orderby: '-id', op: 'mt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
@@ -375,12 +375,10 @@ export default {
     // 获取频道在播单(当前时间之后的)
     getEpgsOfDay() {
       fetchListByDate({ orderby: 'id', op: 'egt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
-        this.epgsBefore = data.items ? data.items : null
-        this.epgsBefore.map((item) => {
-          item.epgHistory = true
-        })
-        if (this.epgsBefore) {
-          this.firstStartTime = this.epgsBefore[this.epgsBefore.length - 1].endtime
+        var epgsBefore = data.items ? data.items : null
+        if (epgsBefore) {
+          this.listCurr = epgsBefore
+          this.firstStartTime = epgsBefore[epgsBefore.length - 1].endtime
         } else {
           this.firstStartTime = parseTime(new Date().getTime())
         }

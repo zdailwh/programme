@@ -34,8 +34,14 @@ export function getLastEpg(query) {
   if (query.orderby) {
     params.orderby = query.orderby
   }
+  if (query.op) {
+    params.op = query.op
+  }
   if (query.channelId !== '') {
     params.channelId = query.channelId
+  }
+  if (query.starttime !== '') {
+    params.starttime = query.starttime
   }
 
   return request({

@@ -41,7 +41,7 @@
           <span>{{ row.duration | formateSeconds }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <!-- <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-popover
             placement="top"
@@ -55,7 +55,7 @@
             <el-button v-if="new Date(row.starttime).getTime() > new Date().getTime()" slot="reference" type="text" size="small" style="margin-left: 10px;">删除</el-button>
           </el-popover>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
   </div>

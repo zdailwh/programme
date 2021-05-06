@@ -19,7 +19,7 @@
       <el-table-column label="操作" align="center" width="50">
         <template slot-scope="{row, $index}">
           <el-popover
-            v-if="!row.isTheLastEpg && !row.epgHistory"
+            v-if="!row.isTheLastEpg"
             title="节目开始时间"
             placement="top"
             width="190"
@@ -172,19 +172,19 @@ export default {
         let i = 0
         while (i < sum) {
           const index = min + i
-          if (this.listCurr[index] && !this.listCurr[index].isTheLastEpg) {
+          if (this.listCurr[index]) {
             this.$refs.multipleTable.toggleRowSelection(this.listCurr[index], true)
           }
           i++
         }
       } else {
-        if (val && !val.isTheLastEpg) {
+        if (val) {
           this.$refs.multipleTable.toggleRowSelection(val)
         }
       }
     },
     selectable(row) {
-      if (row && (row.isTheLastEpg || row.epgHistory)) {
+      if (row && (row.isTheLastEpg)) {
         return false
       } else {
         return true
@@ -206,7 +206,12 @@ export default {
         }
       }
 
-      if (row && (row.isTheLastEpg || row.epgHistory)) {
+      if (new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
+        // 判断在播单中某条是否为当前正在播出的节目
+        this.listCurr[rowIndex].isTheLastEpg = true
+      }
+
+      if (row && (row.isTheLastEpg)) {
         // 在播单最后一条节目
         return 'bg-gray'
       }

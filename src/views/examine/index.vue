@@ -155,7 +155,7 @@ export default {
       })
     },
     async getLastEpg() {
-      await getLastEpg({ orderby: '-id', channelId: this.currChannelId }).then(data => {
+      await getLastEpg({ orderby: '-id', op: 'mt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
@@ -163,6 +163,22 @@ export default {
       })
     }
   }
+}
+function parseTime(time) {
+  const date = new Date(time)
+
+  const formatObj = {
+    y: date.getFullYear(),
+    m: date.getMonth() + 1,
+    d: date.getDate(),
+    h: date.getHours(),
+    i: date.getMinutes(),
+    s: date.getSeconds(),
+    a: date.getDay(),
+    ms: date.getMilliseconds()
+  }
+
+  return `${formatObj.y}-${formatObj.m.toString().padStart(2, '0')}-${formatObj.d.toString().padStart(2, '0')} ${formatObj.h.toString().padStart(2, '0')}:${formatObj.i.toString().padStart(2, '0')}:${formatObj.s.toString().padStart(2, '0')}.${formatObj.ms.toString().padStart(3, '0')}`
 }
 </script>
 <style scoped>

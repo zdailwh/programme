@@ -26,12 +26,12 @@
       <el-table-column type="index" align="center" width="40" />
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.showname }}</span>
+          <span>{{ row.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="文件名" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.name }}</span>
+          <span>{{ row.filename }}</span>
         </template>
       </el-table-column>
       <el-table-column label="文件大小" align="center">
@@ -122,8 +122,8 @@ export default {
           data.items.map((item, idx, arr) => {
             item.starttime = ''
             item.endtime = ''
-            item.name = item.showname
-            item.filename = item.name + '.' + item.ext
+            item.filename = item.name // 文件名称
+            item.name = item.showname // 节目名称
             item.flag = 0 // 0: 顺播；1: 定时播
           })
           this.list = data.items
