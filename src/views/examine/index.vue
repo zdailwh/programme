@@ -17,7 +17,7 @@
               <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
             </template>
           </div>
-          <Waiting :list-curr="listCurrComp" />
+          <Waiting :list-curr="listCurrComp" @hide-the-last-epg-online="ifHideLastEpgOnline = true" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -53,12 +53,13 @@ export default {
       options: [],
       allChannels: [],
       listCurr: [],
-      lastEpg: null
+      lastEpg: null,
+      ifHideLastEpgOnline: false // 是否隐藏在播单中当前时间点节目
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.lastEpg !== null) {
+      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
         return [this.lastEpg].concat(this.listCurr)
       } else {
         return this.listCurr

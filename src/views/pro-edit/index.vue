@@ -300,11 +300,12 @@ export default {
       })
     },
     pendHandler() {
-      this.$confirm(`确定要将在编节目单提交审核吗?`, '提示', {
+      this.$confirm(`确定要将在编节目单保存并提交审核吗?`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
-      }).then(() => {
+      }).then(async() => {
+        await this.updateHandler(false)
         pend({ id: this.tempEpg.id }).then(data => {
           console.log(data)
           if (Array.isArray(data)) {
@@ -378,6 +379,8 @@ export default {
         if (epgsBefore) {
           this.listCurr = epgsBefore
           this.firstStartTime = epgsBefore[epgsBefore.length - 1].endtime
+        } else if (this.lastEpg) {
+          this.firstStartTime = this.lastEpg.endtime
         } else {
           this.firstStartTime = parseTime(new Date().getTime())
         }
