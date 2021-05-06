@@ -123,8 +123,8 @@ export default {
             item.starttime = ''
             item.endtime = ''
             item.name = item.showname
-            item.filename = item.name
-            item.flag = 0
+            item.filename = item.name + '.' + item.ext
+            item.flag = 0 // 0: 顺播；1: 定时播
           })
           this.list = data.items
         } else {

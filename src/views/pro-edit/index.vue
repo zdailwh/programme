@@ -218,9 +218,11 @@ export default {
     removePro(params) {
       var pros = params.items
       pros.map((item) => {
-        var delIdx = this.listCurr.indexOf(item)
-        this.updatetimeAfterHandle(delIdx, -(new Date(item.endtime).getTime() - new Date(item.starttime).getTime()))
-        this.listCurr.splice(delIdx, 1)
+        if (!item.epgHistory && !item.isTheLastEpg) {
+          var delIdx = this.listCurr.indexOf(item)
+          this.updatetimeAfterHandle(delIdx, -(new Date(item.endtime).getTime() - new Date(item.starttime).getTime()))
+          this.listCurr.splice(delIdx, 1)
+        }
       })
     },
     // 节目被砍 删除节目单中的记录
@@ -238,6 +240,8 @@ export default {
         var playduration = new Date(item.endtime).getTime() - new Date(item.starttime).getTime()
         item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
         item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(playduration))
+        delete item.epgHistory
+        delete item.isTheLastEpg
         this.listCurr.splice(insertIdx, 0, item)
       })
     },
@@ -358,8 +362,8 @@ export default {
     },
     // 获取频道播出单最后一条
     async getLastEpg() {
-      await getLastEpg({ orderby: 'id', channelId: this.currChannelId }).then(data => {
-        this.lastEpg = data.items ? data.items[data.items.length - 1] : null
+      await getLastEpg({ orderby: '-id', channelId: this.currChannelId }).then(data => {
+        this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
           this.firstStartTime = this.lastEpg.endtime
@@ -372,6 +376,9 @@ export default {
     getEpgsOfDay() {
       fetchListByDate({ orderby: 'id', op: 'egt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
         this.epgsBefore = data.items ? data.items : null
+        this.epgsBefore.map((item) => {
+          item.epgHistory = true
+        })
         if (this.epgsBefore) {
           this.firstStartTime = this.epgsBefore[this.epgsBefore.length - 1].endtime
         } else {

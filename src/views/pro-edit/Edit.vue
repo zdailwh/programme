@@ -14,12 +14,12 @@
     </el-form>
 
     <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
-      <el-table-column type="selection" width="50" align="center" :selectable="selectable" />
+      <el-table-column type="selection" width="50" align="center" />
       <!-- <el-table-column type="index" width="40" /> -->
       <el-table-column label="操作" align="center" width="50">
         <template slot-scope="{row, $index}">
           <el-popover
-            v-if="!row.isTheLastEpg"
+            v-if="!row.isTheLastEpg && !row.epgHistory"
             title="节目开始时间"
             placement="top"
             width="220"
@@ -164,6 +164,7 @@ export default {
       var startIdx = this.listCurr.indexOf(oldVal)
       var endIdx = this.listCurr.indexOf(val)
       if (startIdx !== -1 && this.pin) {
+        // shift多选
         const sum = Math.abs(startIdx - endIdx) + 1
         const min = Math.min(startIdx, endIdx)
         let i = 0
@@ -181,7 +182,7 @@ export default {
       }
     },
     selectable(row) {
-      if (row && row.isTheLastEpg) {
+      if (row && (row.isTheLastEpg || row.epgHistory)) {
         return false
       } else {
         return true
@@ -203,7 +204,7 @@ export default {
         }
       }
 
-      if (row && row.isTheLastEpg) {
+      if (row && (row.isTheLastEpg || row.epgHistory)) {
         // 在播单最后一条节目
         return 'bg-gray'
       }

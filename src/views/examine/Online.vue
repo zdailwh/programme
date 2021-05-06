@@ -8,6 +8,7 @@
           type="datetime"
           value-format="yyyy-MM-dd HH:mm:ss"
           placeholder="播出日期"
+          :clearable="false"
           :picker-options="pickerOptions"
         />
       </el-form-item>
