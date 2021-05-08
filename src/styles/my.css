@@ -83,3 +83,10 @@ tr.bg-red .el-button--text, tr.bg-blue .el-button--text {
   display: inline-block;
   padding: 10px 20px;
 }
+
+.updateTimeWrap .el-date-editor.el-input, .updateTimeWrap .el-date-editor.el-input__inner {
+  width: auto;
+}
+.updateTimeWrap .el-input__inner {
+  padding-right: 10px;
+}

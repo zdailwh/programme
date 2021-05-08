@@ -22,11 +22,18 @@
             v-if="!row.isTheLastEpg"
             title="节目开始时间"
             placement="top"
-            width="190"
+            width="250"
             trigger="click"
             @show="setDefaultStartTime(row.starttime)"
           >
-            <el-input v-model="myStartTime" size="small" placeholder="请输入节目开始时间" style="margin-bottom: 10px;" />
+            <el-row class="updateTimeWrap" style="margin-bottom: 10px;">
+              <el-col :span="12">
+                <el-date-picker v-model="myStartDate" type="date" placeholder="选择日期" size="mini" value-format="yyyy-MM-dd" :clearable="false" :editable="false" />
+              </el-col>
+              <el-col :span="12">
+                <el-time-picker v-model="myStartTime" placeholder="选择时间" size="mini" value-format="HH:mm:ss" :clearable="false" :editable="false" />
+              </el-col>
+            </el-row>
             <div style="text-align: right; margin: 0">
               <el-button type="danger" size="mini" @click="fixedTime(row, $index)">定时播</el-button>
               <el-button type="primary" size="mini" @click="turnTime(row, $index)">顺播</el-button>
@@ -101,6 +108,7 @@ export default {
     return {
       selectedItems: [],
       currentRow: null,
+      myStartDate: '',
       myStartTime: '',
       myStartTimeHaom: '',
       pin: false
@@ -124,7 +132,8 @@ export default {
   },
   methods: {
     setDefaultStartTime(starttime) {
-      this.myStartTime = starttime.substring(0, starttime.length - 4)
+      this.myStartDate = starttime.substring(0, starttime.indexOf(' '))
+      this.myStartTime = starttime.substring(starttime.indexOf(' ') + 1, starttime.length - 4)
       this.myStartTimeHaom = starttime.substring(starttime.indexOf('.'))
     },
     fixedTime(row, idx) {
@@ -132,21 +141,14 @@ export default {
       popNodes.forEach((item) => {
         item.style.display = 'none'
       })
-      this.$emit('fixed-time', { index: idx, starttime: this.myStartTime + this.myStartTimeHaom })
+      this.$emit('fixed-time', { index: idx, starttime: this.myStartDate + ' ' + this.myStartTime + this.myStartTimeHaom })
     },
     turnTime(row, idx) {
       var popNodes = document.querySelectorAll('.el-popover.el-popper')
       popNodes.forEach((item) => {
         item.style.display = 'none'
       })
-      this.$emit('turn-time', { index: idx, starttime: this.myStartTime + this.myStartTimeHaom })
-    },
-    updateStartTime(row, idx) {
-      var popNodes = document.querySelectorAll('.el-popover.el-popper')
-      popNodes.forEach((item) => {
-        item.style.display = 'none'
-      })
-      this.$emit('update-start-time', { index: idx, starttime: this.myStartTime })
+      this.$emit('turn-time', { index: idx, starttime: this.myStartDate + ' ' + this.myStartTime + this.myStartTimeHaom })
     },
     handleDelSelected() {
       this.$emit('remove-pro', { items: this.selectedItems })
