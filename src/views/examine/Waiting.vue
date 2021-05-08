@@ -75,7 +75,6 @@ export default {
       if (!row.isTheLastEpg && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
         // 判断在播单中某条是否为当前正在播出的节目
         this.listCurr[rowIndex].isTheLastEpg = true
-        this.$emit('hide-the-last-epg-online')
       }
       if (row && row.isTheLastEpg) {
         return 'bg-gray'

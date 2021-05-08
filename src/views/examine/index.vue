@@ -17,7 +17,7 @@
               <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
             </template>
           </div>
-          <Waiting :list-curr="listCurrComp" @hide-the-last-epg-online="ifHideLastEpgOnline = true" />
+          <Waiting :list-curr="listCurrComp" />
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -34,7 +34,7 @@
 <script>
 import { fetchList, pass, fail, upload, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
-import { getLastEpg, epgExport } from '@/api/epg'
+import { epgExport } from '@/api/epg'
 import Online from './Online.vue'
 import Waiting from './Waiting.vue'
 
@@ -53,17 +53,12 @@ export default {
       options: [],
       allChannels: [],
       listCurr: [],
-      lastEpg: null,
-      ifHideLastEpgOnline: false // 是否隐藏在播单中当前时间点节目
+      lastEpg: null
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
-        return [this.lastEpg].concat(this.listCurr)
-      } else {
-        return this.listCurr
-      }
+      return this.listCurr
     }
   },
   watch: {
@@ -79,13 +74,10 @@ export default {
     },
     currChannel: function(newVal) {
       this.listCurr = []
-      // 获取频道播出单当前时间点节目
-      this.getLastEpg().then(() => {
-        // 获取指定频道下的临时节目单
-        this.getTempEpg()
-        // 获取指定频道下的在播节目单
-        this.$refs.epgs.handleFilter()
-      })
+      // 获取指定频道下的临时节目单
+      this.getTempEpg()
+      // 获取指定频道下的在播节目单
+      this.$refs.epgs.handleFilter()
     }
   },
   mounted() {
@@ -133,14 +125,11 @@ export default {
                   })
                 }
               })
-              // 获取频道播出单当前时间点节目
-              this.getLastEpg().then(() => {
-                // 获取指定频道下的临时节目单
-                this.listCurr = []
-                this.getTempEpg()
-                // 获取指定频道下的在播节目单
-                this.$refs.epgs.handleFilter()
-              })
+              // 获取指定频道下的临时节目单
+              this.listCurr = []
+              this.getTempEpg()
+              // 获取指定频道下的在播节目单
+              this.$refs.epgs.handleFilter()
             })
           })
         })
@@ -162,32 +151,8 @@ export default {
       }).catch(() => {
         console.log('已取消')
       })
-    },
-    async getLastEpg() {
-      await getLastEpg({ orderby: '-id', op: 'mt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
-        this.lastEpg = data.items ? data.items[0] : null
-        if (this.lastEpg) {
-          this.lastEpg.isTheLastEpg = true
-        }
-      })
     }
   }
-}
-function parseTime(time) {
-  const date = new Date(time)
-
-  const formatObj = {
-    y: date.getFullYear(),
-    m: date.getMonth() + 1,
-    d: date.getDate(),
-    h: date.getHours(),
-    i: date.getMinutes(),
-    s: date.getSeconds(),
-    a: date.getDay(),
-    ms: date.getMilliseconds()
-  }
-
-  return `${formatObj.y}-${formatObj.m.toString().padStart(2, '0')}-${formatObj.d.toString().padStart(2, '0')} ${formatObj.h.toString().padStart(2, '0')}:${formatObj.i.toString().padStart(2, '0')}:${formatObj.s.toString().padStart(2, '0')}.${formatObj.ms.toString().padStart(3, '0')}`
 }
 </script>
 <style scoped>
