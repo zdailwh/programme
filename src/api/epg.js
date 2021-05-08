@@ -60,3 +60,10 @@ export function deleteEpg(query) {
     }
   })
 }
+
+export function epgExport(query) {
+  return request({
+    url: '/admin/programme/v1/epgs/export?channelId=' + query.channelId,
+    method: 'get'
+  })
+}

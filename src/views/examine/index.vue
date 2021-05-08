@@ -34,7 +34,7 @@
 <script>
 import { fetchList, pass, fail, upload, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
-import { getLastEpg } from '@/api/epg'
+import { getLastEpg, epgExport } from '@/api/epg'
 import Online from './Online.vue'
 import Waiting from './Waiting.vue'
 
@@ -79,7 +79,7 @@ export default {
     },
     currChannel: function(newVal) {
       this.listCurr = []
-      // 获取指定频道下的最后一条在播节目
+      // 获取频道播出单当前时间点节目
       this.getLastEpg().then(() => {
         // 获取指定频道下的临时节目单
         this.getTempEpg()
@@ -125,7 +125,15 @@ export default {
                 message: '节目单已通过审核并提交播出！',
                 type: 'success'
               })
-              // 获取指定频道下的最后一条在播节目
+              epgExport({ channelId: this.currChannelId }).then((data) => {
+                if (data.code === 0) {
+                  this.$message({
+                    message: '节目单已导出！',
+                    type: 'success'
+                  })
+                }
+              })
+              // 获取频道播出单当前时间点节目
               this.getLastEpg().then(() => {
                 // 获取指定频道下的临时节目单
                 this.listCurr = []

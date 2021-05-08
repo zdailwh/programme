@@ -216,7 +216,7 @@ export default {
     removePro(params) {
       var pros = params.items
       pros.map((item) => {
-        if (!item.isTheLastEpg) {
+        if (!item.isTheLastEpg && !item.isTheLastEpgInsert) {
           var delIdx = this.listCurr.indexOf(item)
           this.updatetimeAfterHandle(delIdx, -(new Date(item.endtime).getTime() - new Date(item.starttime).getTime()))
           this.listCurr.splice(delIdx, 1)
@@ -239,6 +239,7 @@ export default {
         item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
         item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(playduration))
         delete item.isTheLastEpg
+        delete item.isTheLastEpgInsert
         this.listCurr.splice(insertIdx, 0, item)
       })
     },
@@ -360,7 +361,7 @@ export default {
         })
       })
     },
-    // 获取频道播出单最后一条
+    // 获取频道播出单当前时间点节目
     async getLastEpg() {
       await getLastEpg({ orderby: '-id', op: 'mt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
         this.lastEpg = data.items ? data.items[0] : null

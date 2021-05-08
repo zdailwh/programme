@@ -19,7 +19,7 @@
       <el-table-column label="操作" align="center" width="50">
         <template slot-scope="{row, $index}">
           <el-popover
-            v-if="!row.isTheLastEpg"
+            v-if="!row.isTheLastEpg && !row.isTheLastEpgInsert"
             title="节目开始时间"
             placement="top"
             width="250"
@@ -186,16 +186,17 @@ export default {
       }
     },
     selectable(row) {
-      if (row && (row.isTheLastEpg)) {
+      if (row && (row.isTheLastEpg || row.isTheLastEpgInsert)) {
         return false
       } else {
         return true
       }
     },
     tableRowClassName({ row, rowIndex }) {
+      delete row.isTheLastEpgInsert
       if (!row.isTheLastEpg && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
         // 判断在播单中某条是否为当前正在播出的节目
-        this.listCurr[rowIndex].isTheLastEpg = true
+        this.listCurr[rowIndex].isTheLastEpgInsert = true
         this.$emit('hide-the-last-epg-online')
       }
 
@@ -214,7 +215,7 @@ export default {
         }
       }
 
-      if (row && (row.isTheLastEpg)) {
+      if (row && (row.isTheLastEpg || row.isTheLastEpgInsert)) {
         // 在播单最后一条节目
         return 'bg-gray'
       }
