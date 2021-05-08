@@ -13,7 +13,7 @@
         />
       </el-form-item>
       <el-form-item>
-        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
+        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter(channelId)">
           查找
         </el-button>
       </el-form-item>
@@ -165,9 +165,9 @@ export default {
         })
       })
     },
-    handleFilter() {
-      if (this.channelId) {
-        this.listQuery.channelId = this.channelId
+    handleFilter(channelId) {
+      if (channelId) {
+        this.listQuery.channelId = channelId
       }
       if (this.filterForm.starttime) {
         this.listQuery.starttime_range = [this.filterForm.starttime, parseTime(new Date(new Date(this.filterForm.starttime).toLocaleDateString()).getTime() + 24 * 60 * 60 * 1000)]

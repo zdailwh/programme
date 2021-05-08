@@ -77,7 +77,7 @@ export default {
       // 获取指定频道下的临时节目单
       this.getTempEpg()
       // 获取指定频道下的在播节目单
-      this.$refs.epgs.handleFilter()
+      this.$refs.epgs.handleFilter(this.currChannelId)
     }
   },
   mounted() {
@@ -129,7 +129,7 @@ export default {
               this.listCurr = []
               this.getTempEpg()
               // 获取指定频道下的在播节目单
-              this.$refs.epgs.handleFilter()
+              this.$refs.epgs.handleFilter(this.currChannelId)
             })
           })
         })

@@ -19,7 +19,7 @@
               <el-button type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
               <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
-            <el-button type="text" icon="el-icon-download" class="cardBtn" :disabled="!!listCurr.length" @click="getEpgsOfDay">读取在播单</el-button>
+            <el-button type="text" icon="el-icon-download" class="cardBtn" @click="getEpgsOfDay">读取在播单</el-button>
           </div>
           <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" @hide-the-last-epg-online="ifHideLastEpgOnline = true" />
         </el-card>
@@ -119,8 +119,11 @@ export default {
   },
   computed: {
     listCurrComp: function() {
-      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
-        return [this.lastEpg].concat(this.listCurr)
+      if (this.lastEpg !== null && this.ifHideLastEpgOnline && this.listCurr.length) {
+        // return [this.lastEpg].concat(this.listCurr)
+        this.lastEpg = null
+        this.listCurr.shift()
+        return this.listCurr
       } else {
         return this.listCurr
       }
@@ -144,6 +147,7 @@ export default {
       }
     },
     currChannel: async function(newVal, oldVal) {
+      this.ifHideLastEpgOnline = false
       this.listCurr = []
       // 获取指定频道下的最后一条在播节目
       this.getLastEpg().then(() => {
@@ -245,20 +249,12 @@ export default {
     },
     // 定时播
     fixedTime({ index, starttime }) {
-      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
-        // 首行为程序插入的 在播单 当前节目
-        index = index - 1
-      }
       this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
 
       this.listCurr[index].flag = 1
     },
     // 顺时播
     turnTime({ index, starttime }) {
-      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
-        // 首行为程序插入的 在播单 当前节目
-        index = index - 1
-      }
       this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
 
       this.listCurr[index].flag = 0
@@ -368,6 +364,7 @@ export default {
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
           this.firstStartTime = this.lastEpg.endtime
+          this.listCurr.unshift(this.lastEpg)
         } else {
           this.firstStartTime = parseTime(new Date().getTime())
         }
@@ -375,16 +372,24 @@ export default {
     },
     // 获取频道在播单(当前时间之后的)
     getEpgsOfDay() {
-      fetchListByDate({ orderby: 'id', op: 'egt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
-        var epgsBefore = data.items ? data.items : null
-        if (epgsBefore) {
-          this.listCurr = epgsBefore
-          this.firstStartTime = epgsBefore[epgsBefore.length - 1].endtime
-        } else if (this.lastEpg) {
-          this.firstStartTime = this.lastEpg.endtime
-        } else {
-          this.firstStartTime = parseTime(new Date().getTime())
-        }
+      this.ifHideLastEpgOnline = false
+      this.listCurr = []
+      // 获取指定频道下的最后一条在播节目
+      this.getLastEpg().then(() => {
+        fetchListByDate({ orderby: 'id', op: 'egt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
+          var epgsBefore = data.items ? data.items : null
+          if (epgsBefore) {
+            this.listCurr = epgsBefore
+            if (this.lastEpg !== null) {
+              this.listCurr.unshift(this.lastEpg)
+            }
+            this.firstStartTime = epgsBefore[epgsBefore.length - 1].endtime
+          } else if (this.lastEpg) {
+            this.firstStartTime = this.lastEpg.endtime
+          } else {
+            this.firstStartTime = parseTime(new Date().getTime())
+          }
+        })
       })
     }
   }
