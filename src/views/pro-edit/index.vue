@@ -114,22 +114,24 @@ export default {
       listCurr: [],
       firstStartTime: '',
       lastEpg: null,
-      ifHideLastEpgOnline: false // 是否隐藏在播单中当前时间点节目
+      ifHideLastEpgOnline: false, // 是否隐藏在播单中当前时间点节目
+      canDelLastEpg: true
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.lastEpg !== null && this.ifHideLastEpgOnline && this.listCurr.length) {
-        // return [this.lastEpg].concat(this.listCurr)
-        this.lastEpg = null
-        this.listCurr.shift()
-        return this.listCurr
-      } else {
-        return this.listCurr
-      }
+      return this.listCurr
     }
   },
   watch: {
+    ifHideLastEpgOnline: function(newVal) {
+      if (newVal) {
+        if (this.lastEpg !== null && this.listCurr.length && this.canDelLastEpg) {
+          this.canDelLastEpg = false // 防止下次再执行此段代码
+          this.listCurr.shift()
+        }
+      }
+    },
     listCurr: {
       handler: function(newVal) {
         if (!newVal.length) return []
@@ -173,7 +175,11 @@ export default {
       fetchList({ page: 1, limit: 20, channelId: this.currChannelId, status: [0, 3] }).then(data => {
         this.tempEpg = data.items ? data.items[0] : null
         if (this.tempEpg !== null) {
-          this.listCurr = this.listCurr.concat(JSON.parse(this.tempEpg.epg))
+          var arr = JSON.parse(this.tempEpg.epg)
+          var filterArr = arr.filter((item) => {
+            return new Date(item.endtime).getTime() > new Date().getTime()
+          })
+          this.listCurr = this.listCurr.concat(filterArr)
           // this.listCurr = JSON.parse(tempEpgDemo)
         }
 
@@ -304,7 +310,6 @@ export default {
       }).then(async() => {
         await this.updateHandler(false)
         pend({ id: this.tempEpg.id }).then(data => {
-          console.log(data)
           if (Array.isArray(data)) {
             var strArr = []
             strArr = data.map((item) => {
@@ -372,6 +377,7 @@ export default {
     },
     // 获取频道在播单(当前时间之后的)
     getEpgsOfDay() {
+      this.canDelLastEpg = false
       this.ifHideLastEpgOnline = false
       this.listCurr = []
       // 获取指定频道下的最后一条在播节目
