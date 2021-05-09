@@ -57,11 +57,7 @@ export function updateChannel(data) {
   return request({
     url: '/admin/programme/v1/channels/' + data.id,
     method: 'put',
-    data: {
-      port: data.port,
-      height: data.height,
-      width: data.width
-    }
+    data: data
   })
 }
 

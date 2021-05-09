@@ -72,7 +72,21 @@ export const constantRoutes = [
   },
   {
     path: '/',
-    redirect: '/setting/admin/index'
+    redirect: '/channelView/index'
+  },
+  {
+    path: '/channelView',
+    component: Layout,
+    redirect: '/channelView/index',
+    meta: { title: '频道预览', icon: 'el-icon-view' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/channel-view/index'),
+        name: 'ChannelViewList',
+        meta: { title: '频道预览', icon: 'el-icon-view' }
+      }
+    ]
   },
   {
     path: '/program',

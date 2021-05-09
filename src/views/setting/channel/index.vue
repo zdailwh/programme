@@ -4,8 +4,8 @@
       <el-form-item prop="name">
         <el-input v-model="filterForm.name" placeholder="频道名称" style="width:120px" />
       </el-form-item>
-      <el-form-item prop="port">
-        <el-input v-model="filterForm.port" placeholder="播出端口" style="width:120px" />
+      <el-form-item prop="index">
+        <el-input v-model="filterForm.index" placeholder="播出编号" style="width:120px" />
       </el-form-item>
       <el-form-item prop="create_time_range">
         <el-date-picker
@@ -39,6 +39,57 @@
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
+      <el-table-column type="expand">
+        <template slot-scope="{row}">
+          <el-form label-position="left" inline class="table-expand" label-width="100px">
+            <!-- SDI -->
+            <template v-if="row.type === 1">
+              <el-form-item label="码率卡序号">
+                <span>{{ row.cardno }}</span>
+              </el-form-item>
+              <el-form-item label="端口号">
+                <span>{{ row.portno }}</span>
+              </el-form-item>
+              <el-form-item label="输出帧率">
+                <span>{{ row.fps }}</span>
+              </el-form-item>
+              <el-form-item label="输出声道">
+                <span>{{ row.audiotype }}</span>
+              </el-form-item>
+            </template>
+            <!-- UDP -->
+            <template v-if="row.type === 0">
+              <el-form-item label="网络ID">
+                <span>{{ row.networkid }}</span>
+              </el-form-item>
+              <el-form-item label="传送流ID">
+                <span>{{ row.tsid }}</span>
+              </el-form-item>
+              <el-form-item label="业务ID">
+                <span>{{ row.serviceid }}</span>
+              </el-form-item>
+              <el-form-item label="PMT PID">
+                <span>{{ row.pmtpid }}</span>
+              </el-form-item>
+              <el-form-item label="VIDEO PID">
+                <span>{{ row.videopid }}</span>
+              </el-form-item>
+              <el-form-item label="组播地址">
+                <span>{{ row.outurl }}</span>
+              </el-form-item>
+              <el-form-item label="组播端口">
+                <span>{{ row.outport }}</span>
+              </el-form-item>
+              <el-form-item label="输出码率">
+                <span>{{ row.bitrate }}</span>
+              </el-form-item>
+              <el-form-item label="输出网卡IP地址">
+                <span>{{ row.localaddr }}</span>
+              </el-form-item>
+            </template>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column label="ID" align="center">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
@@ -49,9 +100,14 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="播出端口" align="center">
+      <el-table-column label="频道编号" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.port }}</span>
+          <span>{{ row.index }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="垫片路径" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.defaultts }}</span>
         </template>
       </el-table-column>
       <el-table-column label="EPG路径" align="center">
@@ -69,10 +125,20 @@
           <span>{{ row.height }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="视频类型" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.videores }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="播出类型" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.type }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <!-- <el-button v-if="row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
-          <el-button v-if="row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button> -->
+          <el-button v-if="row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">启用</el-button>
+          <el-button v-if="row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">停止</el-button>
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-popover
             placement="top"
@@ -167,12 +233,20 @@ export default {
     },
     actived(id, idx) {
       actived({ id: id }).then(data => {
-        this.list[idx] = data
+        this.$message({
+          message: '启用成功！',
+          type: 'success'
+        })
+        this.getList()
       })
     },
     inactived(id, idx) {
       inactived({ id: id }).then(data => {
-        this.list[idx] = data
+        this.$message({
+          message: '停止成功！',
+          type: 'success'
+        })
+        this.getList()
       })
     },
     delChannel(id, idx) {
