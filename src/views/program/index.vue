@@ -48,19 +48,19 @@
       <el-table-column type="expand">
         <template slot-scope="{row}">
           <el-form label-position="left" inline class="table-expand" label-width="100px">
-            <el-form-item v-if="row.realpath" label="节目路径">
+            <el-form-item v-if="row.realpath" label="节目路径：">
               <span>{{ row.realpath }}</span>
             </el-form-item>
-            <el-form-item v-if="row.size" label="文件大小">
+            <el-form-item v-if="row.size" label="文件大小：">
               <span>{{ row.size }}</span>
             </el-form-item>
-            <el-form-item v-if="row.ext" label="扩展名">
+            <el-form-item v-if="row.ext" label="扩展名：">
               <span>{{ row.ext }}</span>
             </el-form-item>
-            <el-form-item v-if="row.md5" label="MD5值">
+            <el-form-item v-if="row.md5" label="MD5值：">
               <span>{{ row.md5 }}</span>
             </el-form-item>
-            <el-form-item v-if="row.info" label="简介">
+            <el-form-item v-if="row.info" label="简介：">
               <span>{{ row.info }}</span>
             </el-form-item>
           </el-form>

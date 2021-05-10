@@ -10,8 +10,8 @@
         <!-- <el-form-item label="频道名称" prop="name">
           <el-input v-model="editItem.name" placeholder="请输入频道名称" />
         </el-form-item> -->
-        <el-form-item label="频道编号" prop="index">
-          <el-input v-model="editItem.index" placeholder="请输入频道编号" />
+        <el-form-item label="频道编号" prop="no">
+          <el-input v-model="editItem.no" placeholder="请输入频道编号" />
         </el-form-item>
         <el-form-item label="垫片路径" prop="defaultts">
           <el-input v-model="editItem.defaultts" placeholder="请输入垫片路径" />
@@ -33,29 +33,29 @@
           </el-col>
         </el-form-item>
         <el-form-item label="视频类型" prop="videores">
-          <el-select v-model="editItem.videores" placeholder="请选择视频类型">
+          <el-select v-model="editItem.videores" placeholder="请选择视频类型" style="width: 100%;">
             <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
         <el-form-item label="播出类型" prop="type">
-          <el-select v-model="editItem.type" placeholder="请选择播出类型">
+          <el-select v-model="editItem.type" placeholder="请选择播出类型" style="width: 100%;">
             <el-option v-for="(item,k) in outputTypeArr" :key="k" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
         <!-- SDI -->
         <template v-if="editItem.type === 1">
-          <el-form-item label="码率卡序号" prop="cardno">
+          <el-form-item label="码率卡序号" prop="cardno" style="width: 100%;">
             <el-select v-model="editItem.cardno" placeholder="请选择码率卡序号">
               <el-option :value="0" label="0" />
               <el-option :value="1" label="1" />
             </el-select>
           </el-form-item>
-          <el-form-item label="端口号" prop="portno">
+          <el-form-item label="端口号" prop="portno" style="width: 100%;">
             <el-select v-model="editItem.portno" placeholder="请选择端口号">
               <el-option v-for="item in 8" :key="item" :value="item" :label="item" />
             </el-select>
           </el-form-item>
-          <el-form-item label="输出帧率" prop="fps">
+          <el-form-item label="输出帧率" prop="fps" style="width: 100%;">
             <el-select v-model="editItem.fps" placeholder="请选择输出帧率">
               <el-option :value="25" label="25" />
               <el-option :value="30" label="30" />
@@ -63,7 +63,7 @@
               <el-option :value="60" label="60" />
             </el-select>
           </el-form-item>
-          <el-form-item label="输出声道" prop="audiotype">
+          <el-form-item label="输出声道" prop="audiotype" style="width: 100%;">
             <el-select v-model="editItem.audiotype" placeholder="请选择输出声道">
               <el-option :value="2" label="双声道" />
               <el-option :value="6" label="六声道" />
@@ -97,7 +97,9 @@
             <el-input v-model="editItem.bitrate" placeholder="请输入输出码率" />
           </el-form-item>
           <el-form-item label="输出网卡IP地址" prop="localaddr">
-            <el-input v-model="editItem.localaddr" placeholder="请输入输出网卡IP地址" />
+            <el-select v-model="editItem.localaddr" placeholder="请选择输出网卡IP地址" style="width: 100%;">
+              <el-option v-for="(item,k) in netCardArr" :key="k" :value="item.ip" :label="k + '（' + item.ip + ' / ' + item.netmask + '）'" />
+            </el-select>
           </el-form-item>
         </template>
       </el-form>
@@ -121,6 +123,12 @@ export default {
       default() {
         return {}
       }
+    },
+    netCardArr: {
+      type: Object,
+      default: function() {
+        return {}
+      }
     }
   },
   data() {
@@ -129,7 +137,7 @@ export default {
         name: [
           { required: true, message: '频道名称不能为空', trigger: 'blur' }
         ],
-        index: [
+        no: [
           { required: true, message: '频道编号不能为空', trigger: 'blur' }
         ],
         defaultts: [

@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <h4 class="time-head">{{ currtime }}</h4>
     <el-table :data="tableData" :row-class-name="tableRowClassName" border fit highlight-current-row style="width: 100%">
       <el-table-column type="index" label="序号" align="center" />
       <el-table-column prop="servicetype" label="特性" width="60px" align="center" />
@@ -49,10 +50,10 @@
           <el-button plain size="mini">查看节目单</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="DefaultTs" label="垫播节目" align="center">
+      <el-table-column prop="defaultts" label="垫播节目" align="center">
         <template slot-scope="scope">
           <p style="text-align: center;">
-            {{ scope.row.DefaultTs }}<br>
+            {{ scope.row.defaultts }}<br>
             <el-button type="primary" size="mini" @click="playDefaultTs(scope.row)">应急垫片</el-button>
             <el-button type="primary" size="mini" style="margin-top: 5px;margin-left: 0;" @click="tsVisible = true; canInterval = false;">素材库</el-button>
           </p>
@@ -65,9 +66,8 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="pageWrap">
-      <el-pagination background layout="prev, pager, next" :total="tableData.length" />
-    </div>
+
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <el-dialog title="素材库" :visible.sync="tsVisible" width="30%" :before-close="handleCloseTs">
       <div>
@@ -84,6 +84,7 @@
 
 <script>
 import { parseTime } from '@/utils/index'
+import Pagination from '@/components/Pagination'
 import { getAllChannels } from '@/api/channel'
 
 var timer = null
@@ -92,6 +93,7 @@ export default {
     window.clearInterval(timer)
     next()
   },
+  components: { Pagination },
   filters: {
     timeDiff(diff) {
       if (!diff) return ''
@@ -106,6 +108,11 @@ export default {
       canInterval: true,
       currtime: parseTime(new Date(), '{y}年{m}月{d}日 {h}:{i}:{s}'),
       tableData: [],
+      total: 0,
+      listQuery: {
+        page: 1,
+        limit: 20
+      },
       tsVisible: false,
       checkedTs: '',
       tsList: [
@@ -125,11 +132,10 @@ export default {
   },
   methods: {
     getList() {
-      const params = {
-      }
-      getAllChannels(params).then((response) => {
+      getAllChannels(this.listQuery).then((response) => {
         this.$parent.maintag = response.main
         this.tableData = response.items
+        this.total = response.total
       }).catch((error) => {
         console.log(error)
       })
@@ -292,5 +298,10 @@ function formatTimeDiff(diff) {
   /*background-color: #DCDFE6;*/
   font-weight: bold;
   color: #409EFF;
+}
+.time-head {
+  text-align: center;
+  font-size: 25px;
+  margin: 15px 0;
 }
 </style>

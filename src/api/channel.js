@@ -14,8 +14,8 @@ export function fetchList(query) {
   if (query.name !== '') {
     params.name = query.name
   }
-  if (query.port !== '') {
-    params.port = query.port
+  if (query.no !== '') {
+    params.no = query.no
   }
   return request({
     url: '/admin/programme/v1/channels',
@@ -24,24 +24,36 @@ export function fetchList(query) {
   })
 }
 
-export function getAllChannels() {
+export function getAllChannels(query) {
+  var params = {
+    page: query.page - 1,
+    per_page: query.limit
+  }
   return request({
     url: '/admin/programme/v1/channels',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
 export function actived(query) {
   return request({
-    url: '/admin/programme/v1/channels/' + query.id + '/actived',
+    url: '/admin/programme/v1/channels/' + query.id + '/on',
     method: 'put'
   })
 }
 
 export function inactived(query) {
   return request({
-    url: '/admin/programme/v1/channels/' + query.id + '/inactived',
+    url: '/admin/programme/v1/channels/' + query.id + '/off',
     method: 'put'
+  })
+}
+
+export function getAllNetworks() {
+  return request({
+    url: '/admin/programme/v1/channels/getnetworks',
+    method: 'get'
   })
 }
 
