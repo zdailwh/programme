@@ -24,13 +24,20 @@ export function fetchList(query) {
   })
 }
 
-export function getAllChannels(query) {
+export function getAllChannels() {
+  return request({
+    url: '/admin/programme/v1/channels',
+    method: 'get'
+  })
+}
+
+export function getChannelsPreview(query) {
   var params = {
     page: query.page - 1,
     per_page: query.limit
   }
   return request({
-    url: '/admin/programme/v1/channels',
+    url: '/admin/programme/v1/channels/preview',
     method: 'get',
     params
   })

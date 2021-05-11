@@ -47,7 +47,7 @@
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
       <el-table-column type="expand">
         <template slot-scope="{row}">
-          <el-form label-position="left" inline class="table-expand" label-width="100px">
+          <el-form label-position="left" inline class="table-expand">
             <el-form-item v-if="row.realpath" label="节目路径：">
               <span>{{ row.realpath }}</span>
             </el-form-item>

@@ -41,7 +41,7 @@
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
       <el-table-column type="expand">
         <template slot-scope="{row}">
-          <el-form label-position="left" inline class="table-expand" label-width="100px">
+          <el-form label-position="left" inline class="table-expand">
             <!-- SDI -->
             <template v-if="row.type === 1">
               <el-form-item label="码率卡序号：">
