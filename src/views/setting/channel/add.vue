@@ -95,7 +95,12 @@
             <el-input v-model="formadd.outport" placeholder="请输入组播端口" />
           </el-form-item>
           <el-form-item label="输出码率" prop="bitrate">
-            <el-input v-model="formadd.bitrate" placeholder="请输入输出码率" />
+            <el-input v-model="formadd.bitrate" placeholder="请输入输出码率">
+              <el-select slot="append" v-model="bitrateUnit" style="width: 70px;">
+                <el-option label="K" value="K" />
+                <el-option label="M" value="M" />
+              </el-select>
+            </el-input>
           </el-form-item>
           <el-form-item label="输出网卡IP地址" prop="localaddr">
             <el-select v-model="formadd.localaddr" placeholder="请选择输出网卡IP地址" style="width: 100%;">
@@ -151,6 +156,7 @@ export default {
         bitrate: null,
         localaddr: null
       },
+      bitrateUnit: 'K',
       ruleValidate: {
         name: [
           { required: true, message: '频道名称不能为空', trigger: 'blur' }
@@ -202,6 +208,7 @@ export default {
       })
     },
     createChannel() {
+      this.formadd.bitrate = this.bitrateUnit === 'K' ? this.formadd.bitrate * 1000 : this.formadd.bitrate * 1000000
       console.log(this.formadd)
       createChannel(this.formadd).then(response => {
         this.$message({

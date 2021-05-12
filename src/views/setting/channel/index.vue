@@ -81,7 +81,7 @@
                 <span>{{ row.outport }}</span>
               </el-form-item>
               <el-form-item label="输出码率：">
-                <span>{{ row.bitrate }}</span>
+                <span>{{ row.bitrate | bitrateUnit }}</span>
               </el-form-item>
               <el-form-item label="输出网卡IP地址：">
                 <span>{{ row.localaddr }}</span>
@@ -179,6 +179,16 @@ import Edit from './edit.vue'
 export default {
   components: { Pagination, Add, Edit },
   directives: { waves },
+  filters: {
+    bitrateUnit(val) {
+      if (!val || val < 1000) return val + 'B'
+      if (val / 1000 < 1000) {
+        return (val / 1000) + 'K'
+      } else {
+        return (val / 1000000) + 'M'
+      }
+    }
+  },
   data() {
     return {
       list: null,
@@ -292,7 +302,7 @@ export default {
       this.dialogVisibleAdd = params
     },
     editHandle(item, idx) {
-      this.editItem = item
+      this.editItem = JSON.parse(JSON.stringify(item))
       this.editIndex = idx
       this.dialogVisibleEdit = true
     },

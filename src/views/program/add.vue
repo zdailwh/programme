@@ -373,7 +373,7 @@ export default {
       // })
 
       var verifyRes = await this.verifyUpload(listItem.hash)
-      if (verifyRes === '资源不存在') {
+      if (verifyRes === '资源不存在' || (verifyRes.file === '' && !verifyRes.chunks.length)) {
         // 说明大文件file在服务端不存在，前端按正常流程将所有分片上传
         this.chunkData = fileChunkList.map(({ file }, index) => ({
           programid: listItem.programid,

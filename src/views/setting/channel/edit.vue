@@ -94,7 +94,12 @@
             <el-input v-model="editItem.outport" placeholder="请输入组播端口" />
           </el-form-item>
           <el-form-item label="输出码率" prop="bitrate">
-            <el-input v-model="editItem.bitrate" placeholder="请输入输出码率" />
+            <el-input v-model="editItem.bitrate" placeholder="请输入输出码率">
+              <el-select slot="append" v-model="bitrateUnit" style="width: 70px;">
+                <el-option label="K" value="K" />
+                <el-option label="M" value="M" />
+              </el-select>
+            </el-input>
           </el-form-item>
           <el-form-item label="输出网卡IP地址" prop="localaddr">
             <el-select v-model="editItem.localaddr" placeholder="请选择输出网卡IP地址" style="width: 100%;">
@@ -167,7 +172,20 @@ export default {
         { label: 'SD', value: 'SD' },
         { label: 'HD', value: 'HD' },
         { label: '4K', value: '4K' }
-      ]
+      ],
+      bitrateUnit: ''
+    }
+  },
+  watch: {
+    editItem(val) {
+      if (val.id) {
+        this.editItem.bitrate = this.editItem.bitrate / 1000
+        this.bitrateUnit = 'K'
+        if (this.editItem.bitrate > 1000) {
+          this.editItem.bitrate = this.editItem.bitrate / 1000
+          this.bitrateUnit = 'M'
+        }
+      }
     }
   },
   mounted() {
@@ -184,6 +202,7 @@ export default {
       })
     },
     updateChannel() {
+      this.editItem.bitrate = this.bitrateUnit === 'K' ? this.editItem.bitrate * 1000 : this.editItem.bitrate * 1000000
       updateChannel(this.editItem).then(response => {
         this.$message({
           message: '编辑成功！',
