@@ -146,18 +146,7 @@
           <el-button v-if="row.action === 0" type="text" size="medium" @click="actived(row.id, $index)">启用</el-button>
           <el-button v-if="row.action === 1" type="text" size="medium" @click="inactived(row.id, $index)">停止</el-button>
           <el-button v-if="row.action === 0" type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
-          <el-popover
-            v-if="row.action === 0"
-            placement="top"
-            width="170"
-            trigger="hover"
-          >
-            <p>确定要删除此频道吗？</p>
-            <div style="text-align: right; margin: 0">
-              <el-button type="danger" size="mini" @click="delChannel(row.id, $index)">确定</el-button>
-            </div>
-            <el-button slot="reference" type="text" size="medium" style="margin-left: 10px;">删除</el-button>
-          </el-popover>
+          <el-button v-if="row.action === 0" type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -287,6 +276,15 @@ export default {
           type: 'success'
         })
         this.getList()
+      })
+    },
+    delHandler(id, idx) {
+      this.$confirm('确定要删除此频道吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.delChannel(id, idx)
       })
     },
     delChannel(id, idx) {
