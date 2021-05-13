@@ -33,7 +33,7 @@
           </el-col>
         </el-form-item>
         <el-form-item label="视频类型" prop="videores">
-          <el-select v-model="editItem.videores" placeholder="请选择视频类型" style="width: 100%;">
+          <el-select v-model="editItem.videores" :disabled="editItem.type === 1" placeholder="请选择视频类型" style="width: 100%;">
             <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
@@ -177,6 +177,11 @@ export default {
     }
   },
   watch: {
+    'editItem.type'(val) {
+      if (val === 1) {
+        this.editItem.videores = 'HD'
+      }
+    },
     editItem(val) {
       if (val.id) {
         this.editItem.bitrate = this.editItem.bitrate / 1000

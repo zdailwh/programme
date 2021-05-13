@@ -34,7 +34,7 @@
           </el-col>
         </el-form-item>
         <el-form-item label="视频类型" prop="videores">
-          <el-select v-model="formadd.videores" placeholder="请选择视频类型" style="width: 100%;">
+          <el-select v-model="formadd.videores" :disabled="formadd.type === 1" placeholder="请选择视频类型" style="width: 100%;">
             <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
@@ -192,6 +192,13 @@ export default {
         { label: 'HD', value: 'HD' },
         { label: '4K', value: '4K' }
       ]
+    }
+  },
+  watch: {
+    'formadd.type'(val) {
+      if (val === 1) {
+        this.formadd.videores = 'HD'
+      }
     }
   },
   mounted() {
