@@ -26,7 +26,7 @@ export function fetchListByDate(query) {
   })
 }
 
-export function getLastEpg(query) {
+export function getCurrEpg(query) {
   var params = {
     per_page: 1
   }
@@ -42,6 +42,25 @@ export function getLastEpg(query) {
   }
   if (query.starttime !== '') {
     params.starttime = query.starttime
+  }
+
+  return request({
+    url: '/admin/programme/v1/epgs',
+    method: 'get',
+    params
+  })
+}
+
+export function getLastEpg(query) {
+  var params = {
+    per_page: 1
+  }
+
+  if (query.orderby) {
+    params.orderby = query.orderby
+  }
+  if (query.channelId !== '') {
+    params.channelId = query.channelId
   }
 
   return request({
