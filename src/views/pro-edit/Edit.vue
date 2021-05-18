@@ -14,7 +14,7 @@
     </el-form>
 
     <el-table ref="multipleTable" :data="listCurr" size="mini" fit highlight-current-row style="width: 100%;" height="600" :row-class-name="tableRowClassName" @selection-change="handleSelectionChange" @current-change="handleCurrentChange">
-      <el-table-column type="selection" width="50" align="center" />
+      <el-table-column type="selection" width="50" align="center" :selectable="selectable" />
       <!-- <el-table-column type="index" width="40" /> -->
       <el-table-column label="操作" align="center" width="50">
         <template slot-scope="{row, $index}">
@@ -194,7 +194,7 @@ export default {
     },
     tableRowClassName({ row, rowIndex }) {
       delete row.isTheLastEpgInsert
-      if (!row.isTheLastEpg && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
+      if (row.fromEpgsBefore && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
         // 判断临时节目单中某条是否为当前正在播出的节目
         this.listCurr[rowIndex].isTheLastEpgInsert = true
         this.$emit('hide-the-last-epg-online')

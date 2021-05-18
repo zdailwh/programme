@@ -59,24 +59,24 @@ export default {
   components: { Programs, Edit },
   beforeRouteUpdate(to, from, next) {
     if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && this.listCurr.length && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
-      this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
-        confirmButtonText: '保存离开',
-        cancelButtonText: '留下',
-        type: 'warning'
-      }).then(async() => {
-        // 保存
-        if (this.tempEpg === null) {
-          await this.createHandler(false)
-        } else {
-          await this.updateHandler(false)
-        }
+      // this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
+      //   confirmButtonText: '保存离开',
+      //   cancelButtonText: '留下',
+      //   type: 'warning'
+      // }).then(async() => {
+      // 保存
+      if (this.tempEpg === null) {
+        this.createHandler(false)
+      } else {
+        this.updateHandler(false)
+      }
 
-        this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
-        this.currChannelId = parseInt(to.query.currChannelId) || this.allChannels[0].id || 0
-        next()
-      }).catch(() => {
-        next(false)
-      })
+      this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
+      this.currChannelId = parseInt(to.query.currChannelId) || this.allChannels[0].id || 0
+      next()
+      // }).catch(() => {
+      //   next(false)
+      // })
     } else {
       this.currChannel = to.query.currChannel || this.allChannels[0].name || ''
       this.currChannelId = parseInt(to.query.currChannelId) || this.allChannels[0].id || 0
@@ -85,21 +85,21 @@ export default {
   },
   beforeRouteLeave(to, from, next) {
     if ((this.tempEpg === null && this.listCurr.length) || (this.tempEpg !== null && this.listCurr.length && JSON.stringify(this.listCurr) !== this.tempEpg.epg)) {
-      this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
-        confirmButtonText: '保存离开',
-        cancelButtonText: '留下',
-        type: 'warning'
-      }).then(async() => {
-        // 保存
-        if (this.tempEpg === null) {
-          await this.createHandler(false)
-        } else {
-          await this.updateHandler(false)
-        }
-        next()
-      }).catch(() => {
-        next(false)
-      })
+      // this.$confirm(`${this.currChannel}编单还没有保存`, '提示', {
+      //   confirmButtonText: '保存离开',
+      //   cancelButtonText: '留下',
+      //   type: 'warning'
+      // }).then(async() => {
+      // 保存
+      if (this.tempEpg === null) {
+        this.createHandler(false)
+      } else {
+        this.updateHandler(false)
+      }
+      next()
+      // }).catch(() => {
+      //   next(false)
+      // })
     } else {
       next()
     }
@@ -250,6 +250,7 @@ export default {
         item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(playduration))
         delete item.isTheLastEpg
         delete item.isTheLastEpgInsert
+        delete item.fromEpgsBefore
         this.listCurr.splice(insertIdx, 0, item)
       })
     },
@@ -385,6 +386,9 @@ export default {
         fetchListByDate({ orderby: 'id', op: 'egt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
           var epgsBefore = data.items ? data.items : null
           if (epgsBefore) {
+            epgsBefore.map((item) => {
+              item.fromEpgsBefore = true
+            })
             this.listCurr = epgsBefore
             if (this.lastEpg !== null) {
               this.listCurr.unshift(this.lastEpg)
