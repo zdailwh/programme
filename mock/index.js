@@ -10,6 +10,7 @@ const channel = require('./channel')
 const program = require('./program')
 const tempEpg = require('./temp-epg')
 const epg = require('./epg')
+const device = require('./device')
 
 const mocks = [
   ...user,
@@ -20,7 +21,8 @@ const mocks = [
   ...channel,
   ...program,
   ...tempEpg,
-  ...epg
+  ...epg,
+  ...device
 ]
 
 // for front mock

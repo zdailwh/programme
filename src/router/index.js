@@ -137,6 +137,20 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/device',
+    component: Layout,
+    redirect: '/device/index',
+    meta: { title: '设备管理', icon: 'el-icon-cpu' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/device/index'),
+        name: 'ProgramList',
+        meta: { title: '设备列表', icon: 'el-icon-cpu' }
+      }
+    ]
+  },
+  {
     path: '/setting',
     component: Layout,
     redirect: '/setting/admin',
