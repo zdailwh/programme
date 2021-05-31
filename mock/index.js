@@ -11,6 +11,7 @@ const program = require('./program')
 const tempEpg = require('./temp-epg')
 const epg = require('./epg')
 const device = require('./device')
+const devicechn = require('./device-chn')
 
 const mocks = [
   ...user,
@@ -22,7 +23,8 @@ const mocks = [
   ...program,
   ...tempEpg,
   ...epg,
-  ...device
+  ...device,
+  ...devicechn
 ]
 
 // for front mock

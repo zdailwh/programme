@@ -137,20 +137,6 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/device',
-    component: Layout,
-    redirect: '/device/index',
-    meta: { title: '设备管理', icon: 'el-icon-cpu' },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/device/index'),
-        name: 'ProgramList',
-        meta: { title: '设备列表', icon: 'el-icon-cpu' }
-      }
-    ]
-  },
-  {
     path: '/setting',
     component: Layout,
     redirect: '/setting/admin',
@@ -183,6 +169,33 @@ export const constantRoutes = [
             meta: { title: '频道设置', icon: 'el-icon-monitor' }
           }
         ]
+      },
+      {
+        path: 'device',
+        component: () => import('@/views/setting/device/layout'),
+        name: 'Device',
+        redirect: '/setting/device/index',
+        children: [
+          {
+            path: 'index',
+            component: () => import('@/views/setting/device/index'),
+            name: 'DeviceList',
+            meta: { title: '设备管理', icon: 'el-icon-cpu' }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    path: '/devicechns',
+    component: Layout,
+    redirect: '/devicechns/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/devicechns/index'),
+        name: 'DeviceChnsList',
+        meta: { title: '设备频道管理', icon: 'el-icon-connection' }
       }
     ]
   }
