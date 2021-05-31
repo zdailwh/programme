@@ -39,57 +39,6 @@
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column type="expand">
-        <template slot-scope="{row}">
-          <el-form label-position="left" inline class="table-expand">
-            <!-- SDI -->
-            <template v-if="row.type === 1">
-              <el-form-item label="码率卡序号：">
-                <span>{{ row.cardno }}</span>
-              </el-form-item>
-              <el-form-item label="端口号：">
-                <span>{{ row.portno }}</span>
-              </el-form-item>
-              <el-form-item label="输出帧率：">
-                <span>{{ row.fps }}</span>
-              </el-form-item>
-              <el-form-item label="输出声道：">
-                <span>{{ row.audiotype }}</span>
-              </el-form-item>
-            </template>
-            <!-- UDP -->
-            <template v-if="row.type === 0">
-              <el-form-item label="网络ID：">
-                <span>{{ row.networkid }}</span>
-              </el-form-item>
-              <el-form-item label="传送流ID：">
-                <span>{{ row.tsid }}</span>
-              </el-form-item>
-              <el-form-item label="业务ID：">
-                <span>{{ row.serviceid }}</span>
-              </el-form-item>
-              <el-form-item label="PMT PID：">
-                <span>{{ row.pmtpid }}</span>
-              </el-form-item>
-              <el-form-item label="VIDEO PID：">
-                <span>{{ row.videopid }}</span>
-              </el-form-item>
-              <el-form-item label="组播地址：">
-                <span>{{ row.outurl }}</span>
-              </el-form-item>
-              <el-form-item label="组播端口：">
-                <span>{{ row.outport }}</span>
-              </el-form-item>
-              <el-form-item label="输出码率：">
-                <span>{{ row.bitrate | bitrateUnit }}</span>
-              </el-form-item>
-              <el-form-item label="输出网卡IP地址：">
-                <span>{{ row.localaddr }}</span>
-              </el-form-item>
-            </template>
-          </el-form>
-        </template>
-      </el-table-column>
       <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
@@ -130,23 +79,20 @@
           <span>{{ row.videores }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="播出类型" align="center" width="80">
+      <el-table-column label="日志" align="center" width="80">
         <template slot-scope="{row}">
-          <span>{{ row.type === 0? 'UDP': 'SDI' }}</span>
+          <span>{{ row.log }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="动作状态" align="center" width="100">
+      <el-table-column label="状态" align="center" width="80">
         <template slot-scope="{row}">
-          <el-tag v-if="row.action === 0" type="danger">停止</el-tag>
-          <el-tag v-else type="success">启用</el-tag>
+          <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button v-if="row.action === 0" type="text" size="medium" @click="actived(row.id, $index)">启用</el-button>
-          <el-button v-if="row.action === 1" type="text" size="medium" @click="inactived(row.id, $index)">停止</el-button>
-          <el-button v-if="row.action === 0" type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
-          <el-button v-if="row.action === 0" type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
+          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
+          <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -168,16 +114,6 @@ import Edit from './edit.vue'
 export default {
   components: { Pagination, Add, Edit },
   directives: { waves },
-  filters: {
-    bitrateUnit(val) {
-      if (!val || val < 1000) return val + 'B'
-      if (val / 1000 < 1000) {
-        return (val / 1000) + 'K'
-      } else {
-        return (val / 1000000) + 'M'
-      }
-    }
-  },
   data() {
     return {
       list: null,
