@@ -53,12 +53,12 @@
       </el-table-column>
       <el-table-column label="输出网卡IP" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.devip }}</span>
+          <span>{{ row.devips }}</span>
         </template>
       </el-table-column>
       <el-table-column label="媒资目录" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.mediaPath }}</span>
+          <span>{{ row.mediapath }}</span>
         </template>
       </el-table-column>
       <el-table-column label="总空间" align="center">
@@ -93,7 +93,7 @@
 
 <script>
 import { getAllNetworks } from '@/api/channel'
-import { fetchList, actived, inactived, deleteDevice } from '@/api/device'
+import { fetchList, deleteDevice } from '@/api/device'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
@@ -102,16 +102,6 @@ import Edit from './edit.vue'
 export default {
   components: { Pagination, Add, Edit },
   directives: { waves },
-  filters: {
-    bitrateUnit(val) {
-      if (!val || val < 1000) return val + 'B'
-      if (val / 1000 < 1000) {
-        return (val / 1000) + 'K'
-      } else {
-        return (val / 1000000) + 'M'
-      }
-    }
-  },
   data() {
     return {
       list: null,
@@ -169,26 +159,8 @@ export default {
       this.$refs[formName].resetFields()
       this.handleFilter()
     },
-    actived(id, idx) {
-      actived({ id: id }).then(data => {
-        this.$message({
-          message: '启用成功！',
-          type: 'success'
-        })
-        this.getList()
-      })
-    },
-    inactived(id, idx) {
-      inactived({ id: id }).then(data => {
-        this.$message({
-          message: '停止成功！',
-          type: 'success'
-        })
-        this.getList()
-      })
-    },
     delHandler(id, idx) {
-      this.$confirm('确定要删除此频道吗？', '提示', {
+      this.$confirm('确定要删除此设备吗？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -210,6 +182,7 @@ export default {
     },
     editHandle(item, idx) {
       this.editItem = JSON.parse(JSON.stringify(item))
+      this.editItem.devips = this.editItem.devips.split('#')
       this.editIndex = idx
       this.dialogVisibleEdit = true
     },

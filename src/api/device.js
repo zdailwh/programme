@@ -28,20 +28,6 @@ export function getAllDevices() {
   })
 }
 
-export function actived(query) {
-  return request({
-    url: '/admin/programme/v1/devices/' + query.id + '/on',
-    method: 'put'
-  })
-}
-
-export function inactived(query) {
-  return request({
-    url: '/admin/programme/v1/devices/' + query.id + '/off',
-    method: 'put'
-  })
-}
-
 export function createDevice(data) {
   return request({
     url: '/admin/programme/v1/devices',
