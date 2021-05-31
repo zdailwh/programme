@@ -198,6 +198,32 @@ export const constantRoutes = [
         meta: { title: '设备频道管理', icon: 'el-icon-connection' }
       }
     ]
+  },
+  {
+    path: '/devicepros',
+    component: Layout,
+    redirect: '/devicepros/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/devicepros/index'),
+        name: 'DeviceProsList',
+        meta: { title: '设备节目管理', icon: 'el-icon-connection' }
+      }
+    ]
+  },
+  {
+    path: '/prochns',
+    component: Layout,
+    redirect: '/prochns/index',
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/prochns/index'),
+        name: 'ProChnsList',
+        meta: { title: '频道节目管理', icon: 'el-icon-connection' }
+      }
+    ]
   }
   // {
   //   path: '/',

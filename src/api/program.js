@@ -34,6 +34,13 @@ export function fetchList(query) {
   })
 }
 
+export function getAllPros() {
+  return request({
+    url: '/admin/programme/v1/programmes',
+    method: 'get'
+  })
+}
+
 export function updateProgram(data) {
   return request({
     url: '/admin/programme/v1/programmes/' + data.id,

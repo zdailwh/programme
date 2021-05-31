@@ -27,9 +27,9 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+      <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
-      </el-button>
+      </el-button> -->
     </el-form>
 
     <div class="deviceTabs">
@@ -40,57 +40,6 @@
     </div>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column type="expand">
-        <template slot-scope="{row}">
-          <el-form label-position="left" inline class="table-expand">
-            <!-- SDI -->
-            <template v-if="row.type === 1">
-              <el-form-item label="码率卡序号：">
-                <span>{{ row.cardno }}</span>
-              </el-form-item>
-              <el-form-item label="端口号：">
-                <span>{{ row.portno }}</span>
-              </el-form-item>
-              <el-form-item label="输出帧率：">
-                <span>{{ row.fps }}</span>
-              </el-form-item>
-              <el-form-item label="输出声道：">
-                <span>{{ row.audiotype }}</span>
-              </el-form-item>
-            </template>
-            <!-- UDP -->
-            <template v-if="row.type === 0">
-              <el-form-item label="网络ID：">
-                <span>{{ row.networkid }}</span>
-              </el-form-item>
-              <el-form-item label="传送流ID：">
-                <span>{{ row.tsid }}</span>
-              </el-form-item>
-              <el-form-item label="业务ID：">
-                <span>{{ row.serviceid }}</span>
-              </el-form-item>
-              <el-form-item label="PMT PID：">
-                <span>{{ row.pmtpid }}</span>
-              </el-form-item>
-              <el-form-item label="VIDEO PID：">
-                <span>{{ row.videopid }}</span>
-              </el-form-item>
-              <el-form-item label="组播地址：">
-                <span>{{ row.outurl }}</span>
-              </el-form-item>
-              <el-form-item label="组播端口：">
-                <span>{{ row.outport }}</span>
-              </el-form-item>
-              <el-form-item label="输出码率：">
-                <span>{{ row.bitrate | bitrateUnit }}</span>
-              </el-form-item>
-              <el-form-item label="输出网卡IP地址：">
-                <span>{{ row.localaddr }}</span>
-              </el-form-item>
-            </template>
-          </el-form>
-        </template>
-      </el-table-column>
       <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
@@ -101,31 +50,14 @@
           <span>{{ row.device_id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="频道" align="center">
+      <el-table-column label="节目" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.channel_id }}</span>
+          <span>{{ row.record_id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="播出类型" align="center">
+      <el-table-column label="心跳时间" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.type === 0? 'UDP': 'SDI' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="动作状态" align="center">
-        <template slot-scope="{row}">
-          <el-tag v-if="row.action === 0" type="danger">停止</el-tag>
-          <el-tag v-else type="success">启用</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="运行状态" align="center">
-        <template slot-scope="{row}">
-          <el-tag v-if="row.running === 0" type="success">正常</el-tag>
-          <el-tag v-else type="danger">异常</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="运行日志" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.log }}</span>
+          <span>{{ row.heartbeat }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center">
@@ -133,25 +65,25 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <!-- <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
-          <!-- <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button> -->
+          <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <Add :dialog-visible-add="dialogVisibleAdd" :net-card-arr="netCardArr" :options-chns="optionsChns" :options-devices="optionsDevices" @changeAddVisible="changeAddVisible" @refresh="getList" />
-    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" :net-card-arr="netCardArr" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <Add :dialog-visible-add="dialogVisibleAdd" :options-pros="optionsPros" :options-devices="optionsDevices" @changeAddVisible="changeAddVisible" @refresh="getList" />
+    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
   </div>
 </template>
 
 <script>
-import { getAllNetworks, getAllChannels } from '@/api/channel'
+import { getAllPros } from '@/api/program'
 import { getAllDevices } from '@/api/device'
-import { fetchList, deleteDevicechn } from '@/api/devicechns'
+import { fetchList, deleteProdevice } from '@/api/devicepros'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
@@ -160,16 +92,6 @@ import Edit from './edit.vue'
 export default {
   components: { Pagination, Add, Edit },
   directives: { waves },
-  filters: {
-    bitrateUnit(val) {
-      if (!val || val < 1000) return val + 'B'
-      if (val / 1000 < 1000) {
-        return (val / 1000) + 'K'
-      } else {
-        return (val / 1000000) + 'M'
-      }
-    }
-  },
   data() {
     return {
       list: null,
@@ -189,18 +111,17 @@ export default {
       editIndex: '',
       dialogVisibleAdd: false,
       dialogVisibleEdit: false,
-      netCardArr: {},
-      allChannels: [],
-      optionsChns: [],
+      allPrograms: [],
+      optionsPros: [],
       currDevice: '全部',
       allDevices: [],
       optionsDevices: []
     }
   },
   watch: {
-    allChannels: function(newVal) {
+    allPrograms: function(newVal) {
       if (newVal.length) {
-        this.optionsChns = newVal.map((item, idx, arr) => {
+        this.optionsPros = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
             value: item.id
@@ -231,8 +152,7 @@ export default {
     }
   },
   created() {
-    this.getNetworkList()
-    this.getAllChannels()
+    this.getAllPros()
     this.getAllDevices()
     this.getList()
   },
@@ -277,11 +197,11 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.delDevicechn(id, idx)
+        this.delDevicepro(id, idx)
       })
     },
-    delDevicechn(id, idx) {
-      deleteDevicechn({ id: id }).then(response => {
+    delDevicepro(id, idx) {
+      deleteProdevice({ id: id }).then(response => {
         this.$message({
           message: '删除成功！',
           type: 'success'
@@ -300,16 +220,9 @@ export default {
     changeEditVisible(params) {
       this.dialogVisibleEdit = params
     },
-    getNetworkList() {
-      getAllNetworks().then((response) => {
-        this.netCardArr = response || {}
-      }).catch((error) => {
-        console.log(error)
-      })
-    },
-    getAllChannels() {
-      getAllChannels().then(data => {
-        this.allChannels = data.items
+    getAllPros() {
+      getAllPros().then(data => {
+        this.allPrograms = data.items
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
