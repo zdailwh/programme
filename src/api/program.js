@@ -46,9 +46,7 @@ export function updateProgram(data) {
     url: '/admin/programme/v1/programmes/' + data.id,
     method: 'put',
     data: {
-      showname: data.showname,
-      chnnames: data.chnnames.join('#'),
-      chnids: data.chnids.join('#')
+      showname: data.showname
     }
   })
 }

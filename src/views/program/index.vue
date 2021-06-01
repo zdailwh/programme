@@ -1,5 +1,21 @@
 <template>
   <div class="app-container">
+    <el-form ref="filterForm1" :model="filterForm1" :inline="true" class="filter-form">
+      <el-form-item prop="channelId">
+        <el-select v-model="filterForm1.channelId" placeholder="所属频道" @change="handleFilter1">
+          <el-option label="全部频道" value="" />
+          <el-option v-for="item in optionsChannels" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option label="与频道无关联" value="-1" />
+        </el-select>
+      </el-form-item>
+      <el-form-item prop="deviceId">
+        <el-select v-model="filterForm1.deviceId" placeholder="所属设备" @change="handleFilter1">
+          <el-option label="全部设备" value="" />
+          <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item.value" />
+          <el-option label="与设备无关联" value="-1" />
+        </el-select>
+      </el-form-item>
+    </el-form>
     <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
       <el-form-item prop="showname">
         <el-input v-model="filterForm.showname" placeholder="节目名称" style="width:120px" />
@@ -35,16 +51,19 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
+      <el-form-item>
+        <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelectedPros">批量删除</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="filter-item" type="danger" icon="el-icon-share" :disabled="!selectedItems.length" @click="dialogVisibleDevice = true">批量关联设备</el-button>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="filter-item" type="danger" icon="el-icon-share" :disabled="!selectedItems.length" @click="dialogVisibleChannel = true">批量关联频道</el-button>
+      </el-form-item>
     </el-form>
 
-    <div class="channelTabs">
-      <el-radio-group v-model="currChannel" @change="handleFilter">
-        <el-radio-button label="全部" />
-        <el-radio-button v-for="item in options" :key="item.value" :label="item.label" />
-      </el-radio-group>
-    </div>
-
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" />
       <el-table-column type="expand">
         <template slot-scope="{row}">
           <el-form label-position="left" inline class="table-expand">
@@ -74,11 +93,6 @@
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
           <span>{{ row.showname }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="所属频道" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.chnnames | tojoin }}</span>
         </template>
       </el-table-column>
       <el-table-column label="时长" align="center" width="100">
@@ -118,7 +132,47 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <Edit :edit-item="editItem" :all-channels="allChannels" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <Edit :edit-item="editItem" :options-channels="optionsChannels" :options-devices="optionsDevices" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
+
+    <el-dialog
+      title="批量关联设备"
+      :visible.sync="dialogVisibleDevice"
+      width="50%"
+    >
+      <div>
+        <el-form ref="deviceForm" label-width="100px">
+          <el-form-item prop="deviceid" label="所属设备：">
+            <el-select v-model="deviceForm.deviceid" placeholder="请选择" style="width: 100%;">
+              <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisibleDevice = false">取 消</el-button>
+        <el-button type="primary" @click="handleSelectedContDevice">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog
+      title="批量关联频道"
+      :visible.sync="dialogVisibleChannel"
+      width="50%"
+    >
+      <div>
+        <el-form ref="channelForm" label-width="100px">
+          <el-form-item prop="channelid" label="所属频道：">
+            <el-select v-model="channelForm.channelid" placeholder="请选择" style="width: 100%;">
+              <el-option v-for="item in optionsChannels" :key="item.value" :label="item.label" :value="item.value" />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisibleChannel = false">取 消</el-button>
+        <el-button type="primary" @click="handleSelectedContChannel">确 定</el-button>
+      </span>
+    </el-dialog>
 
   </div>
 </template>
@@ -126,6 +180,9 @@
 <script>
 import { fetchList, deleteProgram } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
+import { getAllDevices } from '@/api/device'
+import { createProdevice } from '@/api/devicepros'
+import { createProchn } from '@/api/prochns'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Edit from './edit.vue'
@@ -148,15 +205,20 @@ export default {
   },
   data() {
     return {
-      currChannel: '全部',
-      options: [],
       allChannels: [],
+      optionsChannels: [],
+      allDevices: [],
+      optionsDevices: [],
       list: null,
       total: 0,
       listLoading: true,
       listQuery: {
         page: 1,
         limit: 20
+      },
+      filterForm1: {
+        channelId: '',
+        deviceId: ''
       },
       filterForm: {
         showname: '',
@@ -169,13 +231,22 @@ export default {
       statusArr: [{ label: '已创建', value: 0 }, { label: '文件待上传', value: 1 }, { label: '文件上传成功', value: 2 }],
       editItem: {},
       editIndex: '',
-      dialogVisibleEdit: false
+      dialogVisibleEdit: false,
+      selectedItems: [],
+      dialogVisibleDevice: false,
+      dialogVisibleChannel: false,
+      deviceForm: {
+        deviceid: ''
+      },
+      channelForm: {
+        channelid: ''
+      }
     }
   },
   watch: {
     allChannels: function(newVal) {
       if (newVal.length) {
-        this.options = newVal.map((item, idx, arr) => {
+        this.optionsChannels = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
             value: item.id
@@ -183,33 +254,27 @@ export default {
         })
       }
     },
-    currChannel: function(newVal) {
-      if (newVal !== '全部') {
-        this.filterForm.channel = newVal
-        this.filterForm.channelId = this.options.filter((item, idx, arr) => {
-          return item.label === newVal
-        })[0].value
-      } else {
-        this.filterForm.channel = ''
-        this.filterForm.channelId = ''
+    allDevices: function(newVal) {
+      if (newVal.length) {
+        this.optionsDevices = newVal.map((item, idx, arr) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
       }
     }
   },
   created() {
     this.getList()
     this.getAllChannels()
+    this.getAllDevices()
   },
   methods: {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
         if (data.items) {
-          data.items.map((item, idx, arr) => {
-            item.chnids = item.chnids.split('#').map((it) => {
-              return parseInt(it)
-            })
-            item.chnnames = item.chnnames.split('#')
-          })
           this.list = data.items
         } else {
           this.list = []
@@ -228,12 +293,6 @@ export default {
       }
       if (this.filterForm.showname !== '') {
         this.listQuery.showname = this.filterForm.showname
-      }
-      if (this.filterForm.channel !== '') {
-        this.listQuery.channel = this.filterForm.channel
-      }
-      if (this.filterForm.channelId !== '') {
-        this.listQuery.channelId = this.filterForm.channelId
       }
       if (this.filterForm.create_time_range && this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
@@ -270,7 +329,22 @@ export default {
     },
     getAllChannels() {
       getAllChannels().then(data => {
-        this.allChannels = data.items
+        this.allChannels = data.items || []
+      }).catch(error => {
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
+      })
+    },
+    getAllDevices() {
+      getAllDevices().then(data => {
+        this.allDevices = data.items || []
+      }).catch(error => {
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
       })
     },
     editHandle(item, idx) {
@@ -280,6 +354,102 @@ export default {
     },
     changeEditVisible(params) {
       this.dialogVisibleEdit = params
+    },
+    handleFilter1() {
+      console.log(this.filterForm1)
+    },
+    handleSelectionChange(val) {
+      this.selectedItems = val
+    },
+    handleDelSelectedPros() {
+      this.$confirm(`此操作将删除当前选中的${this.selectedItems.length}个节目, 是否继续?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.doDelSelectedPros()
+      }).catch(() => {
+        console.log('已取消删除')
+      })
+    },
+    doDelSelectedPros() {
+      const requestList = this.selectedItems.map(async(listItem, idx, arr) => {
+        return new Promise((resolve, reject) => {
+          deleteProgram({ id: listItem.id }).then(response => {
+            resolve(idx)
+          }).catch(error => {
+            reject(error)
+          })
+        })
+      })
+      Promise.all(requestList).then(res => {
+        if (res.length < this.selectedItems.length) {
+          this.$message({
+            message: '批量删除节目执行成功！',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: '批量删除节目执行成功！',
+            type: 'success'
+          })
+        }
+        this.getList()
+      })
+    },
+    handleSelectedContDevice() {
+      this.dialogVisibleDevice = false
+
+      const requestList = this.selectedItems.map(async(listItem, idx, arr) => {
+        return new Promise((resolve, reject) => {
+          createProdevice({ programmeId: listItem.id, deviceId: this.deviceForm.deviceid }).then(response => {
+            resolve(idx)
+          }).catch(error => {
+            reject(error)
+          })
+        })
+      })
+      Promise.all(requestList).then(res => {
+        if (res.length < this.selectedItems.length) {
+          this.$message({
+            message: '批量关联设备执行成功！',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: '批量关联设备执行成功！',
+            type: 'success'
+          })
+        }
+        this.getList()
+      })
+    },
+    handleSelectedContChannel() {
+      this.dialogVisibleChannel = false
+
+      const requestList = this.selectedItems.map(async(listItem, idx, arr) => {
+        return new Promise((resolve, reject) => {
+          createProchn({ programmeId: listItem.id, channelId: this.channelForm.channelid }).then(response => {
+            resolve(idx)
+          }).catch(error => {
+            reject(error)
+          })
+        })
+      })
+      Promise.all(requestList).then(res => {
+        if (res.length < this.selectedItems.length) {
+          this.$message({
+            message: '批量关联频道执行成功！',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: '批量关联频道执行成功！',
+            type: 'success'
+          })
+        }
+        this.getList()
+      })
     }
   }
 }

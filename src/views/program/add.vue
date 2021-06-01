@@ -4,7 +4,12 @@
       <el-form ref="addForm" label-width="100px">
         <el-form-item prop="chnids" label="所属频道：">
           <el-select v-model="addForm.chnids" multiple placeholder="请选择" style="width: 100%;">
-            <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+            <el-option v-for="item in chnOptions" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="deviceids" label="所属设备：">
+          <el-select v-model="addForm.deviceids" multiple placeholder="请选择" style="width: 100%;">
+            <el-option v-for="item in deviceOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="文件类型：">
@@ -92,6 +97,9 @@
 <script>
 import { createProgram, mergeProgram } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
+import { getAllDevices } from '@/api/device'
+import { createProdevice, deleteProdevice } from '@/api/devicepros'
+import { createProchn, deleteProchn } from '@/api/prochns'
 const SIZE = 32 * 1024 * 1024 // 切片大小
 
 export default {
@@ -133,8 +141,10 @@ export default {
   },
   data() {
     return {
-      options: [],
+      chnOptions: [],
       allChannels: [],
+      deviceOptions: [],
+      allDevices: [],
       handleList: [],
       list: [],
       filterList: [],
@@ -142,7 +152,7 @@ export default {
       rootHandle: {},
       addForm: {
         chnids: [],
-        chnnames: []
+        deviceids: []
       },
       container: {
         file: null,
@@ -164,7 +174,7 @@ export default {
   watch: {
     allChannels: function(newVal) {
       if (newVal.length) {
-        this.options = newVal.map((item, idx, arr) => {
+        this.chnOptions = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
             value: item.id
@@ -172,16 +182,20 @@ export default {
         })
       }
     },
-    'addForm.chnids': function(newVal) {
-      this.addForm.chnnames = this.options.filter((item, idx, arr) => {
-        return newVal.indexOf(item.value) !== -1
-      }).map((item, idx, arr) => {
-        return item.label
-      })
+    allDevices: function(newVal) {
+      if (newVal.length) {
+        this.deviceOptions = newVal.map((item, idx, arr) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
     }
   },
   created() {
     this.getAllChannels()
+    this.getAllDevices()
   },
   mounted() {
     window.addEventListener('beforeunload', beforeunloadFn, true)
@@ -297,6 +311,13 @@ export default {
         })
         return
       }
+      if (!this.addForm.deviceids.length) {
+        this.$message({
+          message: '请选择所属设备！',
+          type: 'warning'
+        })
+        return
+      }
       if (!this.checkedList.length) {
         this.$message({
           message: '请选择要上传的文件！',
@@ -304,8 +325,19 @@ export default {
         })
         return
       }
-
       await this.createTasks(this.checkedList, 0)
+    },
+    async createChannelPro(chnids, programmeId) {
+      const requestList = chnids.map(async(item) => {
+        this.createProchn(item, programmeId)
+      })
+      return requestList
+    },
+    async createDevicePro(deviceids, programmeId) {
+      const requestList = deviceids.map(async(item) => {
+        this.createProdevice(item, programmeId)
+      })
+      return requestList
     },
     async createTasks(filelist, startIdx) {
       this.uploadCompleted = false
@@ -318,6 +350,24 @@ export default {
       await this.createTask(listItem, startIdx).then(async(response) => {
         console.log('创建节目返回' + startIdx + '/' + response.id)
         filelist[startIdx].programid = response.id
+
+        var requestChnpros = await this.createChannelPro(this.addForm.chnids, response.id)
+        console.log(requestChnpros)
+        await Promise.all(requestChnpros).then(async(result) => {
+          console.log('创建频道关联成功了')
+        }).catch((error) => {
+          console.log(error)
+          console.log('创建频道关联失败了')
+        })
+
+        var requestDevicepros = await this.createDevicePro(this.addForm.deviceids, response.id)
+        console.log(requestDevicepros)
+        await Promise.all(requestDevicepros).then(async(result) => {
+          console.log('创建设备关联成功了')
+        }).catch((error) => {
+          console.log(error)
+          console.log('创建设备关联失败了')
+        })
 
         await this.uploadFiles(filelist, startIdx)
       }).catch((error) => {
@@ -333,8 +383,6 @@ export default {
     async createTask(fileItem, idx) {
       var md5 = fileItem.hash
       var params = {
-        chnids: this.addForm.chnids.join('#'),
-        chnnames: this.addForm.chnnames.join('#'),
         name: fileItem.file.name,
         md5: md5,
         ext: fileItem.ext
@@ -481,7 +529,7 @@ export default {
     calculateHash(fileChunkList, filelist, startIdx) {
       console.log('开始计算hash' + startIdx)
       return new Promise(resolve => {
-        this.container.worker = new Worker('/hash.js')
+        this.container.worker = new Worker('/programme/hash.js')
         this.container.worker.postMessage({ fileChunkList })
         this.container.worker.onmessage = e => {
           const { percentage, hash } = e.data
@@ -549,11 +597,73 @@ export default {
     },
     getAllChannels() {
       getAllChannels().then(data => {
-        this.allChannels = data.items
+        this.allChannels = data.items || []
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
           type: 'error'
+        })
+      })
+    },
+    getAllDevices() {
+      getAllDevices().then(data => {
+        this.allDevices = data.items || []
+      }).catch(error => {
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
+      })
+    },
+    createProdevice(deviceId, programmeId) {
+      var formadd = {
+        deviceId: deviceId,
+        programmeId: programmeId
+      }
+      console.log(formadd)
+      return new Promise((resolve, reject) => {
+        createProdevice(formadd).then(response => {
+          // this.$message({
+          //   message: '节目设备关联记录创建成功！',
+          //   type: 'success'
+          // })
+          resolve(response)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    delDevicepro(id) {
+      deleteProdevice({ id: id }).then(response => {
+        this.$message({
+          message: '节目设备关联记录删除成功！',
+          type: 'success'
+        })
+      })
+    },
+    createProchn(channelId, programmeId) {
+      var formadd = {
+        channelId: channelId,
+        programmeId: programmeId
+      }
+      console.log(formadd)
+      return new Promise((resolve, reject) => {
+        createProchn(formadd).then(response => {
+          // this.$message({
+          //   message: '节目频道关联记录创建成功！',
+          //   type: 'success'
+          // })
+          resolve(response)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    delProchn(id) {
+      deleteProchn({ id: id }).then(response => {
+        this.$message({
+          message: '节目频道关联记录删除成功！',
+          type: 'success'
         })
       })
     }

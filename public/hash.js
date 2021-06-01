@@ -1,4 +1,4 @@
-self.importScripts("/spark-md5.min.js"); // 导入脚本
+self.importScripts("/programme/spark-md5.min.js"); // 导入脚本
 
 // 生成文件 hash
 self.onmessage = function(e) {
