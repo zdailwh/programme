@@ -39,7 +39,14 @@
       </el-radio-group>
     </div>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
+    <el-form class="filter-form">
+      <el-form-item>
+        <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelected">批量删除</el-button>
+      </el-form-item>
+    </el-form>
+
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @selection-change="handleSelectionChange">
+      <el-table-column type="selection" />
       <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
@@ -110,7 +117,8 @@ export default {
       optionsPros: [],
       currChannel: '全部',
       allChannels: [],
-      optionsChannels: []
+      optionsChannels: [],
+      selectedItems: []
     }
   },
   watch: {
@@ -233,6 +241,45 @@ export default {
           message: error.message || '操作失败！',
           type: 'error'
         })
+      })
+    },
+    handleSelectionChange(val) {
+      this.selectedItems = val
+    },
+    handleDelSelected() {
+      this.$confirm(`此操作将删除当前选中的${this.selectedItems.length}条记录, 是否继续?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.doDelSelected()
+      }).catch(() => {
+        console.log('已取消删除')
+      })
+    },
+    doDelSelected() {
+      const requestList = this.selectedItems.map(async(listItem, idx, arr) => {
+        return new Promise((resolve, reject) => {
+          deleteProchn({ id: listItem.id }).then(response => {
+            resolve(idx)
+          }).catch(error => {
+            reject(error)
+          })
+        })
+      })
+      Promise.all(requestList).then(res => {
+        if (res.length < this.selectedItems.length) {
+          this.$message({
+            message: '批量删除频道节目关联执行成功！',
+            type: 'success'
+          })
+        } else {
+          this.$message({
+            message: '批量删除频道节目关联执行成功！',
+            type: 'success'
+          })
+        }
+        this.getList()
       })
     }
   }
