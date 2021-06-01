@@ -14,7 +14,7 @@
           <el-input v-model="editItem.ip" placeholder="请输入设备IP" />
         </el-form-item>
         <el-form-item label="输出网卡IP" prop="devips">
-          <el-input v-model="editItem.devips" placeholder="当为多个IP时，用#连接，如：127.0.0.0#127.0.0.1#127.0.0.2" />
+          <el-input v-model="editItem.devips" placeholder="当为多个IP时，用|连接，如：127.0.0.0|127.0.0.1|127.0.0.2" />
         </el-form-item>
         <!-- <el-form-item label="媒资目录" prop="mediapath">
           <el-input v-model="editItem.mediapath" placeholder="请输入媒资目录" />
