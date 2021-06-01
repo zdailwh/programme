@@ -26,7 +26,7 @@
   </el-dialog>
 </template>
 <script>
-import { createProdevice } from '@/api/devicepros'
+import { createProchn } from '@/api/prochns'
 export default {
   props: {
     dialogVisibleAdd: {
@@ -68,16 +68,16 @@ export default {
     commit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.createProdevice()
+          this.createProchn()
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    createProdevice() {
+    createProchn() {
       console.log(this.formadd)
-      createProdevice(this.formadd).then(response => {
+      createProchn(this.formadd).then(response => {
         this.$message({
           message: '创建成功！',
           type: 'success'

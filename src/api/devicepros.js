@@ -29,6 +29,14 @@ export function createProdevice(data) {
   })
 }
 
+export function updateProdevice(data) {
+  return request({
+    url: '/admin/programme/v1/prodevices/' + data.id,
+    method: 'put',
+    data: data
+  })
+}
+
 export function deleteProdevice(query) {
   return request({
     url: '/admin/programme/v1/prodevices/' + query.id,

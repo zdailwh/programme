@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
+    <!-- <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
       <el-form-item prop="create_time_range">
         <el-date-picker
           v-model="filterForm.create_time_range"
@@ -30,13 +30,19 @@
       <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
       </el-button>
-    </el-form>
+    </el-form> -->
 
     <div class="deviceTabs">
       <el-radio-group v-model="currDevice" @change="handleFilter">
         <el-radio-button label="全部" />
         <el-radio-button v-for="item in optionsDevices" :key="item.value" :label="item.label" />
       </el-radio-group>
+    </div>
+
+    <div>
+      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+        创建关联记录
+      </el-button>
     </div>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
@@ -309,7 +315,7 @@ export default {
     },
     getAllChannels() {
       getAllChannels().then(data => {
-        this.allChannels = data.items
+        this.allChannels = data.items || []
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
@@ -319,7 +325,7 @@ export default {
     },
     getAllDevices() {
       getAllDevices().then(data => {
-        this.allDevices = data.items
+        this.allDevices = data.items || []
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',

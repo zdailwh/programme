@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
+    <!-- <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
       <el-form-item prop="create_time_range">
         <el-date-picker
           v-model="filterForm.create_time_range"
@@ -27,10 +27,10 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
-      </el-button> -->
-    </el-form>
+      </el-button>
+    </el-form> -->
 
     <div class="deviceTabs">
       <el-radio-group v-model="currDevice" @change="handleFilter">
@@ -232,7 +232,7 @@ export default {
     },
     getAllDevices() {
       getAllDevices().then(data => {
-        this.allDevices = data.items
+        this.allDevices = data.items || []
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',

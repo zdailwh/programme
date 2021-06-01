@@ -29,6 +29,14 @@ export function createProchn(data) {
   })
 }
 
+export function updateProchn(data) {
+  return request({
+    url: '/admin/programme/v1/prochns/' + data.id,
+    method: 'put',
+    data: data
+  })
+}
+
 export function deleteProchn(query) {
   return request({
     url: '/admin/programme/v1/prochns/' + query.id,

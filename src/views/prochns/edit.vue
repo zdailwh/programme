@@ -16,7 +16,7 @@
   </el-dialog>
 </template>
 <script>
-import { updateDevicechn } from '@/api/devicechns'
+import { updateProchn } from '@/api/prochns'
 export default {
   props: {
     dialogVisibleEdit: {
@@ -42,15 +42,15 @@ export default {
     commit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          this.updateDevicechn()
+          this.updateProchn()
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    updateDevicechn() {
-      updateDevicechn(this.editItem).then(response => {
+    updateProchn() {
+      updateProchn(this.editItem).then(response => {
         this.$message({
           message: '编辑成功！',
           type: 'success'
