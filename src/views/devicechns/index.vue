@@ -104,12 +104,12 @@
       </el-table-column>
       <el-table-column label="设备" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.device_id }}</span>
+          <span>{{ row.device.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="频道" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.channel_id }}</span>
+          <span>{{ row.channel.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="播出类型" align="center">
