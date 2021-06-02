@@ -126,6 +126,8 @@
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
+          <el-button type="text" size="medium" @click="editDeviceProHandle(row, $index)">编辑节目设备关联</el-button>
+          <el-button type="text" size="medium" @click="editChannelProHandle(row, $index)">编辑节目频道关联</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -133,6 +135,8 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <Edit :edit-item="editItem" :options-channels="optionsChannels" :options-devices="optionsDevices" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <EditDevicePro :edit-item="editItem" :options-devices="optionsDevices" :dialog-visible-edit-device-pro="dialogVisibleEditDevicePro" @changeEditDeviceProVisible="changeEditDeviceProVisible" @refresh="getList" />
+    <EditChannelPro :edit-item="editItem" :options-channels="optionsChannels" :dialog-visible-edit-channel-pro="dialogVisibleEditChannelPro" @changeEditChannelProVisible="changeEditChannelProVisible" @refresh="getList" />
 
     <el-dialog
       title="批量关联设备"
@@ -186,9 +190,11 @@ import { createProchn } from '@/api/prochns'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Edit from './edit.vue'
+import EditDevicePro from './editDevicePro.vue'
+import EditChannelPro from './editChannelPro.vue'
 
 export default {
-  components: { Pagination, Edit },
+  components: { Pagination, Edit, EditDevicePro, EditChannelPro },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -240,7 +246,9 @@ export default {
       },
       channelForm: {
         channelid: ''
-      }
+      },
+      dialogVisibleEditDevicePro: false,
+      dialogVisibleEditChannelPro: false
     }
   },
   watch: {
@@ -450,6 +458,20 @@ export default {
         }
         this.getList()
       })
+    },
+    editDeviceProHandle(item, idx) {
+      this.editItem = item
+      this.dialogVisibleEditDevicePro = true
+    },
+    changeEditDeviceProVisible(params) {
+      this.dialogVisibleEditDevicePro = params
+    },
+    editChannelProHandle(item, idx) {
+      this.editItem = item
+      this.dialogVisibleEditChannelPro = true
+    },
+    changeEditChannelProVisible(params) {
+      this.dialogVisibleEditChannelPro = params
     }
   }
 }
