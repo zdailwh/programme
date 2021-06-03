@@ -224,6 +224,32 @@ export const constantRoutes = [
         meta: { title: '频道节目管理', icon: 'el-icon-connection' }
       }
     ]
+  },
+  {
+    path: '/task',
+    component: Layout,
+    redirect: '/task/index',
+    meta: { title: '任务管理', icon: 'el-icon-date' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/task/index'),
+        name: 'TaskView',
+        meta: { title: '任务总览', icon: 'el-icon-view' }
+      },
+      {
+        path: 'index-jobs',
+        component: () => import('@/views/task/index-jobs'),
+        name: 'TaskJobList',
+        meta: { title: '主任务', icon: 'el-icon-s-claim' }
+      },
+      {
+        path: 'index-threads',
+        component: () => import('@/views/task/index-threads'),
+        name: 'TaskThreadList',
+        meta: { title: '主线程', icon: 'el-icon-share' }
+      }
+    ]
   }
   // {
   //   path: '/',
