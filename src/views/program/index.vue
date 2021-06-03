@@ -126,8 +126,8 @@
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
-          <el-button type="text" size="medium" @click="editDeviceProHandle(row, $index)">编辑节目设备关联</el-button>
-          <el-button type="text" size="medium" @click="editChannelProHandle(row, $index)">编辑节目频道关联</el-button>
+          <el-button type="text" size="medium" @click="editDeviceProHandle(row, $index)">节目设备关联</el-button>
+          <el-button type="text" size="medium" @click="editChannelProHandle(row, $index)">节目频道关联</el-button>
         </template>
       </el-table-column>
     </el-table>

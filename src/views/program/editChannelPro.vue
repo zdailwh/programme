@@ -13,10 +13,10 @@
         :disable-transitions="false"
         @close="delProChn(tag.id)"
       >
-        {{ tag.name }}
+        {{ tag.channel.name }}
       </el-tag>
       <el-select v-if="showSelect" v-model="mychannel" class="select-new-tag" size="small" placeholder="关联频道" @change="createProchn">
-        <el-option v-for="item in optionsChannels" :key="item.value" :label="item.label" :value="item.value" />
+        <el-option v-for="item in optionsChannels" :key="item.value" :label="item.label" :value="item.value" :disabled="currIdx.indexOf(item.value) !== -1" />
       </el-select>
       <el-button v-else class="button-new-tag" size="small" @click="showSelect = true">+ 关联频道</el-button>
     </div>
@@ -27,6 +27,7 @@
 </template>
 <script>
 import { createProchn, deleteProchn } from '@/api/prochns'
+import { getAllProchns } from '@/api/program'
 export default {
   props: {
     dialogVisibleEditChannelPro: {
@@ -49,10 +50,15 @@ export default {
   data() {
     return {
       showSelect: false,
-      tags: [
-        { id: 1, name: '频道1' }, { id: 2, name: '频道2' }
-      ],
-      mychannel: {}
+      tags: [],
+      mychannel: ''
+    }
+  },
+  computed: {
+    currIdx() {
+      return this.tags.map((item) => {
+        return item.channel.id
+      })
     }
   },
   watch: {
@@ -64,11 +70,19 @@ export default {
   },
   methods: {
     getChannelProList() {
-      console.log(this.editItem.id)
+      getAllProchns({ id: this.editItem.id }).then(response => {
+        if (response.items) {
+          this.tags = response.items
+        } else {
+          this.tags = []
+        }
+      }).catch(error => {
+        console.log(error)
+      })
     },
     createProchn() {
       var formadd = {
-        channelId: this.mychannel.value,
+        channelId: this.mychannel,
         programmeId: this.editItem.id
       }
       createProchn(formadd).then(response => {
@@ -76,7 +90,7 @@ export default {
           message: '节目频道关联记录创建成功！',
           type: 'success'
         })
-        this.mychannel = {}
+        this.mychannel = ''
         this.showSelect = false
         this.getChannelProList()
       }).catch(error => {

@@ -72,3 +72,17 @@ export function mergeProgram(query) {
     method: 'put'
   })
 }
+
+export function getAllProdevs(query) {
+  return request({
+    url: `/admin/programme/v1/programmes/${query.id}/prodevs`,
+    method: 'get'
+  })
+}
+
+export function getAllProchns(query) {
+  return request({
+    url: `/admin/programme/v1/programmes/${query.id}/prochns`,
+    method: 'get'
+  })
+}

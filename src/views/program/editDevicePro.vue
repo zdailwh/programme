@@ -13,10 +13,10 @@
         :disable-transitions="false"
         @close="delProdevice(tag.id)"
       >
-        {{ tag.name }}
+        {{ tag.device.name }}
       </el-tag>
       <el-select v-if="showSelect" v-model="mydevice" class="select-new-tag" size="small" placeholder="关联设备" @change="createProdevice">
-        <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item.value" />
+        <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item.value" :disabled="currIdx.indexOf(item.value) !== -1" />
       </el-select>
       <el-button v-else class="button-new-tag" size="small" @click="showSelect = true">+ 关联设备</el-button>
     </div>
@@ -27,6 +27,7 @@
 </template>
 <script>
 import { createProdevice, deleteProdevice } from '@/api/devicepros'
+import { getAllProdevs } from '@/api/program'
 export default {
   props: {
     dialogVisibleEditDevicePro: {
@@ -49,10 +50,15 @@ export default {
   data() {
     return {
       showSelect: false,
-      tags: [
-        { id: 1, name: '设备1' }, { id: 2, name: '设备2' }
-      ],
-      mydevice: {}
+      tags: [],
+      mydevice: ''
+    }
+  },
+  computed: {
+    currIdx() {
+      return this.tags.map((item) => {
+        return item.device.id
+      })
     }
   },
   watch: {
@@ -64,11 +70,19 @@ export default {
   },
   methods: {
     getDeviceProList() {
-      console.log(this.editItem.id)
+      getAllProdevs({ id: this.editItem.id }).then(response => {
+        if (response.items) {
+          this.tags = response.items
+        } else {
+          this.tags = []
+        }
+      }).catch(error => {
+        console.log(error)
+      })
     },
     createProdevice() {
       var formadd = {
-        deviceId: this.mydevice.value,
+        deviceId: this.mydevice,
         programmeId: this.editItem.id
       }
       createProdevice(formadd).then(response => {
@@ -76,7 +90,7 @@ export default {
           message: '节目设备关联记录创建成功！',
           type: 'success'
         })
-        this.mydevice = {}
+        this.mydevice = ''
         this.showSelect = false
         this.getDeviceProList()
       }).catch(error => {
