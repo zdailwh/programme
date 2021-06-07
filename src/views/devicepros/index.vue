@@ -47,17 +47,12 @@
       </el-table-column>
       <el-table-column label="设备" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.device.name }}</span>
+          <span>{{ row.device && row.device.name }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.record.showname }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="心跳时间" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.heartbeat }}</span>
+          <span>{{ row.record && row.record.showname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center">
