@@ -21,7 +21,7 @@
             </template>
             <el-button type="text" icon="el-icon-download" class="cardBtn" :disabled="getepgsDisable" @click="getEpgsOfDay">读取在播单</el-button>
           </div>
-          <Edit ref="editlist" :list-curr="listCurrComp" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" @hide-the-last-epg-online="ifHideLastEpgOnline = true" />
+          <Edit ref="editlist" :list-curr="listCurrComp" :has-prepend="hasPrepend" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" /><!--  @hide-the-last-epg-online="ifHideLastEpgOnline = true" -->
         </el-card>
       </el-col>
       <el-col :span="12">
@@ -116,32 +116,37 @@ export default {
       lastEpg: null,
       currEpg: null,
       ifHideLastEpgOnline: false, // 是否隐藏在播单中当前时间点节目
-      canDelLastEpg: true,
+      // canDelLastEpg: true,
       getepgsDisable: false
     }
   },
   computed: {
     listCurrComp: function() {
-      if (this.tempEpg === null) {
-        if (this.lastEpg !== null) {
-          return [this.lastEpg].concat(this.listCurr)
-        } else {
-          return this.listCurr
-        }
+      if (this.lastEpg !== null && !this.ifHideLastEpgOnline) {
+        return [this.lastEpg].concat(this.listCurr)
+      } else if (this.currEpg !== null && this.ifHideLastEpgOnline) {
+        return [this.currEpg].concat(this.listCurr)
       } else {
         return this.listCurr
+      }
+    },
+    hasPrepend: function() {
+      if ((!this.ifHideLastEpgOnline && this.lastEpg !== null) || (this.ifHideLastEpgOnline && this.currEpg !== null)) {
+        return true
+      } else {
+        return false
       }
     }
   },
   watch: {
-    ifHideLastEpgOnline: function(newVal) {
-      if (newVal) {
-        if (this.lastEpg !== null && this.listCurr.length && this.canDelLastEpg) {
-          this.canDelLastEpg = false // 防止下次再执行此段代码
-          this.listCurr.shift()
-        }
-      }
-    },
+    // ifHideLastEpgOnline: function(newVal) {
+    //   if (newVal) {
+    //     if (this.lastEpg !== null && this.listCurr.length && this.canDelLastEpg) {
+    //       this.canDelLastEpg = false // 防止下次再执行此段代码
+    //       this.listCurr.shift()
+    //     }
+    //   }
+    // },
     listCurr: {
       handler: function(newVal) {
         if (!newVal.length) return []
@@ -161,6 +166,7 @@ export default {
     currChannel: async function(newVal, oldVal) {
       this.ifHideLastEpgOnline = false
       this.listCurr = []
+      this.getepgsDisable = false
       // 获取指定频道下的在播单最后一条节目
       this.getLastEpg().then(() => {
         // 获取指定频道下的临时节目单
@@ -190,7 +196,6 @@ export default {
             return new Date(item.endtime).getTime() > new Date().getTime()
           })
           this.listCurr = this.listCurr.concat(filterArr)
-          // this.listCurr = JSON.parse(tempEpgDemo)
         }
 
         this.listLoading = false
@@ -214,18 +219,30 @@ export default {
         item.starttime = this.$refs.editlist.currentRow.endtime
         item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
         this.listCurr.splice(insertIdx + 1, 0, item)
-
-        this.updatetimeAfterHandle(insertIdx + 1, item.duration)
+        if (this.hasPrepend) {
+          this.updatetimeAfterHandle(insertIdx + 2, item.duration)
+        } else {
+          this.updatetimeAfterHandle(insertIdx + 1, item.duration)
+        }
       } else {
-        // 插入到尾部
-        insertIdx = this.listCurr.length
-        item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
-        item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
-        this.listCurr.splice(insertIdx, 0, item)
+        if (this.$refs.editlist.currentRow !== null && (this.$refs.editlist.currentRow.isTheLastEpg || this.$refs.editlist.currentRow.isTheCurrEpg)) {
+          // 插入到灰色节目之后 即第一条
+          item.starttime = this.firstStartTime
+          item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
+          this.listCurr.unshift(item)
+
+          this.updatetimeAfterHandle(1, item.duration)
+        } else {
+          // 插入到尾部
+          insertIdx = this.listCurr.length
+          item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
+          item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(item.duration))
+          this.listCurr.splice(insertIdx, 0, item)
+        }
       }
     },
     updatetimeAfterHandle(startIdx, offset) {
-      this.listCurr.map((item, idx, arr) => {
+      this.listCurrComp.map((item, idx, arr) => {
         if (idx > startIdx) {
           item.starttime = parseTime(new Date(item.starttime).getTime() + parseInt(offset))
           item.endtime = parseTime(new Date(item.endtime).getTime() + parseInt(offset))
@@ -236,7 +253,7 @@ export default {
     removePro(params) {
       var pros = params.items
       pros.map((item) => {
-        if (!item.isTheLastEpg && !item.isTheLastEpgInsert) {
+        if (!item.isTheLastEpg && !item.isTheCurrEpg) {
           var delIdx = this.listCurr.indexOf(item)
           this.updatetimeAfterHandle(delIdx, -(new Date(item.endtime).getTime() - new Date(item.starttime).getTime()))
           this.listCurr.splice(delIdx, 1)
@@ -247,6 +264,7 @@ export default {
     cutPro(params) {
       var item = params.item
       var delIdx = this.listCurr.indexOf(item)
+
       this.listCurr.splice(delIdx, 1)
     },
     // 复制节目单记录
@@ -259,22 +277,22 @@ export default {
         item.starttime = insertIdx === 0 ? this.firstStartTime : this.listCurr[insertIdx - 1].endtime
         item.endtime = parseTime(new Date(item.starttime).getTime() + parseInt(playduration))
         delete item.isTheLastEpg
-        delete item.isTheLastEpgInsert
+        delete item.isTheCurrEpg
         delete item.fromEpgsBefore
         this.listCurr.splice(insertIdx, 0, item)
       })
     },
     // 定时播
     fixedTime({ index, starttime }) {
-      this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
+      this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurrComp[index].starttime).getTime())
 
-      this.listCurr[index].flag = 1
+      this.listCurrComp[index].flag = 1
     },
     // 顺时播
     turnTime({ index, starttime }) {
-      this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurr[index].starttime).getTime())
+      this.updatetimeAfterHandle(index - 1, new Date(starttime).getTime() - new Date(this.listCurrComp[index].starttime).getTime())
 
-      this.listCurr[index].flag = 0
+      this.listCurrComp[index].flag = 0
     },
     async createHandler(ifRefresh = true) {
       var epg = this.listCurr.map((item, idx, arr) => {
@@ -377,12 +395,15 @@ export default {
     async getCurrEpg() {
       await getCurrEpg({ orderby: '-id', op: 'mt', channelId: this.currChannelId, starttime: parseTime(new Date().getTime()) }).then(data => {
         this.currEpg = data.items ? data.items[0] : null
+        if (this.currEpg) {
+          this.currEpg.isTheCurrEpg = true
+        }
       })
     },
     // 获取频道在播单(当前时间之后的)
     getEpgsOfDay() {
-      this.canDelLastEpg = false
-      this.ifHideLastEpgOnline = false
+      // this.canDelLastEpg = false
+      this.ifHideLastEpgOnline = true
       this.getepgsDisable = true
       // this.listCurr = []
       // 获取频道播出单当前时间点节目
@@ -393,14 +414,33 @@ export default {
             epgsBefore.map((item) => {
               item.fromEpgsBefore = true
             })
-            console.log(this.listCurr)
-            console.log(epgsBefore)
-            this.listCurr = epgsBefore.concat(this.listCurr)
-            console.log(this.listCurr)
-            if (this.currEpg !== null) {
-              this.listCurr.unshift(this.currEpg)
+            if (this.listCurr.length) {
+              var editepgStarttime = this.listCurr[0].starttime
+              console.log('新编单第一条的起始时间' + editepgStarttime)
+              var cutIdx = epgsBefore.length
+              for (var idx = 0; idx < epgsBefore.length; idx++) {
+                if (idx <= epgsBefore.length - 2) {
+                  if (new Date(epgsBefore[idx].starttime).getTime() < new Date(editepgStarttime).getTime() && new Date(epgsBefore[idx + 1].starttime).getTime() >= new Date(editepgStarttime).getTime()) {
+                    cutIdx = idx
+                    break
+                  }
+                } else {
+                  if (new Date(epgsBefore[idx].starttime).getTime() < new Date(editepgStarttime).getTime()) {
+                    cutIdx = idx
+                  }
+                }
+              }
+              console.log('在播单分割索引' + cutIdx)
+              epgsBefore.splice(cutIdx + 1)
+              this.listCurr = epgsBefore.concat(this.listCurr)
+            } else {
+              this.listCurr = epgsBefore.concat(this.listCurr)
             }
-            this.firstStartTime = this.listCurr[this.listCurr.length - 1].endtime
+            if (this.currEpg) {
+              this.firstStartTime = this.currEpg.endtime
+            } else {
+              this.firstStartTime = this.listCurr[0] ? this.listCurr[0].starttime : parseTime(new Date().getTime())
+            }
           }
         })
       })
@@ -411,7 +451,7 @@ export default {
         this.lastEpg = data.items ? data.items[0] : null
         if (this.lastEpg) {
           this.lastEpg.isTheLastEpg = true
-          this.firstStartTime = this.lastEpg.endtime
+          this.firstStartTime = parseTime(Math.max(new Date(this.lastEpg.endtime).getTime(), new Date().getTime()))
         } else {
           this.firstStartTime = parseTime(new Date().getTime())
         }

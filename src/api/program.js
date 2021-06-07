@@ -9,8 +9,8 @@ export function fetchList(query) {
   if (query.showname !== '') {
     params.showname = query.showname
   }
-  if (query.channel !== '') {
-    params.channel = query.channel
+  if (query.deviceId !== '') {
+    params.deviceId = query.deviceId
   }
   if (query.channelId !== '') {
     params.channelId = query.channelId

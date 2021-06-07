@@ -1,22 +1,20 @@
 <template>
   <div class="app-container">
-    <el-form ref="filterForm1" :model="filterForm1" :inline="true" class="filter-form">
+    <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
       <el-form-item prop="channelId">
-        <el-select v-model="filterForm1.channelId" placeholder="所属频道" @change="handleFilter1">
+        <el-select v-model="filterForm.channelId" placeholder="所属频道">
           <el-option label="全部频道" value="" />
           <el-option v-for="item in optionsChannels" :key="item.value" :label="item.label" :value="item.value" />
-          <el-option label="与频道无关联" value="-1" />
+          <el-option label="与频道无关联" value="0" />
         </el-select>
       </el-form-item>
       <el-form-item prop="deviceId">
-        <el-select v-model="filterForm1.deviceId" placeholder="所属设备" @change="handleFilter1">
+        <el-select v-model="filterForm.deviceId" placeholder="所属设备">
           <el-option label="全部设备" value="" />
           <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item.value" />
-          <el-option label="与设备无关联" value="-1" />
+          <el-option label="与设备无关联" value="0" />
         </el-select>
       </el-form-item>
-    </el-form>
-    <el-form ref="filterForm" :model="filterForm" :inline="true" class="filter-form">
       <el-form-item prop="showname">
         <el-input v-model="filterForm.showname" placeholder="节目名称" style="width:120px" />
       </el-form-item>
@@ -51,6 +49,7 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
+      <br>
       <el-form-item>
         <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelectedPros">批量删除</el-button>
       </el-form-item>
@@ -222,14 +221,10 @@ export default {
         page: 1,
         limit: 20
       },
-      filterForm1: {
-        channelId: '',
-        deviceId: ''
-      },
       filterForm: {
         showname: '',
-        channel: '',
         channelId: '',
+        deviceId: '',
         create_time_range: [],
         update_time_range: [],
         status: ''
@@ -302,6 +297,12 @@ export default {
       if (this.filterForm.showname !== '') {
         this.listQuery.showname = this.filterForm.showname
       }
+      if (this.filterForm.deviceId !== '') {
+        this.listQuery.deviceId = this.filterForm.deviceId
+      }
+      if (this.filterForm.channelId !== '') {
+        this.listQuery.channelId = this.filterForm.channelId
+      }
       if (this.filterForm.create_time_range && this.filterForm.create_time_range.length) {
         this.listQuery.create_time_range = this.filterForm.create_time_range
       }
@@ -362,9 +363,6 @@ export default {
     },
     changeEditVisible(params) {
       this.dialogVisibleEdit = params
-    },
-    handleFilter1() {
-      console.log(this.filterForm1)
     },
     handleSelectionChange(val) {
       this.selectedItems = val
