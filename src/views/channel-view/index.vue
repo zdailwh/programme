@@ -1,19 +1,13 @@
 <template>
   <div class="app-container">
     <div class="deviceTabs">
-      <el-radio-group v-model="currDevice">
+      <el-radio-group v-model="currDevice" @change="handleFilter">
+        <el-radio-button label="全部" />
         <el-radio-button v-for="item in optionsDevices" :key="item.value" :label="item.label" />
       </el-radio-group>
     </div>
-    <div class="deviceTabs" style="margin-top: 10px;">
-      <el-radio-group v-model="currChannel">
-        <el-radio-button v-for="item in optionsChannelsOfDevice" :key="item.value" :label="item.label" />
-      </el-radio-group>
-    </div>
-    <h4 class="time-head">
-      {{ currtime }}
-      <span v-if="currDevice && currChannel" style="font-size: 17px; font-weight: normal; color: #409EFF; margin-left: 15px;">（{{ currDevice + '-' + currChannel }}）</span>
-    </h4>
+
+    <h4 class="time-head">{{ currtime }}</h4>
     <el-table :data="tableData" :row-class-name="tableRowClassName" fit highlight-current-row style="width: 100%">
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="videores" label="视频类型" width="60" align="center" />
@@ -79,7 +73,6 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-
   </div>
 </template>
 
@@ -88,7 +81,6 @@ import { parseTime } from '@/utils/index'
 import Pagination from '@/components/Pagination'
 import { getChannelsPreview } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
-import { fetchList } from '@/api/devicechns'
 
 var timer = null
 export default {
@@ -116,12 +108,12 @@ export default {
         page: 1,
         limit: 20
       },
+      filterForm: {
+        deviceId: ''
+      },
+      currDevice: '全部',
       allDevices: [],
-      optionsDevices: [],
-      allChannelsOfDevice: [],
-      optionsChannelsOfDevice: [],
-      currDevice: '',
-      currChannel: ''
+      optionsDevices: []
     }
   },
   watch: {
@@ -135,48 +127,51 @@ export default {
         })
       }
     },
-    allChannelsOfDevice: function(newVal) {
-      if (newVal.length) {
-        this.optionsChannelsOfDevice = newVal.map((item, idx, arr) => {
-          return {
-            label: item.name,
-            value: item.id
-          }
-        })
-      }
-    },
     currDevice: function(newVal) {
-      var deviceId = this.optionsDevices.filter((item, idx, arr) => {
-        return item.label === newVal
-      })[0].value
-      this.optionsChannelsOfDevice = []
-      this.getDevicechns(deviceId)
-    },
-    currChannel: function(newVal) {
-      var channelId = this.optionsChannelsOfDevice.filter((item, idx, arr) => {
-        return item.label === newVal
-      })[0].value
-      this.getList(channelId)
+      if (newVal !== '全部') {
+        this.filterForm.deviceId = this.optionsDevices.filter((item, idx, arr) => {
+          return item.label === newVal
+        })[0].value
+      } else {
+        this.filterForm.deviceId = ''
+      }
     }
   },
   mounted() {
-    var _this = this
-    timer = window.setInterval(function() {
-      _this.currtime = parseTime(new Date(), '{y}年{m}月{d}日 {h}:{i}:{s}')
-      if (_this.canInterval) {
-        _this.getList()
-      }
-    }, 1000)
+    this.beginInterval()
     this.getAllDevices()
   },
   methods: {
+    beginInterval() {
+      var _this = this
+      timer = window.setInterval(function() {
+        _this.currtime = parseTime(new Date(), '{y}年{m}月{d}日 {h}:{i}:{s}')
+        if (_this.canInterval) {
+          _this.getList()
+        }
+      }, 1000)
+    },
     getList() {
       getChannelsPreview(this.listQuery).then((response) => {
         this.tableData = response.items
         this.total = response.total
       }).catch((error) => {
         console.log(error)
+        window.clearInterval(timer)
       })
+    },
+    handleFilter() {
+      window.clearInterval(timer)
+      this.tableData = []
+      this.total = 0
+      this.listQuery = {
+        page: 1,
+        limit: 20
+      }
+      if (this.filterForm.deviceId !== '') {
+        this.listQuery.deviceId = this.filterForm.deviceId
+      }
+      this.beginInterval()
     },
     tableRowClassName({ row, rowIndex }) {
       var endtime = new Date(row.EndTime).getTime() - new Date().getTime()
@@ -196,19 +191,6 @@ export default {
     getAllDevices() {
       getAllDevices().then(data => {
         this.allDevices = data.items || []
-      }).catch(error => {
-        this.$message({
-          message: error.message || '操作失败！',
-          type: 'error'
-        })
-      })
-    },
-    getDevicechns(deviceId) {
-      fetchList({ page: 1, limit: 20, deviceId: deviceId }).then(data => {
-        var devicechns = data.items || []
-        this.allChannelsOfDevice = devicechns.map(item => {
-          return item.channel
-        })
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',

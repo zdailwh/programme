@@ -34,7 +34,8 @@ export function getAllChannels() {
 export function getChannelsPreview(query) {
   var params = {
     page: query.page - 1,
-    per_page: query.limit
+    per_page: query.limit,
+    deviceId: query.deviceId
   }
   return request({
     url: '/admin/programme/v1/channels/preview',
