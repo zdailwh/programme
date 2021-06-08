@@ -37,22 +37,22 @@
           <span>{{ row.success }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="exception" align="center">
+      <el-table-column label="exception" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.exception }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="flag" align="center">
+      <el-table-column label="flag" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.flag }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="log" align="center">
+      <el-table-column label="log" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.log }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>

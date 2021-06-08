@@ -97,6 +97,9 @@ tr.bg-red .el-button--text, tr.bg-blue .el-button--text {
 .table-expand .el-form-item__content {
   min-width: 80px;
 }
+.table-expand .el-form-item {
+  margin-bottom: 0;
+}
 
 /*频道预览*/
 .el-table .warning-row .endtime {
