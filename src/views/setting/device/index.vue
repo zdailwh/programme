@@ -61,17 +61,22 @@
           <span>{{ row.mediapath }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="总空间" align="center">
+      <el-table-column label="心跳" align="center" width="100">
+        <template slot-scope="{row}">
+          <span>{{ row.heartbeat }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="总空间" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.spacetotal }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="可用空间" align="center">
+      <el-table-column label="可用空间" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.spaceavail }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>

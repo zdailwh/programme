@@ -44,20 +44,6 @@ export function getChannelsPreview(query) {
   })
 }
 
-export function actived(query) {
-  return request({
-    url: '/admin/programme/v1/channels/' + query.id + '/on',
-    method: 'put'
-  })
-}
-
-export function inactived(query) {
-  return request({
-    url: '/admin/programme/v1/channels/' + query.id + '/off',
-    method: 'put'
-  })
-}
-
 export function getAllNetworks() {
   return request({
     url: '/admin/programme/v1/channels/getnetworks',
@@ -77,7 +63,14 @@ export function updateChannel(data) {
   return request({
     url: '/admin/programme/v1/channels/' + data.id,
     method: 'put',
-    data: data
+    data: {
+      no: data.no,
+      defaultts: data.defaultts,
+      epgurl: data.epgurl,
+      width: data.width,
+      height: data.height,
+      videores: data.videores
+    }
   })
 }
 

@@ -141,7 +141,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
+          <el-button v-if="row.action === 0" type="text" size="medium" @click="actived(row.id, $index)">启用</el-button>
+          <el-button v-if="row.action === 1" type="text" size="medium" @click="inactived(row.id, $index)">停止</el-button>
+          <el-button type="text" size="medium" :disabled="row.action === 1" @click="editHandle(row, $index)">编辑</el-button>
           <!-- <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button> -->
         </template>
       </el-table-column>
@@ -157,7 +159,7 @@
 <script>
 import { getAllNetworks, getAllChannels } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
-import { fetchList, deleteDevicechn } from '@/api/devicechns'
+import { fetchList, deleteDevicechn, actived, inactived } from '@/api/devicechns'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
@@ -331,6 +333,24 @@ export default {
           message: error.message || '操作失败！',
           type: 'error'
         })
+      })
+    },
+    actived(id, idx) {
+      actived({ id: id }).then(data => {
+        this.$message({
+          message: '启用成功！',
+          type: 'success'
+        })
+        this.getList()
+      })
+    },
+    inactived(id, idx) {
+      inactived({ id: id }).then(data => {
+        this.$message({
+          message: '停止成功！',
+          type: 'success'
+        })
+        this.getList()
       })
     }
   }

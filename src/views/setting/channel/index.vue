@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { fetchList, actived, inactived, deleteChannel, getAllNetworks } from '@/api/channel'
+import { fetchList, deleteChannel, getAllNetworks } from '@/api/channel'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
@@ -133,28 +133,7 @@ export default {
       editIndex: '',
       dialogVisibleAdd: false,
       dialogVisibleEdit: false,
-      netCardArr: {
-        docker0: {
-          ip: '172.17.0.1',
-          netmask: '255.255.0.0'
-        },
-        ecsfixed: {
-          ip: '192.168.88.88',
-          netmask: '255.255.255.0'
-        },
-        eno1: {
-          ip: '192.168.6.201',
-          netmask: '255.255.255.0'
-        },
-        enp3s0f0: {
-          ip: '192.168.10.201',
-          netmask: '255.255.255.0'
-        },
-        lo: {
-          ip: '127.0.0.1',
-          netmask: '255.0.0.0'
-        }
-      }
+      netCardArr: {}
     }
   },
   created() {
@@ -195,24 +174,6 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
       this.handleFilter()
-    },
-    actived(id, idx) {
-      actived({ id: id }).then(data => {
-        this.$message({
-          message: '启用成功！',
-          type: 'success'
-        })
-        this.getList()
-      })
-    },
-    inactived(id, idx) {
-      inactived({ id: id }).then(data => {
-        this.$message({
-          message: '停止成功！',
-          type: 'success'
-        })
-        this.getList()
-      })
     },
     delHandler(id, idx) {
       this.$confirm('确定要删除此频道吗？', '提示', {
