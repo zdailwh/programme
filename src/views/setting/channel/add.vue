@@ -10,6 +10,9 @@
         <el-form-item label="频道名称" prop="name">
           <el-input v-model="formadd.name" placeholder="请输入频道名称" />
         </el-form-item>
+        <el-form-item label="显示名称" prop="showname">
+          <el-input v-model="formadd.showname" placeholder="请输入频道显示名称" />
+        </el-form-item>
         <el-form-item label="频道编号" prop="no">
           <el-input v-model="formadd.no" placeholder="请输入频道编号" />
         </el-form-item>
@@ -64,6 +67,7 @@ export default {
     return {
       formadd: {
         name: '',
+        showname: '',
         no: '',
         defaultts: '',
         epgurl: '',
@@ -74,6 +78,9 @@ export default {
       ruleValidate: {
         name: [
           { required: true, message: '频道名称不能为空', trigger: 'blur' }
+        ],
+        showname: [
+          { required: true, message: '频道显示名称不能为空', trigger: 'blur' }
         ],
         no: [
           { required: true, message: '频道编号不能为空', trigger: 'blur' }
@@ -123,6 +130,7 @@ export default {
         })
         this.formadd = {
           name: '',
+          showname: '',
           no: '',
           defaultts: '',
           epgurl: '',

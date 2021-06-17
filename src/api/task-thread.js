@@ -22,14 +22,14 @@ export function getLast() {
 
 export function threadStop(query) {
   return request({
-    url: `/admin/task/v1/main_threads/${query.id}/stop`,
+    url: `/admin/task/v1/main_threads/stop`,
     method: 'get'
   })
 }
 
 export function threadRestart(query) {
   return request({
-    url: `/admin/task/v1/main_threads/${query.id}/restart`,
+    url: `/admin/task/v1/main_threads/restart`,
     method: 'get'
   })
 }

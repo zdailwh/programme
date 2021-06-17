@@ -112,6 +112,11 @@
           <span>{{ row.channel.name }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="运行进程PID" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.pid }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="播出类型" align="center">
         <template slot-scope="{row}">
           <span>{{ row.type === 0? 'UDP': 'SDI' }}</span>
@@ -144,7 +149,7 @@
           <el-button v-if="row.action === 0" type="text" size="medium" @click="actived(row.id, $index)">启用</el-button>
           <el-button v-if="row.action === 1" type="text" size="medium" @click="inactived(row.id, $index)">停止</el-button>
           <el-button type="text" size="medium" :disabled="row.action === 1" @click="editHandle(row, $index)">编辑</el-button>
-          <!-- <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button> -->
+          <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
