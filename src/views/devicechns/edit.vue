@@ -74,7 +74,7 @@
           </el-form-item>
           <el-form-item label="输出网卡IP地址" prop="localaddr">
             <el-select v-model="editItem.localaddr" placeholder="请选择输出网卡IP地址" style="width: 100%;">
-              <el-option v-for="(item,k) in netCardArr" :key="k" :value="item.ip" :label="k + '（' + item.ip + ' / ' + item.netmask + '）'" />
+              <el-option v-for="(item,k) in netCardArr" :key="k" :value="item" :label="item" />
             </el-select>
           </el-form-item>
         </template>
@@ -99,12 +99,6 @@ export default {
       default() {
         return {}
       }
-    },
-    netCardArr: {
-      type: Object,
-      default: function() {
-        return {}
-      }
     }
   },
   data() {
@@ -118,7 +112,8 @@ export default {
         { label: 'UDP', value: 0 },
         { label: 'SDI', value: 1 }
       ],
-      bitrateUnit: ''
+      bitrateUnit: '',
+      netCardArr: []
     }
   },
   watch: {
@@ -130,6 +125,9 @@ export default {
           this.editItem.bitrate = this.editItem.bitrate / 1000
           this.bitrateUnit = 'M'
         }
+      }
+      if (val.device) {
+        this.netCardArr = val.device.devips.split('|').filter(it => { return it !== '' })
       }
     }
   },

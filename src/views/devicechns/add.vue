@@ -9,8 +9,8 @@
     <div>
       <el-form ref="form" :model="formadd" :rules="ruleValidate" label-width="100px">
         <el-form-item prop="deviceId" label="设备">
-          <el-select v-model="formadd.deviceId" placeholder="请选择" style="width: 100%;">
-            <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item.value" />
+          <el-select v-model="formadd.device" placeholder="请选择" style="width: 100%;" @change="deviceChange">
+            <el-option v-for="item in optionsDevices" :key="item.value" :label="item.label" :value="item" />
           </el-select>
         </el-form-item>
         <el-form-item prop="channelId" label="关联频道">
@@ -84,7 +84,7 @@
           </el-form-item>
           <el-form-item label="输出网卡IP地址" prop="localaddr">
             <el-select v-model="formadd.localaddr" placeholder="请选择输出网卡IP地址" style="width: 100%;">
-              <el-option v-for="(item,k) in netCardArr" :key="k" :value="item.ip" :label="k + '（' + item.ip + ' / ' + item.netmask + '）'" />
+              <el-option v-for="(item,k) in netCardArr" :key="k" :value="item" :label="item" />
             </el-select>
           </el-form-item>
         </template>
@@ -103,12 +103,6 @@ export default {
     dialogVisibleAdd: {
       type: Boolean,
       default: false
-    },
-    netCardArr: {
-      type: Object,
-      default: function() {
-        return {}
-      }
     },
     optionsDevices: {
       type: Array,
@@ -158,12 +152,17 @@ export default {
       outputTypeArr: [
         { label: 'UDP', value: 0 },
         { label: 'SDI', value: 1 }
-      ]
+      ],
+      netCardArr: []
     }
   },
   mounted() {
   },
   methods: {
+    deviceChange(dev) {
+      this.formadd.deviceId = dev.value
+      this.netCardArr = dev.devips
+    },
     commit() {
       this.$refs.form.validate((valid) => {
         if (valid) {

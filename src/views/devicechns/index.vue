@@ -156,13 +156,13 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <Add :dialog-visible-add="dialogVisibleAdd" :net-card-arr="netCardArr" :options-chns="optionsChns" :options-devices="optionsDevices" @changeAddVisible="changeAddVisible" @refresh="getList" />
-    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" :net-card-arr="netCardArr" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <Add :dialog-visible-add="dialogVisibleAdd" :options-chns="optionsChns" :options-devices="optionsDevices" @changeAddVisible="changeAddVisible" @refresh="getList" />
+    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
   </div>
 </template>
 
 <script>
-import { getAllNetworks, getAllChannels } from '@/api/channel'
+import { getAllChannels } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
 import { fetchList, deleteDevicechn, actived, inactived } from '@/api/devicechns'
 import waves from '@/directive/waves' // waves directive
@@ -226,7 +226,8 @@ export default {
         this.optionsDevices = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
-            value: item.id
+            value: item.id,
+            devips: item.devips.split('|').filter(it => { return it !== '' })
           }
         })
       }
@@ -244,7 +245,6 @@ export default {
     }
   },
   created() {
-    this.getNetworkList()
     this.getAllChannels()
     this.getAllDevices()
     this.getList()
@@ -312,13 +312,6 @@ export default {
     },
     changeEditVisible(params) {
       this.dialogVisibleEdit = params
-    },
-    getNetworkList() {
-      getAllNetworks().then((response) => {
-        this.netCardArr = response || {}
-      }).catch((error) => {
-        console.log(error)
-      })
     },
     getAllChannels() {
       getAllChannels().then(data => {
