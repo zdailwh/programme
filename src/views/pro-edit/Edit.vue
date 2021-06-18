@@ -19,7 +19,7 @@
       <el-table-column label="操作" align="center" width="50">
         <template slot-scope="{row, $index}">
           <el-popover
-            v-if="!row.isTheLastEpg && !row.isTheLastEpgInsert"
+            v-if="!row.isTheLastEpg && !row.isTheCurrEpg"
             title="节目开始时间"
             placement="top"
             width="250"
@@ -84,10 +84,10 @@ export default {
       let min = 0 // 初始化分
       let h = 0 // 初始化小时
       let result = ''
-      if (secondTime > 60) { // 如果秒数大于60，将秒数转换成整数
+      if (secondTime >= 60) { // 如果秒数大于60，将秒数转换成整数
         min = parseInt(secondTime / 60) // 获取分钟，除以60取整数，得到整数分钟
         secondTime = parseInt(secondTime % 60) // 获取秒数，秒数取佘，得到整数秒数
-        if (min > 60) { // 如果分钟大于60，将分钟转换成小时
+        if (min >= 60) { // 如果分钟大于60，将分钟转换成小时
           h = parseInt(min / 60) // 获取小时，获取分钟除以60，得到整数小时
           min = parseInt(min % 60) // 获取小时后取佘的分，获取分钟除以60取佘的分
         }
@@ -102,6 +102,10 @@ export default {
       default() {
         return []
       }
+    },
+    hasPrepend: {
+      type: Boolean,
+      default: true
     }
   },
   data() {
@@ -186,19 +190,19 @@ export default {
       }
     },
     selectable(row) {
-      if (row && (row.isTheLastEpg || row.isTheLastEpgInsert)) {
+      if (row && (row.isTheLastEpg || row.isTheCurrEpg)) {
         return false
       } else {
         return true
       }
     },
     tableRowClassName({ row, rowIndex }) {
-      delete row.isTheLastEpgInsert
-      if (!row.fromEpgsBefore && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
-        // 判断临时节目单中某条是否为当前正在播出的节目
-        this.listCurr[rowIndex].isTheLastEpgInsert = true
-        this.$emit('hide-the-last-epg-online')
-      }
+      // delete row.isTheLastEpgInsert
+      // if (!row.fromEpgsBefore && new Date(this.listCurr[rowIndex].starttime).getTime() < new Date().getTime() && new Date(this.listCurr[rowIndex].endtime).getTime() > new Date().getTime()) {
+      //   // 判断临时节目单中某条是否为当前正在播出的节目
+      //   this.listCurr[rowIndex].isTheLastEpgInsert = true
+      //   this.$emit('hide-the-last-epg-online')
+      // }
 
       if (this.listCurr[rowIndex - 1]) {
         var startT = new Date(this.listCurr[rowIndex].starttime).getTime()
@@ -208,14 +212,20 @@ export default {
           // 当前节目占用上一节目部分时间
           // 修改上一条节目的结束时间
           this.listCurr[rowIndex - 1].endtime = this.listCurr[rowIndex].starttime
-        } else if (startT < prevStartT) {
+        } else if (startT <= prevStartT) {
           // 当前节目占用上一节目全部时间
           // 删除上一条节目
-          this.$emit('cut-pro', { item: this.listCurr[rowIndex - 1] })
+          if (this.hasPrepend) {
+            if (rowIndex > 1) {
+              this.$emit('cut-pro', { item: this.listCurr[rowIndex - 1] })
+            }
+          } else {
+            this.$emit('cut-pro', { item: this.listCurr[rowIndex - 1] })
+          }
         }
       }
 
-      if (row && (row.isTheLastEpg || row.isTheLastEpgInsert)) {
+      if (row && (row.isTheLastEpg || row.isTheCurrEpg)) {
         // 在播单最后一条节目
         return 'bg-gray'
       }
