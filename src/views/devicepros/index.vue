@@ -197,11 +197,13 @@ export default {
     },
     delDevicepro(id, idx) {
       deleteProdevice({ id: id }).then(response => {
-        this.$message({
-          message: '删除成功！',
-          type: 'success'
-        })
-        this.getList()
+        if (response.fail === 0 && response.total === response.success) {
+          this.$message({
+            message: response.message || '删除成功！',
+            type: 'success'
+          })
+          this.getList()
+        }
       })
     },
     changeAddVisible(params) {

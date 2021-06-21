@@ -205,11 +205,13 @@ export default {
     },
     delProchn(id, idx) {
       deleteProchn({ id: id }).then(response => {
-        this.$message({
-          message: '删除成功！',
-          type: 'success'
-        })
-        this.getList()
+        if (response.fail === 0 && response.total === response.success) {
+          this.$message({
+            message: response.message || '删除成功！',
+            type: 'success'
+          })
+          this.getList()
+        }
       })
     },
     changeAddVisible(params) {
@@ -261,7 +263,11 @@ export default {
       const requestList = this.selectedItems.map(async(listItem, idx, arr) => {
         return new Promise((resolve, reject) => {
           deleteProchn({ id: listItem.id }).then(response => {
-            resolve(idx)
+            if (response.fail === 0 && response.total === response.success) {
+              resolve(idx)
+            } else {
+              reject(idx)
+            }
           }).catch(error => {
             reject(error)
           })
@@ -270,8 +276,8 @@ export default {
       Promise.all(requestList).then(res => {
         if (res.length < this.selectedItems.length) {
           this.$message({
-            message: '批量删除频道节目关联执行成功！',
-            type: 'success'
+            message: '批量删除频道节目关联执行失败！',
+            type: 'error'
           })
         } else {
           this.$message({
