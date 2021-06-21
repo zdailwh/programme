@@ -83,20 +83,20 @@ export function deleteChannel(query) {
 export function emerempty(data) {
   return request({
     url: `/admin/programme/v1/channels/${data.id}/emerempty`,
-    method: 'get'
+    method: 'put'
   })
 }
 // 修改应急状态为第二种————节目替换
 export function emerreplace(data) {
   return request({
     url: `/admin/programme/v1/channels/${data.id}/emerreplace`,
-    method: 'get'
+    method: 'put'
   })
 }
 // 修改应急状态为非应急状态
 export function emernone(data) {
   return request({
     url: `/admin/programme/v1/channels/${data.id}/emernone`,
-    method: 'get'
+    method: 'put'
   })
 }
