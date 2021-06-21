@@ -471,13 +471,14 @@ export default {
     async uploadChunks(filelist, startIdx, chunkData, uploadedList = []) {
       const requestList = chunkData
         .filter(({ hash }) => !uploadedList.includes(hash))
-        .map(({ programid, fileHash, chunk, hash, index }) => {
+        .map(({ programid, fileHash, chunk, hash, index, size }) => {
           const formData = new FormData()
           formData.append('bigFileId', programid)
           formData.append('chunk', chunk)
           formData.append('hash', hash)
           formData.append('chunkTotal', chunkData.length)
           formData.append('fileHash', fileHash)
+          formData.append('size', size)
           return { formData, index }
         })
         .map(async({ formData, index }) =>
