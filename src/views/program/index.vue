@@ -291,11 +291,7 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
-        if (data.items) {
-          this.list = data.items
-        } else {
-          this.list = []
-        }
+        this.list = data.items || []
         this.total = data.total
 
         this.listLoading = false

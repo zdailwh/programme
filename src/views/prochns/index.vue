@@ -167,7 +167,7 @@ export default {
     getList() {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
-        this.list = data.items
+        this.list = data.items || []
         this.total = data.total
 
         this.listLoading = false
@@ -231,7 +231,7 @@ export default {
     },
     getAllPros() {
       getAllPros().then(data => {
-        this.allPrograms = data.items
+        this.allPrograms = data.items || []
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
@@ -241,7 +241,7 @@ export default {
     },
     getAllChannels() {
       getAllChannels().then(data => {
-        this.allChannels = data.items
+        this.allChannels = data.items || []
       }).catch(error => {
         this.$message({
           message: error.message || '操作失败！',
