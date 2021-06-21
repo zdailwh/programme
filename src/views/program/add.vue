@@ -369,7 +369,7 @@ export default {
           console.log('创建设备关联失败了')
         })
 
-        await this.uploadFiles(filelist, startIdx)
+        this.uploadFiles(filelist, startIdx)
       }).catch((error) => {
         filelist[startIdx].createRes = (error.response && error.response.data) || '节目创建执行失败'
       })
