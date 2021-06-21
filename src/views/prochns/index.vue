@@ -62,17 +62,21 @@
           <span>{{ row.record && row.record.showname }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="应急切播标识" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.emertagstr }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="状态" align="center">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
-          <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
+          <el-button type="text" size="medium" @click="emergency(row, $index)">设为应急切播节目</el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
@@ -85,7 +89,7 @@
 <script>
 import { getAllPros } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
-import { fetchList, deleteProchn } from '@/api/prochns'
+import { fetchList, deleteProchn, emergency } from '@/api/prochns'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
@@ -286,6 +290,17 @@ export default {
           })
         }
         this.getList()
+      })
+    },
+    emergency(id, idx) {
+      emergency({ id: id }).then(response => {
+        if (response.emertag === 1) {
+          this.$message({
+            message: '执行成功！',
+            type: 'success'
+          })
+          this.getList()
+        }
       })
     }
   }

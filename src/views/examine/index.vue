@@ -118,9 +118,9 @@ export default {
                 type: 'success'
               })
               epgExport({ channelId: this.currChannelId }).then((data) => {
-                if (data.code === 0) {
+                if (data.total === data.success) {
                   this.$message({
-                    message: '节目单已导出！',
+                    message: data.message || '节目单已导出！',
                     type: 'success'
                   })
                 }

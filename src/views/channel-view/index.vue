@@ -57,7 +57,18 @@
       </el-table-column>
       <el-table-column prop="defaultts" label="垫播节目" align="center">
         <template slot-scope="scope">
-          {{ scope.row.defaultts }}
+          <div v-if="scope.row.defaultts" style="text-align: center;">
+            {{ scope.row.defaultts }}
+            <el-button type="primary" size="mini" @click="emerempty(scope.row.id)">播出垫片</el-button>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column prop="record" label="应急切播节目" align="center">
+        <template slot-scope="scope">
+          <div v-if="scope.row.record" style="text-align: center;">
+            {{ scope.row.record.showname }}
+            <el-button type="primary" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="running" label="运行状态" align="center" width="80">
@@ -70,6 +81,18 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column prop="emergency" label="应急播出状态" align="center" width="80">
+        <template slot-scope="scope">
+          {{ scope.row.emergency === 0 ? '正常' : scope.row.emergency === 1 ? '播出垫片' : '节目替换' }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center">
+        <template slot-scope="scope">
+          <!-- <el-button v-if="scope.row.emergency !== 1" type="text" size="mini" @click="emerempty(scope.row.id)">播出垫片</el-button>
+          <el-button v-if="scope.row.emergency !== 2" type="text" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button> -->
+          <el-button v-if="scope.row.emergency !== 0" type="text" size="mini" @click="emernone(scope.row.id)">非应急</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
@@ -79,8 +102,9 @@
 <script>
 import { parseTime } from '@/utils/index'
 import Pagination from '@/components/Pagination'
-import { getChannelsPreview } from '@/api/channel'
+import { getChannelsPreview, emerempty, emerreplace, emernone } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
+import { epgExport } from '@/api/epg'
 
 var timer = null
 export default {
@@ -196,6 +220,52 @@ export default {
           message: error.message || '操作失败！',
           type: 'error'
         })
+      })
+    },
+    // 修改应急状态为第一种————播出垫片
+    emerempty(id) {
+      emerempty({ id: id }).then(data => {
+        if (data.emergency === 1) {
+          this.$message({
+            message: '执行成功！',
+            type: 'success'
+          })
+          this.epgExport(id)
+        }
+      })
+    },
+    // 修改应急状态为第二种————节目替换
+    emerreplace(id) {
+      emerreplace({ id: id }).then(data => {
+        if (data.emergency === 2) {
+          this.$message({
+            message: '执行成功！',
+            type: 'success'
+          })
+          this.epgExport(id)
+        }
+      })
+    },
+    // 修改应急状态为非应急状态
+    emernone(id) {
+      emernone({ id: id }).then(data => {
+        if (data.emergency === 0) {
+          this.$message({
+            message: '执行成功！',
+            type: 'success'
+          })
+          this.epgExport(id)
+        }
+      })
+    },
+    epgExport(channelId) {
+      epgExport({ channelId: channelId }).then((data) => {
+        if (data.total === data.success) {
+          this.$message({
+            message: data.message || '节目单已导出！',
+            type: 'success'
+          })
+        }
       })
     }
   }
