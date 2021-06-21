@@ -92,7 +92,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" @click="commit">确 定</el-button>
+      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -119,6 +119,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       formadd: {
         deviceId: '',
         channelId: '',
@@ -174,6 +175,7 @@ export default {
       })
     },
     createDevicechn() {
+      this.loading = true
       this.formadd.bitrate = this.bitrateUnit === 'K' ? this.formadd.bitrate * 1000 : this.formadd.bitrate * 1000000
       console.log(this.formadd)
       createDevicechn(this.formadd).then(response => {
@@ -199,8 +201,11 @@ export default {
           bitrate: null,
           localaddr: null
         }
+        this.loading = false
         this.$emit('changeAddVisible', false)
         this.$emit('refresh')
+      }).catch(() => {
+        this.loading = false
       })
     },
     reset() {
