@@ -14,6 +14,7 @@ export function fetchList(query) {
   if (query.name !== '') {
     params.name = query.name
   }
+  params.orderby = 'id'
   return request({
     url: '/admin/programme/v1/devices',
     method: 'get',
@@ -22,9 +23,12 @@ export function fetchList(query) {
 }
 
 export function getAllDevices() {
+  var params = {}
+  params.orderby = 'id'
   return request({
     url: '/admin/programme/v1/devices',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 

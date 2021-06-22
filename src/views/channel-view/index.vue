@@ -2,8 +2,8 @@
   <div class="app-container">
     <div class="deviceTabs">
       <el-radio-group v-model="currDevice" @change="handleFilter">
-        <el-radio-button label="全部" />
         <el-radio-button v-for="item in optionsDevices" :key="item.value" :label="item.label" />
+        <el-radio-button label="全部" />
       </el-radio-group>
     </div>
 
@@ -67,7 +67,11 @@
         <template slot-scope="scope">
           <div v-if="scope.row.record" style="text-align: center;">
             {{ scope.row.record.showname }}
+            <el-button type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id)">选择节目</el-button>
             <el-button type="primary" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button>
+          </div>
+          <div v-else>
+            <el-button type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id)">选择节目</el-button>
           </div>
         </template>
       </el-table-column>
@@ -83,7 +87,7 @@
       </el-table-column>
       <el-table-column prop="emergency" label="应急播出状态" align="center" width="80">
         <template slot-scope="scope">
-          {{ scope.row.emergency === 0 ? '正常' : scope.row.emergency === 1 ? '播出垫片' : '节目替换' }}
+          <div :class="{ playstate: scope.row.emergency !== 0 }">{{ scope.row.emergency === 0 ? '正常' : scope.row.emergency === 1 ? '播出垫片' : '节目替换' }}</div>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center">
@@ -96,6 +100,23 @@
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+
+    <el-dialog title="素材库" :visible.sync="tsVisible" width="50%" :before-close="handleCloseTs">
+      <div>
+        <el-select v-model="checkedTs" placeholder="请选择" style="width: 100%">
+          <el-option
+            v-for="item in tsList"
+            :key="item.id"
+            :label="item.record.showname"
+            :value="item.id"
+          />
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="tsVisible = false; canInterval = true;">取 消</el-button>
+        <el-button type="primary" @click="checkTs">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -105,6 +126,7 @@ import Pagination from '@/components/Pagination'
 import { getChannelsPreview, emerempty, emerreplace, emernone } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
 import { epgExport } from '@/api/epg'
+import { fetchList, emergency } from '@/api/prochns'
 
 var timer = null
 export default {
@@ -137,7 +159,10 @@ export default {
       },
       currDevice: '全部',
       allDevices: [],
-      optionsDevices: []
+      optionsDevices: [],
+      tsVisible: false,
+      checkedTs: null,
+      tsList: []
     }
   },
   watch: {
@@ -151,6 +176,14 @@ export default {
         })
       }
     },
+    optionsDevices: function(newVal) {
+      if (newVal.length) {
+        this.currDevice = newVal[0].label
+        this.filterForm.device = newVal[0].label
+        this.filterForm.deviceId = newVal[0].value
+        this.handleFilter()
+      }
+    },
     currDevice: function(newVal) {
       if (newVal !== '全部') {
         this.filterForm.deviceId = this.optionsDevices.filter((item, idx, arr) => {
@@ -162,7 +195,7 @@ export default {
     }
   },
   mounted() {
-    this.beginInterval()
+    // this.beginInterval()
     this.getAllDevices()
   },
   methods: {
@@ -267,6 +300,36 @@ export default {
           })
         }
       })
+    },
+    toGetTs(id) {
+      this.tsVisible = true
+      this.canInterval = false
+      this.getProChnList(id)
+    },
+    getProChnList(channelId) {
+      fetchList({ page: 1, channelId: channelId }).then(data => {
+        this.tsList = data.items || []
+      }).catch(() => {
+      })
+    },
+    handleCloseTs() {
+      this.tsVisible = false
+      this.canInterval = true
+    },
+    checkTs() {
+      console.log(this.checkedTs)
+      if (this.checkedTs) {
+        emergency({ id: this.checkedTs }).then(response => {
+          if (response.emertag === 1) {
+            this.$message({
+              message: '执行成功！',
+              type: 'success'
+            })
+          }
+          this.tsVisible = false
+          this.canInterval = true
+        })
+      }
     }
   }
 }

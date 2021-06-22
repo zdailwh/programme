@@ -11,6 +11,7 @@ export function fetchList(query) {
   if (query.username !== '') {
     params.username = query.username
   }
+  params.orderby = 'id'
   return request({
     url: '/admin/v1/users',
     method: 'get',

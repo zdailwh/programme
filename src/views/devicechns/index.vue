@@ -34,8 +34,8 @@
 
     <div class="deviceTabs">
       <el-radio-group v-model="currDevice" @change="handleFilter">
-        <el-radio-button label="全部" />
         <el-radio-button v-for="item in optionsDevices" :key="item.value" :label="item.label" />
+        <el-radio-button label="全部" />
       </el-radio-group>
     </div>
 
@@ -232,6 +232,14 @@ export default {
         })
       }
     },
+    optionsDevices: function(newVal) {
+      if (newVal.length) {
+        this.currDevice = newVal[0].label
+        this.filterForm.device = newVal[0].label
+        this.filterForm.deviceId = newVal[0].value
+        this.handleFilter()
+      }
+    },
     currDevice: function(newVal) {
       if (newVal !== '全部') {
         this.filterForm.device = newVal
@@ -247,7 +255,7 @@ export default {
   created() {
     this.getAllChannels()
     this.getAllDevices()
-    this.getList()
+    // this.getList()
   },
   methods: {
     getList() {

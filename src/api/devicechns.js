@@ -14,6 +14,7 @@ export function fetchList(query) {
   if (query.deviceId !== '') {
     params.deviceId = query.deviceId
   }
+  params.orderby = 'id'
   return request({
     url: '/admin/programme/v1/devicechns',
     method: 'get',

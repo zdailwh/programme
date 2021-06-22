@@ -34,8 +34,8 @@
 
     <div class="channelTabs">
       <el-radio-group v-model="currChannel" @change="handleFilter">
-        <el-radio-button label="全部" />
         <el-radio-button v-for="item in optionsChannels" :key="item.value" :label="item.label" />
+        <el-radio-button label="全部" />
       </el-radio-group>
     </div>
 
@@ -72,11 +72,11 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <!-- <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="emergency(row, $index)">设为应急切播节目</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
@@ -146,6 +146,14 @@ export default {
         })
       }
     },
+    optionsChannels: function(newVal) {
+      if (newVal.length) {
+        this.currChannel = newVal[0].label
+        this.filterForm.channel = newVal[0].label
+        this.filterForm.channelId = newVal[0].value
+        this.handleFilter()
+      }
+    },
     currChannel: function(newVal) {
       if (newVal !== '全部') {
         this.filterForm.channel = newVal
@@ -161,7 +169,7 @@ export default {
   created() {
     this.getAllPros()
     this.getAllChannels()
-    this.getList()
+    // this.getList()
   },
   methods: {
     getList() {

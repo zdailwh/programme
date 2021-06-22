@@ -17,6 +17,7 @@ export function fetchList(query) {
   if (query.no !== '') {
     params.no = query.no
   }
+  params.orderby = 'id'
   return request({
     url: '/admin/programme/v1/channels',
     method: 'get',
@@ -25,9 +26,12 @@ export function fetchList(query) {
 }
 
 export function getAllChannels() {
+  var params = {}
+  params.orderby = 'id'
   return request({
     url: '/admin/programme/v1/channels',
-    method: 'get'
+    method: 'get',
+    params
   })
 }
 
@@ -35,6 +39,7 @@ export function getChannelsPreview(query) {
   var params = {
     page: query.page - 1,
     per_page: query.limit,
+    orderby: 'id',
     deviceId: query.deviceId
   }
   return request({
