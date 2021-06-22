@@ -27,7 +27,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" @click="commit">确 定</el-button>
+      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -42,6 +42,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       formadd: {
         username: '',
         password: '',
@@ -82,6 +83,7 @@ export default {
     },
     createUser() {
       console.log(this.formadd)
+      this.loading = true
       createUser(this.formadd).then(response => {
         this.$message({
           message: '创建成功！',
@@ -93,9 +95,11 @@ export default {
           mobile: '',
           isadmin: ''
         }
+        this.loading = false
         this.$emit('changeAddVisible', false)
         this.$emit('refresh')
       }).catch(error => {
+        this.loading = false
         this.$message({
           message: error.message || '操作失败！',
           type: 'error'

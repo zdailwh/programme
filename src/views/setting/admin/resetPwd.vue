@@ -14,7 +14,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" @click="commit">确 定</el-button>
+      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -35,6 +35,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       formadd: {
         password: ''
       },
@@ -60,6 +61,7 @@ export default {
       })
     },
     resetPwd() {
+      this.loading = true
       this.formadd.id = this.editItem.id
       resetPwd(this.formadd).then(response => {
         this.$message({
@@ -69,7 +71,10 @@ export default {
         this.formadd = {
           password: ''
         }
+        this.loading = false
         this.$emit('changeResetPwdVisible', false)
+      }).catch(() => {
+        this.loading = false
       })
     },
     reset() {

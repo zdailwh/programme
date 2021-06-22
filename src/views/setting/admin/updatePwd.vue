@@ -17,7 +17,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" @click="commit">确 定</el-button>
+      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -32,6 +32,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       formadd: {
         old: '',
         new: ''
@@ -61,6 +62,7 @@ export default {
       })
     },
     updatePwd() {
+      this.loading = true
       updatePwd(this.formadd).then(async response => {
         this.$message({
           message: '密码修改成功，请重新登录！',
@@ -70,9 +72,12 @@ export default {
           old: '',
           new: ''
         }
+        this.loading = false
         this.$emit('changeUpdatePwdVisible', false)
         await this.$store.dispatch('user/logout')
         this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      }).catch(() => {
+        this.loading = false
       })
     },
     reset() {

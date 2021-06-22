@@ -14,7 +14,7 @@
     </div>
     <span slot="footer" class="dialog-footer">
       <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" @click="commit">确 定</el-button>
+      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -35,6 +35,7 @@ export default {
   },
   data() {
     return {
+      loading: false,
       ruleValidate: {
         showname: [
           { required: true, type: 'string', message: '节目名称不能为空', trigger: 'blur' }
@@ -56,13 +57,17 @@ export default {
       })
     },
     updateProgram() {
+      this.loading = true
       updateProgram(this.editItem).then(response => {
         this.$message({
           message: '编辑成功！',
           type: 'success'
         })
+        this.loading = false
         this.$emit('changeEditVisible', false)
         this.$emit('refresh')
+      }).catch(() => {
+        this.loading = false
       })
     },
     reset() {
