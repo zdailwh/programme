@@ -56,7 +56,7 @@
       </el-table-column>
       <el-table-column prop="EndTime" label="节目单剩余时间" class-name="endtime" align="center" width="100">
         <template slot-scope="scope">
-          {{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | formateSeconds }}
+          {{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | timeDiff }}
         </template>
       </el-table-column>
       <el-table-column prop="defaultts" label="垫播节目" align="center">
