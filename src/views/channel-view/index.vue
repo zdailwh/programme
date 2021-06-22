@@ -11,7 +11,11 @@
     <el-table :data="tableData" :row-class-name="tableRowClassName" fit highlight-current-row style="width: 100%">
       <el-table-column type="index" label="序号" width="60" align="center" />
       <el-table-column prop="videores" label="视频类型" width="60" align="center" />
-      <el-table-column prop="name" label="频道名称" width="120" align="center" />
+      <el-table-column prop="name" label="频道名称" width="120" align="center">
+        <template slot-scope="scope">
+          <el-button type="text" @click="toGetEpgs(scope.row.id)">{{ scope.row.name }}</el-button>
+        </template>
+      </el-table-column>
       <el-table-column prop="CurEpg.name" label="当前播出节目" align="center">
         <template v-if="scope.row.CurEpg" slot-scope="scope"><div class="currEpg">{{ scope.row.CurEpg.name }}</div></template>
       </el-table-column>
@@ -114,9 +118,41 @@
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="tsVisible = false; canInterval = true;">取 消</el-button>
-        <el-button type="primary" @click="checkTs">确 定</el-button>
+        <el-button type="primary" :loading="tsLoading" @click="checkTs">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog title="节目单" :visible.sync="epgVisible" width="50%" :before-close="handleCloseEpg">
+      <div>
+        <el-table ref="tableList" v-loading="epglistLoading" :data="epgList" size="mini" fit style="width: 100%;" height="600">
+          <el-table-column type="index" align="center" width="50" />
+          <el-table-column label="开始时间" align="center" class-name="start-time">
+            <template slot-scope="{row}">
+              <span>{{ row.starttime.substring(0, row.starttime.length - 4) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="结束时间" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.endtime.substring(0, row.endtime.length - 4) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="节目名称" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.name }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="时长" align="center">
+            <template slot-scope="{row}">
+              <span>{{ row.duration | formateSeconds }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="epgVisible = false">关 闭</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -127,6 +163,7 @@ import { getChannelsPreview, emerempty, emerreplace, emernone } from '@/api/chan
 import { getAllDevices } from '@/api/device'
 import { epgExport } from '@/api/epg'
 import { fetchList, emergency } from '@/api/prochns'
+import { fetchListByDate } from '@/api/epg'
 
 var timer = null
 export default {
@@ -142,6 +179,23 @@ export default {
     },
     formatTime(time) {
       return parseTime(time, '{h}:{i}:{s}')
+    },
+    formateSeconds(second) {
+      let secondTime = parseInt(second / 1000)
+      // var haomiao = parseInt(second % 1000)
+      let min = 0 // 初始化分
+      let h = 0 // 初始化小时
+      let result = ''
+      if (secondTime >= 60) { // 如果秒数大于60，将秒数转换成整数
+        min = parseInt(secondTime / 60) // 获取分钟，除以60取整数，得到整数分钟
+        secondTime = parseInt(secondTime % 60) // 获取秒数，秒数取佘，得到整数秒数
+        if (min >= 60) { // 如果分钟大于60，将分钟转换成小时
+          h = parseInt(min / 60) // 获取小时，获取分钟除以60，得到整数小时
+          min = parseInt(min % 60) // 获取小时后取佘的分，获取分钟除以60取佘的分
+        }
+      }
+      result = `${h.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}:${secondTime.toString().padStart(2, '0')}`
+      return result
     }
   },
   data() {
@@ -162,7 +216,11 @@ export default {
       optionsDevices: [],
       tsVisible: false,
       checkedTs: null,
-      tsList: []
+      tsList: [],
+      tsLoading: false,
+      epglistLoading: false,
+      epgList: [],
+      epgVisible: false
     }
   },
   watch: {
@@ -317,8 +375,8 @@ export default {
       this.canInterval = true
     },
     checkTs() {
-      console.log(this.checkedTs)
       if (this.checkedTs) {
+        this.tsLoading = true
         emergency({ id: this.checkedTs }).then(response => {
           if (response.emertag === 1) {
             this.$message({
@@ -326,10 +384,37 @@ export default {
               type: 'success'
             })
           }
+          this.tsLoading = false
           this.tsVisible = false
           this.canInterval = true
+        }).catch(() => {
+          this.tsLoading = false
         })
       }
+    },
+    toGetEpgs(id) {
+      this.epgVisible = true
+      var query = {
+        channelId: id,
+        orderby: 'id',
+        starttime: parseTime(new Date().getTime()),
+        op: 'egt'
+      }
+      this.epglistLoading = true
+      fetchListByDate(query).then(data => {
+        this.epgList = data.items || []
+
+        this.epglistLoading = false
+      }).catch(error => {
+        this.epglistLoading = false
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
+      })
+    },
+    handleCloseEpg() {
+      this.epgVisible = false
     }
   }
 }
