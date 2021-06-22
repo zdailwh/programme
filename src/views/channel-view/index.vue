@@ -29,7 +29,7 @@
           </div>
           <div v-else>
             <el-progress :percentage="Math.round((new Date().getTime() - new Date(scope.row.CurEpg.starttime).getTime()) / (new Date(scope.row.CurEpg.endtime).getTime() - new Date(scope.row.CurEpg.starttime).getTime()) * 100)" />
-            {{ (new Date().getTime() - new Date(scope.row.CurEpg.starttime).getTime()) | timeDiff }}
+            {{ (new Date().getTime() - new Date(scope.row.CurEpg.starttime).getTime()) | formateSeconds }}
           </div>
         </template>
       </el-table-column>
@@ -43,7 +43,7 @@
           </div>
           <div v-else>
             <el-progress :percentage="Math.round((new Date(scope.row.CurEpg.endtime).getTime() - new Date().getTime()) / (new Date(scope.row.CurEpg.endtime).getTime() - new Date(scope.row.CurEpg.starttime).getTime()) * 100)" />
-            {{ (new Date(scope.row.CurEpg.endtime).getTime() - new Date().getTime()) | timeDiff }}
+            {{ (new Date(scope.row.CurEpg.endtime).getTime() - new Date().getTime()) | formateSeconds }}
           </div>
         </template>
       </el-table-column>
@@ -52,11 +52,11 @@
         <template v-if="scope.row.NextEpg" slot-scope="scope">{{ scope.row.NextEpg.starttime.substring(0, scope.row.NextEpg.starttime.length - 4) }}</template>
       </el-table-column>
       <el-table-column prop="" label="下一个节目时长" align="center" width="100">
-        <template v-if="scope.row.NextEpg" slot-scope="scope">{{ (new Date(scope.row.NextEpg.endtime).getTime() - new Date(scope.row.NextEpg.starttime).getTime()) | timeDiff }}</template>
+        <template v-if="scope.row.NextEpg" slot-scope="scope">{{ (new Date(scope.row.NextEpg.endtime).getTime() - new Date(scope.row.NextEpg.starttime).getTime()) | formateSeconds }}</template>
       </el-table-column>
       <el-table-column prop="EndTime" label="节目单剩余时间" class-name="endtime" align="center" width="100">
         <template slot-scope="scope">
-          {{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | timeDiff }}
+          {{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | formateSeconds }}
         </template>
       </el-table-column>
       <el-table-column prop="defaultts" label="垫播节目" align="center">
