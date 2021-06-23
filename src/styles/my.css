@@ -201,6 +201,9 @@ tr.bg-red .el-button--text, tr.bg-blue .el-button--text {
   font-weight: bold;
   color: #409EFF;
 }
+.currEpg.bgRed {
+  background-color: #F56C6C;
+}
 .time-head {
   text-align: center;
   font-size: 25px;

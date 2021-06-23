@@ -17,10 +17,18 @@
         </template>
       </el-table-column>
       <el-table-column prop="CurEpg.name" label="当前播出节目" align="center">
-        <template v-if="scope.row.CurEpg" slot-scope="scope"><div class="currEpg">{{ scope.row.CurEpg.name }}</div></template>
+        <template slot-scope="scope">
+          <template v-if="scope.row.emergency !== 0">
+            <div v-if="scope.row.emergency === 1" class="playstate">{{ scope.row.defaultts }}</div>
+            <div v-if="scope.row.emergency === 2 && scope.row.record" class="playstate">{{ scope.row.record.showname }}</div>
+          </template>
+          <template v-if="scope.row.emergency === 0 && scope.row.CurEpg">
+            <div class="currEpg">{{ scope.row.CurEpg.name }}</div>
+          </template>
+        </template>
       </el-table-column>
       <el-table-column prop="" label="节目已播时长" align="center">
-        <template v-if="scope.row.CurEpg" slot-scope="scope">
+        <template v-if="scope.row.emergency === 0 && scope.row.CurEpg" slot-scope="scope">
           <div v-if="new Date().getTime() > new Date(scope.row.CurEpg.endtime).getTime()">
             播放结束
           </div>
@@ -34,7 +42,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="" label="节目剩余时长" align="center">
-        <template v-if="scope.row.CurEpg" slot-scope="scope">
+        <template v-if="scope.row.emergency === 0 && scope.row.CurEpg" slot-scope="scope">
           <div v-if="new Date().getTime() > new Date(scope.row.CurEpg.endtime).getTime()">
             播放结束
           </div>
