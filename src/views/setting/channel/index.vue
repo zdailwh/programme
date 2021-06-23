@@ -39,9 +39,9 @@
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="ID" align="center" width="80">
+      <el-table-column label="频道编号" align="center" width="80">
         <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+          <span>{{ row.no }}</span>
         </template>
       </el-table-column>
       <el-table-column label="频道名称" align="center" width="120">
@@ -52,11 +52,6 @@
       <el-table-column label="显示名称" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.showname }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="频道编号" align="center" width="80">
-        <template slot-scope="{row}">
-          <span>{{ row.no }}</span>
         </template>
       </el-table-column>
       <el-table-column label="垫片路径" align="center">

@@ -66,7 +66,7 @@ export default {
       if (newVal.length) {
         this.options = newVal.map((item, idx, arr) => {
           return {
-            label: item.name,
+            label: item.showname,
             value: item.id
           }
         })

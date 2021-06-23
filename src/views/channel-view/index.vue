@@ -9,7 +9,7 @@
 
     <h4 class="time-head">{{ currtime }}</h4>
     <el-table :data="tableData" :row-class-name="tableRowClassName" fit highlight-current-row style="width: 100%">
-      <el-table-column type="index" label="序号" width="60" align="center" />
+      <el-table-column prop="no" label="频道编号" width="60" align="center" />
       <el-table-column prop="videores" label="视频类型" width="60" align="center" />
       <el-table-column prop="name" label="频道名称" width="120" align="center">
         <template slot-scope="scope">
