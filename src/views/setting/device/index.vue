@@ -36,17 +36,17 @@
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="ID" align="center" width="80">
+      <!-- <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="设备名称" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="设备IP" align="center" width="100">
+      <el-table-column label="设备IP" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.ip }}</span>
         </template>

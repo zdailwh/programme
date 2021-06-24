@@ -97,9 +97,9 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column label="ID" align="center" width="80">
+      <el-table-column label="频道编号" align="center" width="80">
         <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+          <span>{{ row.channel.id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="设备" align="center">
