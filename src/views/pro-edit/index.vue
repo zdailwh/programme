@@ -242,12 +242,14 @@ export default {
       }
     },
     updatetimeAfterHandle(startIdx, offset) {
-      this.listCurrComp.map((item, idx, arr) => {
-        if (idx > startIdx) {
-          item.starttime = parseTime(new Date(item.starttime).getTime() + parseInt(offset))
-          item.endtime = parseTime(new Date(item.endtime).getTime() + parseInt(offset))
+      for (var idx = startIdx + 1; idx < this.listCurrComp.length; idx++) {
+        var item = this.listCurrComp[idx]
+        if (item.flag === 1 && idx !== startIdx + 1) {
+          return false
         }
-      })
+        item.starttime = parseTime(new Date(item.starttime).getTime() + parseInt(offset))
+        item.endtime = parseTime(new Date(item.endtime).getTime() + parseInt(offset))
+      }
     },
     // 正常删除节目单中的记录
     removePro(params) {

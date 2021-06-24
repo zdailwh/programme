@@ -152,7 +152,13 @@ export default {
       popNodes.forEach((item) => {
         item.style.display = 'none'
       })
-      this.$emit('turn-time', { index: idx, starttime: this.myStartDate + ' ' + this.myStartTime + this.myStartTimeHaom })
+      var starttime = ''
+      if (this.listCurr[idx - 1]) {
+        starttime = this.listCurr[idx - 1].endtime
+      } else {
+        starttime = this.myStartDate + ' ' + this.myStartTime + this.myStartTimeHaom
+      }
+      this.$emit('turn-time', { index: idx, starttime: starttime })
     },
     handleDelSelected() {
       this.$emit('remove-pro', { items: this.selectedItems })
@@ -229,10 +235,6 @@ export default {
         // 在播单最后一条节目
         return 'bg-gray'
       }
-      if (row && row.flag) {
-        // 定时播节目
-        return 'bg-blue'
-      }
       if (this.listCurr[rowIndex + 1]) {
         var endT = new Date(this.listCurr[rowIndex].endtime).getTime()
         var nextStartT = new Date(this.listCurr[rowIndex + 1].starttime).getTime()
@@ -240,6 +242,10 @@ export default {
           // 下一条节目和上一条节目之间有间断
           return 'bg-red'
         }
+      }
+      if (row && row.flag) {
+        // 定时播节目
+        return 'bg-blue'
       }
       // if (new Date(this.listCurr[rowIndex].endtime).getTime() < new Date().getTime()) {
       //   // 节目播出时间已经过去
