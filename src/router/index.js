@@ -171,6 +171,20 @@ export const constantRoutes = [
         ]
       },
       {
+        path: 'blackWhite',
+        component: () => import('@/views/setting/black-white/layout'),
+        name: 'BlackWhite',
+        redirect: '/setting/black-white/index',
+        children: [
+          {
+            path: 'index',
+            component: () => import('@/views/setting/black-white/index'),
+            name: 'BlackWhiteList',
+            meta: { title: '黑白名单设置', icon: 'el-icon-tickets' }
+          }
+        ]
+      },
+      {
         path: 'channel',
         component: () => import('@/views/setting/channel/layout'),
         name: 'Channel',
