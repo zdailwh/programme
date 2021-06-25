@@ -1,5 +1,5 @@
 module.exports = {
-  title: '编单系统',
+  title: '异构第三备份播出系统',
 
   /**
    * @type {boolean} true | false
