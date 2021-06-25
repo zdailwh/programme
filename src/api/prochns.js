@@ -44,10 +44,13 @@ export function deleteProchn(query) {
     method: 'delete'
   })
 }
-// 设置应急切播节目
-export function emergency(query) {
+// 设置应急节目
+export function emergency(data) {
   return request({
-    url: `/admin/programme/v1/prochns/${query.id}/emergency`,
-    method: 'put'
+    url: `/admin/programme/v1/prochns/${data.id}/emergency`,
+    method: 'put',
+    data: {
+      tag: data.tag
+    }
   })
 }

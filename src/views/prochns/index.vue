@@ -62,9 +62,12 @@
           <span>{{ row.record && row.record.showname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="应急切播标识" align="center">
+      <el-table-column label="应急类型" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.emertagstr }}</span>
+          <el-tag v-if="row.emertag === 0" type="info">{{ row.emertagstr }}</el-tag>
+          <el-tag v-else-if="row.emertag === 1" type="warning">{{ row.emertagstr }}</el-tag>
+          <el-tag v-else-if="row.emertag === 2" type="warning">{{ row.emertagstr }}</el-tag>
+          <el-tag v-else-if="row.emertag === 3" type="danger">{{ row.emertagstr }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="状态" align="center">

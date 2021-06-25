@@ -70,7 +70,6 @@ export function updateChannel(data) {
     method: 'put',
     data: {
       no: data.no,
-      defaultts: data.defaultts,
       width: data.width,
       height: data.height,
       videores: data.videores

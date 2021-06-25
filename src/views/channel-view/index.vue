@@ -19,7 +19,7 @@
       <el-table-column prop="CurEpg.name" label="当前播出节目" align="center">
         <template slot-scope="scope">
           <template v-if="scope.row.emergency !== 0">
-            <div v-if="scope.row.emergency === 1" class="playstate">{{ scope.row.defaultts }}</div>
+            <div v-if="scope.row.emergency === 1 && scope.row.defaultrecord" class="playstate">{{ scope.row.defaultrecord.showname }}</div>
             <div v-if="scope.row.emergency === 2 && scope.row.record" class="playstate">{{ scope.row.record.showname }}</div>
           </template>
           <template v-if="scope.row.emergency === 0 && scope.row.CurEpg">
@@ -67,11 +67,15 @@
           {{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | timeDiff }}
         </template>
       </el-table-column>
-      <el-table-column prop="defaultts" label="垫播节目" align="center">
+      <el-table-column prop="defaultrecord" label="垫播节目" align="center">
         <template slot-scope="scope">
-          <div v-if="scope.row.defaultts" style="text-align: center;">
-            {{ scope.row.defaultts }}
+          <div v-if="scope.row.defaultrecord" style="text-align: center;">
+            {{ scope.row.defaultrecord.showname }}
+            <el-button type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id, 1)">选择垫片</el-button>
             <el-button type="primary" size="mini" @click="emerempty(scope.row.id)">播出垫片</el-button>
+          </div>
+          <div v-else>
+            <el-button type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id, 1)">选择垫片</el-button>
           </div>
         </template>
       </el-table-column>
@@ -79,11 +83,11 @@
         <template slot-scope="scope">
           <div v-if="scope.row.record" style="text-align: center;">
             {{ scope.row.record.showname }}
-            <el-button type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id)">选择节目</el-button>
+            <el-button type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id, 2)">选择切播节目</el-button>
             <el-button type="primary" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button>
           </div>
           <div v-else>
-            <el-button type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id)">选择节目</el-button>
+            <el-button type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id, 2)">选择切播节目</el-button>
           </div>
         </template>
       </el-table-column>
@@ -113,20 +117,39 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog title="素材库" :visible.sync="tsVisible" width="50%" :before-close="handleCloseTs">
+    <el-dialog title="设置应急垫片" :visible.sync="tsVisible1" width="50%" :before-close="handleCloseTs1">
       <div>
-        <el-select v-model="checkedTs" placeholder="请选择" style="width: 100%">
+        <el-select v-model="checkedTs" value-key="id" placeholder="请选择" style="width: 100%">
           <el-option
             v-for="item in tsList"
             :key="item.id"
             :label="item.record.showname"
-            :value="item.id"
+            :value="item"
+            :disabled="item.status !== 2"
           />
         </el-select>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="tsVisible = false; canInterval = true;">取 消</el-button>
-        <el-button type="primary" :loading="tsLoading" @click="checkTs">确 定</el-button>
+        <el-button @click="tsVisible1 = false; canInterval = true;">取 消</el-button>
+        <el-button type="primary" :loading="tsLoading" @click="checkTs(1)">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog title="设置应急切播节目" :visible.sync="tsVisible2" width="50%" :before-close="handleCloseTs2">
+      <div>
+        <el-select v-model="checkedTs" value-key="id" placeholder="请选择" style="width: 100%">
+          <el-option
+            v-for="item in tsList"
+            :key="item.id"
+            :label="item.record.showname"
+            :value="item"
+            :disabled="item.status !== 2"
+          />
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="tsVisible2 = false; canInterval = true;">取 消</el-button>
+        <el-button type="primary" :loading="tsLoading" @click="checkTs(2)">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -222,7 +245,8 @@ export default {
       currDevice: '全部',
       allDevices: [],
       optionsDevices: [],
-      tsVisible: false,
+      tsVisible1: false,
+      tsVisible2: false,
       checkedTs: null,
       tsList: [],
       tsLoading: false,
@@ -367,9 +391,10 @@ export default {
         }
       })
     },
-    toGetTs(id) {
-      this.tsVisible = true
+    toGetTs(id, tag) {
+      this['tsVisible' + tag] = true
       this.canInterval = false
+      this.checkedTs = null
       this.getProChnList(id)
     },
     getProChnList(channelId) {
@@ -378,22 +403,40 @@ export default {
       }).catch(() => {
       })
     },
-    handleCloseTs() {
-      this.tsVisible = false
+    handleCloseTs(tag) {
+      this['tsVisible' + tag] = false
       this.canInterval = true
     },
-    checkTs() {
-      if (this.checkedTs) {
+    checkTs(tag) {
+      if (this.checkedTs !== null) {
+        if (tag === 1) {
+          if (this.checkedTs.emertag === 1 || this.checkedTs.emertag === 3) {
+            this.$message({
+              message: '该节目已经是该频道的垫片！',
+              type: 'error'
+            })
+            return false
+          }
+        }
+        if (tag === 2) {
+          if (this.checkedTs.emertag === 2 || this.checkedTs.emertag === 3) {
+            this.$message({
+              message: '该节目已经是该频道的应急切播节目！',
+              type: 'error'
+            })
+            return false
+          }
+        }
         this.tsLoading = true
-        emergency({ id: this.checkedTs }).then(response => {
-          if (response.emertag === 1) {
+        emergency({ id: this.checkedTs.id, tag: tag }).then(response => {
+          if (response.emertag === tag || response.emertag === 3) {
             this.$message({
               message: '执行成功！',
               type: 'success'
             })
           }
           this.tsLoading = false
-          this.tsVisible = false
+          this['tsVisible' + tag] = false
           this.canInterval = true
         }).catch(() => {
           this.tsLoading = false

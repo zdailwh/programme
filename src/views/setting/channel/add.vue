@@ -16,9 +16,6 @@
         <el-form-item label="频道编号" prop="no">
           <el-input v-model="formadd.no" placeholder="请输入频道编号" />
         </el-form-item>
-        <el-form-item label="垫片路径" prop="defaultts">
-          <el-input v-model="formadd.defaultts" placeholder="请输入垫片路径" />
-        </el-form-item>
         <!-- <el-form-item label="EPG路径" prop="epgurl">
           <el-input v-model="formadd.epgurl" placeholder="请输入EPG路径" />
         </el-form-item> -->
@@ -70,7 +67,6 @@ export default {
         name: '',
         showname: '',
         no: '',
-        defaultts: '',
         width: '1920',
         height: '1080',
         videores: 'SD'
@@ -85,9 +81,6 @@ export default {
         no: [
           { required: true, message: '频道编号不能为空', trigger: 'blur' }
         ],
-        // defaultts: [
-        //   { required: true, message: '垫片路径不能为空', trigger: 'blur' }
-        // ],
         width: [
           { required: true, message: '分辨率宽不能为空', trigger: 'blur' }
         ],
@@ -130,7 +123,6 @@ export default {
           name: '',
           showname: '',
           no: '',
-          defaultts: '',
           width: '1920',
           height: '1080',
           videores: 'SD'

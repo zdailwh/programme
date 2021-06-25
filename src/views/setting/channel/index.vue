@@ -54,11 +54,6 @@
           <span>{{ row.showname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="垫片路径" align="center">
-        <template slot-scope="{row}">
-          <span>{{ row.defaultts }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="EPG路径" align="center">
         <template slot-scope="{row}">
           <span>{{ row.epgurl }}</span>
