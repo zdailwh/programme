@@ -51,12 +51,12 @@ export default {
       },
       ruleValidate: {
         username: [
-          { required: true, type: 'string', message: '姓名不能为空', trigger: 'blur' },
-          { type: 'string', message: '用户名为2-8位字符', min: 2, max: 8, trigger: 'blur' }
+          { required: true, type: 'string', message: '姓名不能为空', trigger: 'blur' }
+          // { type: 'string', message: '用户名为2-8位字符', min: 2, max: 8, trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '密码不能为空', trigger: 'blur' },
-          { type: 'string', message: '密码为6-12位字符', min: 6, max: 12, trigger: 'blur' }
+          { required: true, message: '密码不能为空', trigger: 'blur' }
+          // { type: 'string', message: '密码为6-12位字符', min: 6, max: 12, trigger: 'blur' }
         ],
         mobile: [
           { required: true, message: '手机号码不能为空', trigger: 'blur' },
