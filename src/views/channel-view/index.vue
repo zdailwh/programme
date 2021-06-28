@@ -117,7 +117,7 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog title="设置应急垫片" :visible.sync="tsVisible1" width="50%" :before-close="handleCloseTs1">
+    <el-dialog title="设置应急垫片" :visible.sync="tsVisible1" width="50%" :before-close="handleCloseTs">
       <div>
         <el-select v-model="checkedTs" value-key="id" placeholder="请选择" style="width: 100%">
           <el-option
@@ -135,7 +135,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="设置应急切播节目" :visible.sync="tsVisible2" width="50%" :before-close="handleCloseTs2">
+    <el-dialog title="设置应急切播节目" :visible.sync="tsVisible2" width="50%" :before-close="handleCloseTs">
       <div>
         <el-select v-model="checkedTs" value-key="id" placeholder="请选择" style="width: 100%">
           <el-option
