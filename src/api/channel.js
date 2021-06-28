@@ -72,7 +72,8 @@ export function updateChannel(data) {
       no: data.no,
       width: data.width,
       height: data.height,
-      videores: data.videores
+      videores: data.videores,
+      supportedformat: data.supportedformat
     }
   })
 }

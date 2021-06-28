@@ -5,7 +5,7 @@
     width="50%"
     :before-close="handleClose"
   >
-    <div>
+    <div class="channelForm">
       <el-form ref="form" :model="formadd" :rules="ruleValidate" label-width="100px">
         <el-form-item label="频道名称" prop="name">
           <el-input v-model="formadd.name" placeholder="请输入频道名称" />
@@ -37,6 +37,11 @@
             <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
+        <el-form-item label="素材格式">
+          <el-tag v-for="tag in currFormat" :key="tag" closable :disable-transitions="false" @close="handleCloseExt(tag)">{{ tag }}</el-tag>
+          <el-input v-if="inputExtVisible" ref="saveTagInput" v-model="inputExtValue" class="input-new-tag" size="small" @keyup.enter.native="handleInputExt" @blur="handleInputExt" />
+          <el-button v-else class="button-new-tag" size="small" @click="showInputExt">+ 其他格式</el-button>
+        </el-form-item>
       </el-form>
     </div>
     <span slot="footer" class="dialog-footer">
@@ -47,6 +52,9 @@
 </template>
 <script>
 import { createChannel } from '@/api/channel'
+import { deepClone } from '@/utils/index'
+const defaultFormat = ['TS', 'MXF', 'MP4', 'MPG', 'MOV', 'AVI', 'MPEG', 'M2TS', 'WMV', 'FLV', 'RMVB', 'M4V', 'MP2', 'MP3', 'AAC', 'AC3']
+
 export default {
   props: {
     dialogVisibleAdd: {
@@ -95,7 +103,10 @@ export default {
         { label: 'SD', value: 'SD' },
         { label: 'HD', value: 'HD' },
         { label: '4K', value: '4K' }
-      ]
+      ],
+      currFormat: deepClone(defaultFormat),
+      inputExtVisible: false,
+      inputExtValue: ''
     }
   },
   mounted() {
@@ -104,6 +115,13 @@ export default {
     commit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          if (!this.currFormat.length) {
+            this.$message({
+              message: '请选择素材格式',
+              type: 'warning'
+            })
+            return
+          }
           this.createChannel()
         } else {
           console.log('error submit!!')
@@ -113,6 +131,7 @@ export default {
     },
     createChannel() {
       console.log(this.formadd)
+      this.formadd.supportedformat = deepClone(this.currFormat).join('|')
       this.loading = true
       createChannel(this.formadd).then(response => {
         this.$message({
@@ -127,6 +146,7 @@ export default {
           height: '1080',
           videores: 'SD'
         }
+        this.currFormat = deepClone(defaultFormat)
         this.loading = false
         this.$emit('changeAddVisible', false)
         this.$emit('refresh')
@@ -141,6 +161,23 @@ export default {
     handleClose(done) {
       this.$emit('changeAddVisible', false)
       // done()
+    },
+    handleCloseExt(tag) {
+      this.currFormat.splice(this.currFormat.indexOf(tag), 1)
+    },
+    showInputExt() {
+      this.inputExtVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputExt() {
+      const inputExtValue = this.inputExtValue
+      if (inputExtValue) {
+        this.currFormat.push(inputExtValue)
+      }
+      this.inputExtVisible = false
+      this.inputExtValue = ''
     }
   }
 }

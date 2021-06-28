@@ -3,7 +3,7 @@
     <div class="formWrap upload-file">
       <el-form ref="addForm" label-width="100px">
         <el-form-item prop="chnids" label="所属频道：">
-          <el-select v-model="addForm.chnids" multiple placeholder="请选择" style="width: 100%;">
+          <el-select v-model="addForm.chnids" multiple placeholder="请选择" style="width: 100%;" @change="selectChn">
             <el-option v-for="item in chnOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
@@ -12,10 +12,8 @@
             <el-option v-for="item in deviceOptions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="文件类型：">
-          <el-tag v-for="tag in enableFile" :key="tag" closable :disable-transitions="false" @close="handleCloseExt(tag)">{{ tag }}</el-tag>
-          <el-input v-if="inputExtVisible" ref="saveTagInput" v-model="inputExtValue" class="input-new-tag" size="small" @keyup.enter.native="handleInputExt" @blur="handleInputExt" />
-          <el-button v-else class="button-new-tag" size="small" @click="showInputExt">+ 其他类型</el-button>
+        <el-form-item v-show="enableFile.length" label="素材格式：">
+          <el-tag v-for="tag in enableFile" :key="tag">{{ tag }}</el-tag>
         </el-form-item>
         <el-form-item label="选择文件：">
           <el-button class="filter-item" icon="el-icon-folder-opened" @click="folderCheckConfirm">
@@ -164,9 +162,7 @@ export default {
       requestList: [],
       extsArr: [],
       checkedExts: [],
-      enableFile: ['TS', 'MXF', 'MP4', 'MPG', 'MOV', 'AVI', 'MPEG', 'M2TS', 'WMV', 'FLV', 'RMVB', 'M4V', 'MP2', 'MP3', 'AAC', 'AC3'],
-      inputExtVisible: false,
-      inputExtValue: '',
+      enableFile: [],
       listLoading: false,
       uploadCompleted: true // 当前页文件是否已经全部上传
     }
@@ -177,7 +173,8 @@ export default {
         this.chnOptions = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
-            value: item.id
+            value: item.id,
+            supportedformat: item.supportedformat
           }
         })
       }
@@ -204,6 +201,25 @@ export default {
     window.removeEventListener('beforeunload', beforeunloadFn, true)
   },
   methods: {
+    selectChn(chnIds) {
+      if (chnIds.length) {
+        var selected = this.chnOptions.filter(item => {
+          return chnIds.indexOf(item.value) !== -1
+        })
+        var selectedFormats = selected.map(item => {
+          return item.supportedformat ? item.supportedformat.split('|') : []
+        })
+        var emptyArr = selectedFormats.filter(item => { return item.length === 0 })
+        if (emptyArr.length) {
+          this.enableFile = []
+        } else {
+          var res = getIntersect(selectedFormats)
+          this.enableFile = res
+        }
+      } else {
+        this.enableFile = []
+      }
+    },
     async fileCheck() {
       const fileHandles = await window.showOpenFilePicker({ multiple: true })
       fileHandles.forEach(async(item, idx, arr) => {
@@ -235,7 +251,7 @@ export default {
     async folderCheck() {
       if (!this.enableFile.length) {
         this.$message({
-          message: '请设置需要筛选的文件类型！',
+          message: '请先为频道设置素材格式！',
           type: 'warning'
         })
         return
@@ -579,23 +595,6 @@ export default {
         filelist[startIdx].percentage = per > 100 ? 100 : per
       }
     },
-    handleCloseExt(tag) {
-      this.enableFile.splice(this.enableFile.indexOf(tag), 1)
-    },
-    showInputExt() {
-      this.inputExtVisible = true
-      this.$nextTick(_ => {
-        this.$refs.saveTagInput.$refs.input.focus()
-      })
-    },
-    handleInputExt() {
-      const inputExtValue = this.inputExtValue
-      if (inputExtValue) {
-        this.enableFile.push(inputExtValue)
-      }
-      this.inputExtVisible = false
-      this.inputExtValue = ''
-    },
     getAllChannels() {
       getAllChannels().then(data => {
         this.allChannels = data.items || []
@@ -677,6 +676,22 @@ function beforeunloadFn(e) {
     e.returnValue = '关闭提示'
   }
   return '关闭提示'
+}
+
+// js 求N个数组的交集
+function getIntersect(arrs) {
+  var arr = arrs.shift()
+  for (var i = arrs.length; i--;) {
+    // var p = { 'boolean': {}, 'number': {}, 'string': {}}, obj = []
+    var p = { 'string': {}}
+    var obj = []
+    arr = arr.concat(arrs[i]).filter(function(x) {
+      var t = typeof x
+      return !((t in p) ? !p[t][x] && (p[t][x] = 1) : obj.indexOf(x) < 0 && obj.push(x))
+    })
+    if (!arr.length) return null // 发现不符合马上退出
+  }
+  return arr
 }
 </script>
 <style scoped>

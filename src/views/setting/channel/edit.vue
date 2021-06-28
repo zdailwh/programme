@@ -5,7 +5,7 @@
     width="50%"
     :before-close="handleClose"
   >
-    <div>
+    <div class="channelForm">
       <el-form ref="form" :model="editItem" :rules="ruleValidate" label-width="80px">
         <!-- <el-form-item label="频道名称" prop="name">
           <el-input v-model="editItem.name" placeholder="请输入频道名称" />
@@ -34,6 +34,11 @@
             <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
           </el-select>
         </el-form-item>
+        <el-form-item label="素材格式" prop="supportedformat">
+          <el-tag v-for="tag in currFormat" :key="tag" closable :disable-transitions="false" @close="handleCloseExt(tag)">{{ tag }}</el-tag>
+          <el-input v-if="inputExtVisible" ref="saveTagInput" v-model="inputExtValue" class="input-new-tag" size="small" @keyup.enter.native="handleInputExt" @blur="handleInputExt" />
+          <el-button v-else class="button-new-tag" size="small" @click="showInputExt">+ 其他格式</el-button>
+        </el-form-item>
       </el-form>
     </div>
     <span slot="footer" class="dialog-footer">
@@ -44,6 +49,8 @@
 </template>
 <script>
 import { updateChannel } from '@/api/channel'
+import { deepClone } from '@/utils/index'
+
 export default {
   props: {
     dialogVisibleEdit: {
@@ -54,6 +61,12 @@ export default {
       type: Object,
       default() {
         return {}
+      }
+    },
+    currFormat: {
+      type: Array,
+      default() {
+        return []
       }
     },
     netCardArr: {
@@ -90,7 +103,9 @@ export default {
         { label: 'SD', value: 'SD' },
         { label: 'HD', value: 'HD' },
         { label: '4K', value: '4K' }
-      ]
+      ],
+      inputExtVisible: false,
+      inputExtValue: ''
     }
   },
   mounted() {
@@ -107,6 +122,7 @@ export default {
       })
     },
     updateChannel() {
+      this.editItem.supportedformat = deepClone(this.currFormat).join('|')
       this.loading = true
       updateChannel(this.editItem).then(response => {
         this.$message({
@@ -127,6 +143,23 @@ export default {
     handleClose(done) {
       this.$emit('changeEditVisible', false)
       // done()
+    },
+    handleCloseExt(tag) {
+      this.currFormat.splice(this.currFormat.indexOf(tag), 1)
+    },
+    showInputExt() {
+      this.inputExtVisible = true
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    handleInputExt() {
+      const inputExtValue = this.inputExtValue
+      if (inputExtValue) {
+        this.currFormat.push(inputExtValue)
+      }
+      this.inputExtVisible = false
+      this.inputExtValue = ''
     }
   }
 }

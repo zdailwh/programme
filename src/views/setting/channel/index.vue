@@ -74,6 +74,11 @@
           <span>{{ row.videores }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="素材格式" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.supportedformat }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="日志" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.log }}</span>
@@ -95,7 +100,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <Add :dialog-visible-add="dialogVisibleAdd" :net-card-arr="netCardArr" @changeAddVisible="changeAddVisible" @refresh="getList" />
-    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" :net-card-arr="netCardArr" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" :net-card-arr="netCardArr" :curr-format="currFormat" @changeEditVisible="changeEditVisible" @refresh="getList" />
   </div>
 </template>
 
@@ -128,7 +133,8 @@ export default {
       editIndex: '',
       dialogVisibleAdd: false,
       dialogVisibleEdit: false,
-      netCardArr: {}
+      netCardArr: {},
+      currFormat: []
     }
   },
   created() {
@@ -195,6 +201,7 @@ export default {
     },
     editHandle(item, idx) {
       this.editItem = JSON.parse(JSON.stringify(item))
+      this.currFormat = this.editItem.supportedformat ? this.editItem.supportedformat.split('|') : []
       this.editIndex = idx
       this.dialogVisibleEdit = true
     },

@@ -12,6 +12,7 @@ for (let i = 0; i < count; i++) {
     epgurl: '/service1/XML/',
     width: '1920',
     height: '1080',
+    supportedformat: 'TS|MXF|AAC|AC3',
     'status|1': [0, 1, 2]
   }))
 }
@@ -24,6 +25,7 @@ const user = Mock.mock({
   epgurl: '/service1/XML/',
   width: '1920',
   height: '1080',
+  supportedformat: 'TS|MXF|AAC|AC3',
   'status|1': [0, 1, 2]
 })
 
