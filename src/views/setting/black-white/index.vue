@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-tabs type="border-card" style="height: 600px;">
+    <el-tabs type="border-card">
       <el-tab-pane label="黑名单"><Black /></el-tab-pane>
       <el-tab-pane label="白名单"><White /></el-tab-pane>
     </el-tabs>
