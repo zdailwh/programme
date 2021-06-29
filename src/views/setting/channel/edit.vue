@@ -16,23 +16,23 @@
         <!-- <el-form-item label="EPG路径" prop="epgurl">
           <el-input v-model="editItem.epgurl" placeholder="请输入EPG路径" />
         </el-form-item> -->
+        <el-form-item label="视频类型" prop="videores">
+          <el-select v-model="editItem.videores" :disabled="editItem.type === 1" placeholder="请选择视频类型" style="width: 100%;" @change="setWH">
+            <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="分辨率">
           <el-col :span="11">
             <el-form-item prop="width">
-              <el-input v-model="editItem.width" placeholder="分辨率宽" />
+              <el-input v-model="editItem.width" :readonly="true" placeholder="分辨率宽" />
             </el-form-item>
           </el-col>
           <el-col :span="2" style="text-align: center;">x</el-col>
           <el-col :span="11">
             <el-form-item prop="height">
-              <el-input v-model="editItem.height" placeholder="分辨率高" />
+              <el-input v-model="editItem.height" :readonly="true" placeholder="分辨率高" />
             </el-form-item>
           </el-col>
-        </el-form-item>
-        <el-form-item label="视频类型" prop="videores">
-          <el-select v-model="editItem.videores" :disabled="editItem.type === 1" placeholder="请选择视频类型" style="width: 100%;">
-            <el-option v-for="(item,k) in videoTypeArr" :key="k" :value="item.value" :label="item.label" />
-          </el-select>
         </el-form-item>
         <el-form-item label="素材格式" prop="supportedformat">
           <el-tag v-for="tag in currFormat" :key="tag" closable :disable-transitions="false" @close="handleCloseExt(tag)">{{ tag }}</el-tag>
@@ -89,20 +89,15 @@ export default {
         // epgurl: [
         //   { required: true, message: 'EPG路径不能为空', trigger: 'blur' }
         // ],
-        width: [
-          { required: true, message: '分辨率宽不能为空', trigger: 'blur' }
-        ],
-        height: [
-          { required: true, message: '分辨率高不能为空', trigger: 'blur' }
-        ],
         videores: [
           { required: true, message: '视频类型不能为空', trigger: 'change' }
         ]
       },
       videoTypeArr: [
-        { label: 'SD', value: 'SD' },
-        { label: 'HD', value: 'HD' },
-        { label: '4K', value: '4K' }
+        { label: '625I', value: '625I', width: '720', height: '576' },
+        { label: '720P', value: '720P', width: '1280', height: '720' },
+        { label: '1080I', value: '1080I', width: '1920', height: '1080' },
+        { label: '1080P', value: '1080P', width: '1920', height: '1080' }
       ],
       inputExtVisible: false,
       inputExtValue: ''
@@ -160,6 +155,14 @@ export default {
       }
       this.inputExtVisible = false
       this.inputExtValue = ''
+    },
+    setWH(type) {
+      this.videoTypeArr.map(item => {
+        if (item.value === type) {
+          this.editItem.width = item.width
+          this.editItem.height = item.height
+        }
+      })
     }
   }
 }
