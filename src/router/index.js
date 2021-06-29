@@ -185,6 +185,20 @@ export const constantRoutes = [
         ]
       },
       {
+        path: 'role',
+        component: () => import('@/views/setting/role/layout'),
+        name: 'Role',
+        redirect: '/setting/role/index',
+        children: [
+          {
+            path: 'index',
+            component: () => import('@/views/setting/role/index'),
+            name: 'RoleList',
+            meta: { title: '权限配置', icon: 'el-icon-tickets' }
+          }
+        ]
+      },
+      {
         path: 'channel',
         component: () => import('@/views/setting/channel/layout'),
         name: 'Channel',
