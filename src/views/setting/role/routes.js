@@ -1,220 +1,159 @@
 export const constantRoutes = [
   {
-    path: '/channelView',
-    component: 'layout/Layout',
-    redirect: '/channelView/index',
-    meta: { title: '频道预览', icon: 'el-icon-view' },
+    title: '频道预览',
+    name: 'ChannelView',
     children: [
       {
-        path: 'index',
-        component: 'views/channel-view/index',
-        name: 'ChannelViewList',
-        meta: { title: '频道预览', icon: 'el-icon-view' }
+        title: '频道预览',
+        name: 'ChannelViewList'
       }
     ]
   },
   {
-    path: '/program',
-    component: 'layout/Layout',
-    redirect: '/program/index',
-    meta: { title: '节目管理', icon: 'el-icon-film' },
+    title: '节目管理',
+    name: 'Program',
     children: [
       {
-        path: 'index',
-        component: 'views/program/index',
-        name: 'ProgramList',
-        meta: { title: '节目列表', icon: 'el-icon-files' }
+        title: '节目列表',
+        name: 'ProgramList'
       },
       {
-        path: 'add',
-        component: 'views/program/add',
-        name: 'ProgramAdd',
-        meta: { title: '节目上载', icon: 'el-icon-upload' }
+        title: '节目上载',
+        name: 'ProgramAdd'
       }
     ]
   },
   {
-    path: '/proEdit',
-    component: 'layout/Layout',
-    redirect: '/pro-edit/index',
-    meta: { title: '编单', icon: 'el-icon-edit-outline' },
+    title: '编单',
+    name: 'ProEdit',
     children: [
       {
-        path: 'index',
-        component: 'views/pro-edit/index',
-        name: 'ProEditMain',
-        meta: { title: '编单', icon: 'el-icon-edit-outline' }
+        title: '编单',
+        name: 'ProEditMain'
       }
     ]
   },
   {
-    path: '/examine',
-    component: 'layout/Layout',
-    redirect: '/examine/index',
-    meta: { title: '审核播出', icon: 'el-icon-s-claim' },
+    title: '审核播出',
+    name: 'Examine',
     children: [
       {
-        path: 'index',
-        component: 'views/examine/index',
-        name: 'ExamineMain',
-        meta: { title: '审核播出', icon: 'el-icon-s-check' }
+        title: '审核播出',
+        name: 'ExamineMain'
       }
     ]
   },
   {
-    path: '/setting',
-    component: 'layout/Layout',
-    redirect: '/setting/admin',
-    meta: { title: '基本配置', icon: 'el-icon-set-up' },
+    title: '基本配置',
+    name: 'Setting',
     children: [
       {
-        path: 'admin',
-        component: 'views/setting/admin/layout',
+        title: '用户设置',
         name: 'Admin',
-        redirect: '/setting/admin/index',
         children: [
           {
-            path: 'index',
-            component: 'views/setting/admin/index',
-            name: 'AdminList',
-            meta: { title: '用户设置', icon: 'peoples' }
+            title: '用户设置',
+            name: 'AdminList'
           }
         ]
       },
       {
-        path: 'pwdSet',
-        component: 'views/setting/admin/layout',
+        title: '密码强度设置',
         name: 'PwdSet',
-        redirect: '/setting/admin/pwdSet',
         children: [
           {
-            path: 'index',
-            component: 'views/setting/admin/pwdSet',
-            name: 'AdminPwdSet',
-            meta: { title: '密码强度设置', icon: 'el-icon-lock' }
+            title: '密码强度设置',
+            name: 'AdminPwdSet'
           }
         ]
       },
       {
-        path: 'blackWhite',
-        component: 'views/setting/black-white/layout',
+        title: '黑白名单设置',
         name: 'BlackWhite',
-        redirect: '/setting/black-white/index',
         children: [
           {
-            path: 'index',
-            component: 'views/setting/black-white/index',
-            name: 'BlackWhiteList',
-            meta: { title: '黑白名单设置', icon: 'el-icon-tickets' }
+            title: '黑白名单设置',
+            name: 'BlackWhiteList'
           }
         ]
       },
       {
-        path: 'role',
-        component: 'views/setting/role/layout',
+        title: '权限配置',
         name: 'Role',
-        redirect: '/setting/role/index',
         children: [
           {
-            path: 'index',
-            component: 'views/setting/role/index',
-            name: 'RoleList',
-            meta: { title: '权限配置', icon: 'el-icon-tickets' }
+            title: '权限配置',
+            name: 'RoleList'
           }
         ]
       },
       {
-        path: 'channel',
-        component: 'views/setting/channel/layout',
+        title: '频道设置',
         name: 'Channel',
-        redirect: '/setting/channel/index',
         children: [
           {
-            path: 'index',
-            component: 'views/setting/channel/index',
-            name: 'ChannelList',
-            meta: { title: '频道设置', icon: 'el-icon-monitor' }
+            title: '频道设置',
+            name: 'ChannelList'
           }
         ]
       },
       {
-        path: 'device',
-        component: 'views/setting/device/layout',
+        title: '设备管理',
         name: 'Device',
-        redirect: '/setting/device/index',
         children: [
           {
-            path: 'index',
-            component: 'views/setting/device/index',
-            name: 'DeviceList',
-            meta: { title: '设备管理', icon: 'el-icon-cpu' }
+            title: '设备管理',
+            name: 'DeviceList'
           }
         ]
       }
     ]
   },
   {
-    path: '/devicechns',
-    component: 'layout/Layout',
-    redirect: '/devicechns/index',
+    title: '设备频道管理',
+    name: 'DeviceChns',
     children: [
       {
-        path: 'index',
-        component: 'views/devicechns/index',
-        name: 'DeviceChnsList',
-        meta: { title: '设备频道管理', icon: 'el-icon-connection' }
+        title: '设备频道管理',
+        name: 'DeviceChnsList'
       }
     ]
   },
   {
-    path: '/devicepros',
-    component: 'layout/Layout',
-    redirect: '/devicepros/index',
+    title: '设备节目管理',
+    name: 'DevicePros',
     children: [
       {
-        path: 'index',
-        component: 'views/devicepros/index',
-        name: 'DeviceProsList',
-        meta: { title: '设备节目管理', icon: 'el-icon-connection' }
+        title: '设备节目管理',
+        name: 'DeviceProsList'
       }
     ]
   },
   {
-    path: '/prochns',
-    component: 'layout/Layout',
-    redirect: '/prochns/index',
+    title: '频道节目管理',
+    name: 'ProChns',
     children: [
       {
-        path: 'index',
-        component: 'views/prochns/index',
-        name: 'ProChnsList',
-        meta: { title: '频道节目管理', icon: 'el-icon-connection' }
+        title: '频道节目管理',
+        name: 'ProChnsList'
       }
     ]
   },
   {
-    path: '/task',
-    component: 'layout/Layout',
-    redirect: '/task/index',
-    meta: { title: '任务管理', icon: 'el-icon-date' },
+    title: '任务管理',
+    name: 'Task',
     children: [
       {
-        path: 'index',
-        component: 'views/task/index',
-        name: 'TaskView',
-        meta: { title: '任务总览', icon: 'el-icon-view' }
+        title: '任务总览',
+        name: 'TaskView'
       },
       {
-        path: 'index-jobs',
-        component: 'views/task/index-jobs',
-        name: 'TaskJobList',
-        meta: { title: '主任务', icon: 'el-icon-s-claim' }
+        title: '主任务',
+        name: 'TaskJobList'
       },
       {
-        path: 'index-threads',
-        component: 'views/task/index-threads',
-        name: 'TaskThreadList',
-        meta: { title: '主线程', icon: 'el-icon-share' }
+        title: '主线程',
+        name: 'TaskThreadList'
       }
     ]
   }
