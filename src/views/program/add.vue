@@ -19,6 +19,9 @@
           <el-button class="filter-item" icon="el-icon-folder-opened" @click="folderCheckConfirm">
             选择文件所属目录
           </el-button>
+          <el-button class="filter-item" icon="el-icon-document-copy" @click="fileCheckConfirm">
+            选择文件
+          </el-button>
           <!-- <span style="color: #909399;margin-left: 10px;">目前支持的文件格式有：{{ enableFile.join('、') }}</span> -->
         </el-form-item>
         <el-form-item>
@@ -220,20 +223,71 @@ export default {
         this.enableFile = []
       }
     },
-    async fileCheck() {
-      const fileHandles = await window.showOpenFilePicker({ multiple: true })
-      fileHandles.forEach(async(item, idx, arr) => {
-        console.log(item)
-        const file = await item.getFile()
-        console.log(file)
-      })
-    },
     resetFilelist() {
       this.list = []
       this.filterList = []
       this.$refs.multipleTable.clearSelection()
       this.extsArr = []
       this.checkedExts = []
+    },
+    fileCheckConfirm() {
+      if (!this.uploadCompleted) {
+        this.$confirm('还有文件上传中, 确定要重新选择文件吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.fileCheck()
+        })
+      } else {
+        this.fileCheck()
+      }
+    },
+    async fileCheck() {
+      if (!this.enableFile.length) {
+        this.$message({
+          message: '请先为频道设置素材格式！',
+          type: 'warning'
+        })
+        return
+      }
+      this.resetFilelist()
+
+      const pickerOpts = {
+        // types: [
+        //   {
+        //     description: 'Images',
+        //     accept: {
+        //       'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+        //     }
+        //   },
+        // ],
+        excludeAcceptAllOption: false,
+        multiple: true
+      }
+      var fileHandles = await window.showOpenFilePicker(pickerOpts)
+      for (var i = 0; i < fileHandles.length; i++) {
+        var file = await fileHandles[i].getFile()
+
+        // file.path = this.rootDirectory + '/' + (await this.rootHandle.resolve(fileHandles)).join('/')
+        var ext = file.name.substring(file.name.lastIndexOf('.') + 1)
+        if (this.enableFile.includes(ext) || this.enableFile.includes(ext.toUpperCase()) || this.enableFile.includes(ext.toLowerCase())) {
+          this.list.push({ file: file, ext: ext, percentage: 0, percentageHash: 0, createRes: '' })
+        }
+      }
+
+      this.listLoading = false
+
+      this.filterList = this.list
+      this.$nextTick(() => {
+        if (this.filterList.length) {
+          this.filterList.forEach(row => {
+            this.$refs.multipleTable.toggleRowSelection(row, true)
+          })
+        }
+      })
+
+      this.getExts()
     },
     folderCheckConfirm() {
       if (!this.uploadCompleted) {
