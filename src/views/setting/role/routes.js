@@ -48,6 +48,14 @@ export const constantRoutes = [
     name: 'Setting',
     children: [
       {
+        title: '编辑个人信息',
+        name: 'AdminEdit'
+      },
+      {
+        title: '修改密码',
+        name: 'AdminUpdatePwd'
+      },
+      {
         title: '用户设置',
         name: 'Admin',
         children: [

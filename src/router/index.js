@@ -202,10 +202,22 @@ export const asyncRoutes = [
   {
     path: '/setting',
     component: Layout,
-    redirect: '/setting/admin',
+    redirect: '/setting/admin/edit',
     name: 'Setting',
     meta: { title: '基本配置', icon: 'el-icon-set-up' },
     children: [
+      {
+        path: 'admin/edit',
+        component: () => import('@/views/setting/admin/edit'),
+        name: 'AdminEdit',
+        meta: { title: '编辑个人信息', icon: 'el-icon-user-solid' }
+      },
+      {
+        path: 'admin/updatePwd',
+        component: () => import('@/views/setting/admin/updatePwd'),
+        name: 'AdminUpdatePwd',
+        meta: { title: '修改密码', icon: 'el-icon-edit' }
+      },
       {
         path: 'admin',
         component: () => import('@/views/setting/admin/layout'),

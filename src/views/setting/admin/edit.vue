@@ -1,43 +1,29 @@
 <template>
-  <el-dialog
-    title="编辑用户"
-    :visible.sync="dialogVisibleEdit"
-    width="50%"
-    :before-close="handleClose"
-  >
-    <div>
-      <el-form ref="form" :model="editItem" :rules="ruleValidate" label-width="80px">
+  <div class="app-container">
+    <div class="formWrap">
+      <el-form ref="form" :model="currUser" :rules="ruleValidate" label-width="80px">
         <el-form-item label="用户名" prop="username">
-          <el-input v-model="editItem.username" />
+          <el-input v-model="currUser.username" />
         </el-form-item>
         <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="editItem.mobile" />
+          <el-input v-model="currUser.mobile" />
+        </el-form-item>
+        <el-form-item>
+          <el-button class="filter-item" type="primary" @click="commit">
+            确定
+          </el-button>
         </el-form-item>
       </el-form>
     </div>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
-    </span>
-  </el-dialog>
+  </div>
 </template>
 <script>
 import { updateUser } from '@/api/admin'
+import { getToken, setToken } from '@/utils/auth'
 export default {
-  props: {
-    dialogVisibleEdit: {
-      type: Boolean,
-      default: false
-    },
-    editItem: {
-      type: Object,
-      default() {
-        return {}
-      }
-    }
-  },
   data() {
     return {
+      currUser: JSON.parse(getToken()),
       loading: false,
       ruleValidate: {
         username: [
@@ -66,14 +52,14 @@ export default {
     },
     updateUser() {
       this.loading = true
-      updateUser(this.editItem).then(response => {
+      updateUser(this.currUser).then(response => {
         this.$message({
           message: '编辑成功！',
           type: 'success'
         })
+        this.$store.commit('user/SET_TOKEN', JSON.stringify(this.currUser))
+        setToken(JSON.stringify(this.currUser))
         this.loading = false
-        this.$emit('changeEditVisible', false)
-        this.$emit('refresh')
       }).catch(error => {
         this.loading = false
         this.$message({
@@ -81,15 +67,15 @@ export default {
           type: 'error'
         })
       })
-    },
-    reset() {
-      this.$refs.form.resetFields()
-      this.$emit('changeEditVisible', false)
-    },
-    handleClose(done) {
-      this.$emit('changeEditVisible', false)
-      // done()
     }
   }
 }
 </script>
+<style scoped>
+.formWrap {
+  width: 500px;
+  padding: 20px;
+  border: 1px solid #DCDFE6;
+  border-radius: 10px;
+}
+</style>

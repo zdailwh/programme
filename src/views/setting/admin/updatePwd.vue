@@ -1,11 +1,6 @@
 <template>
-  <el-dialog
-    title="修改密码"
-    :visible.sync="dialogVisibleUpdatePwd"
-    width="50%"
-    :before-close="handleClose"
-  >
-    <div>
+  <div class="app-container">
+    <div class="formWrap">
       <el-form ref="form" :model="formadd" :rules="ruleValidate" label-width="80px">
         <el-form-item label="原密码" prop="old">
           <el-input v-model="formadd.old" type="password" />
@@ -13,23 +8,18 @@
         <el-form-item label="新密码" prop="new">
           <el-input v-model="formadd.new" type="password" />
         </el-form-item>
+        <el-form-item>
+          <el-button class="filter-item" type="primary" @click="commit">
+            确定
+          </el-button>
+        </el-form-item>
       </el-form>
     </div>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="reset">取 消</el-button>
-      <el-button type="primary" :loading="loading" @click="commit">确 定</el-button>
-    </span>
-  </el-dialog>
+  </div>
 </template>
 <script>
 import { updatePwd } from '@/api/admin'
 export default {
-  props: {
-    dialogVisibleUpdatePwd: {
-      type: Boolean,
-      default: false
-    }
-  },
   data() {
     return {
       loading: false,
@@ -73,21 +63,21 @@ export default {
           new: ''
         }
         this.loading = false
-        this.$emit('changeUpdatePwdVisible', false)
+
         await this.$store.dispatch('user/logout')
         this.$router.push(`/login?redirect=${this.$route.fullPath}`)
       }).catch(() => {
         this.loading = false
       })
-    },
-    reset() {
-      this.$refs.form.resetFields()
-      this.$emit('changeUpdatePwdVisible', false)
-    },
-    handleClose(done) {
-      this.$emit('changeUpdatePwdVisible', false)
-      // done()
     }
   }
 }
 </script>
+<style scoped>
+.formWrap {
+  width: 500px;
+  padding: 20px;
+  border: 1px solid #DCDFE6;
+  border-radius: 10px;
+}
+</style>
