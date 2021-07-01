@@ -7,8 +7,17 @@
       </el-radio-group>
     </div>
 
-    <h4 class="time-head">{{ currtime }}</h4>
-    <el-table :data="tableData" :row-class-name="tableRowClassName" fit highlight-current-row style="width: 100%">
+    <div class="headerWrap">
+      <p v-if="currDeviceObj.id" class="leftCont">
+        <el-tag effect="plain">设备空间：{{ currDeviceObj.spaceavail + ' / ' + currDeviceObj.spacetotal }}</el-tag>
+      </p>
+      <h4 class="time-head">{{ currtime }}</h4>
+      <p v-if="currDeviceObj.id" class="rightCont">
+        <el-tag v-if="heartbeatSpace > 60" effect="dark" type="danger">设备通讯异常</el-tag>
+        <el-tag v-else effect="dark" type="success">设备通讯正常</el-tag>
+      </p>
+    </div>
+    <el-table :data="tableData" :row-class-name="tableRowClassName" fit highlight-current-row size="small" style="width: 100%">
       <el-table-column prop="no" label="频道编号" width="60" align="center" />
       <el-table-column prop="videores" label="视频类型" width="60" align="center" />
       <el-table-column prop="name" label="频道名称" width="120" align="center">
@@ -243,6 +252,7 @@ export default {
         deviceId: ''
       },
       currDevice: '全部',
+      currDeviceObj: {},
       allDevices: [],
       optionsDevices: [],
       tsVisible1: false,
@@ -255,13 +265,24 @@ export default {
       epgVisible: false
     }
   },
+  computed: {
+    heartbeatSpace() {
+      if (this.currDeviceObj.id) {
+        var currtime = parseInt((new Date().getTime() + '').substr(0, 10))
+        return currtime - this.currDeviceObj.heartbeat
+      } else {
+        return ''
+      }
+    }
+  },
   watch: {
     allDevices: function(newVal) {
       if (newVal.length) {
         this.optionsDevices = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
-            value: item.id
+            value: item.id,
+            obj: item
           }
         })
       }
@@ -271,16 +292,20 @@ export default {
         this.currDevice = newVal[0].label
         this.filterForm.device = newVal[0].label
         this.filterForm.deviceId = newVal[0].value
+        this.currDeviceObj = newVal[0].obj
         this.handleFilter()
       }
     },
     currDevice: function(newVal) {
       if (newVal !== '全部') {
-        this.filterForm.deviceId = this.optionsDevices.filter((item, idx, arr) => {
+        var filteredDevs = this.optionsDevices.filter((item, idx, arr) => {
           return item.label === newVal
-        })[0].value
+        })
+        this.filterForm.deviceId = filteredDevs[0].value
+        this.currDeviceObj = filteredDevs[0].obj
       } else {
         this.filterForm.deviceId = ''
+        this.currDeviceObj = {}
       }
     }
   },

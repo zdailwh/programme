@@ -208,7 +208,18 @@ tr.bg-red .el-button--text, tr.bg-blue .el-button--text {
 .currEpg.bgRed {
   background-color: #F56C6C;
 }
-.time-head {
+.headerWrap {
+  display: flex;
+}
+.headerWrap .leftCont {
+  flex: 1;
+}
+.headerWrap .rightCont {
+  flex: 1;
+  text-align: right;
+}
+.headerWrap .time-head {
+  flex: 1;
   text-align: center;
   font-size: 25px;
   margin: 15px 0;
