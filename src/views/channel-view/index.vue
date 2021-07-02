@@ -9,7 +9,7 @@
 
     <div class="headerWrap">
       <p v-if="currDeviceObj.id" class="leftCont">
-        <el-tag effect="plain">设备空间：{{ currDeviceObj.spaceavail + ' / ' + currDeviceObj.spacetotal }}</el-tag>
+        <el-tag effect="plain">设备空间：{{ (currDeviceObj.spaceavail / 1024).toFixed(3) }} GB 可用 ， 共 {{ (currDeviceObj.spacetotal / 1024).toFixed(3) }} GB</el-tag>
       </p>
       <h4 class="time-head">{{ currtime }}</h4>
       <p v-if="currDeviceObj.id" class="rightCont">

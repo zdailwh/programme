@@ -39,9 +39,8 @@
 </template>
 
 <script>
-import { deepClone } from '@/utils'
 import { fetchList, deleteRole } from '@/api/myrole'
-import { constantRoutes, asyncRoutes } from './routes.js'
+import { routes } from './routes.js'
 import Pagination from '@/components/Pagination'
 import Add from './add.vue'
 import Edit from './edit.vue'
@@ -103,9 +102,8 @@ export default {
       })
     },
     async getRoutes() {
-      const res = deepClone([...constantRoutes, ...asyncRoutes])
-      this.serviceRoutes = res
-      this.routes = this.generateRoutes(res)
+      this.serviceRoutes = routes
+      this.routes = this.generateRoutes(routes)
     },
 
     // Reshape the routes structure so that it looks the same as the sidebar

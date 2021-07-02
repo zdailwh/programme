@@ -1,11 +1,12 @@
-export const constantRoutes = [
+export const routes = [
   {
     title: '频道预览',
     name: 'ChannelView',
     children: [
       {
         title: '频道预览',
-        name: 'ChannelViewList'
+        name: 'ChannelViewList',
+        parent: 'ChannelView'
       }
     ]
   },
@@ -15,11 +16,13 @@ export const constantRoutes = [
     children: [
       {
         title: '节目列表',
-        name: 'ProgramList'
+        name: 'ProgramList',
+        parent: 'Program'
       },
       {
         title: '节目上载',
-        name: 'ProgramAdd'
+        name: 'ProgramAdd',
+        parent: 'Program'
       }
     ]
   },
@@ -29,7 +32,8 @@ export const constantRoutes = [
     children: [
       {
         title: '编单',
-        name: 'ProEditMain'
+        name: 'ProEditMain',
+        parent: 'ProEdit'
       }
     ]
   },
@@ -39,7 +43,8 @@ export const constantRoutes = [
     children: [
       {
         title: '审核播出',
-        name: 'ExamineMain'
+        name: 'ExamineMain',
+        parent: 'Examine'
       }
     ]
   },
@@ -49,71 +54,43 @@ export const constantRoutes = [
     children: [
       {
         title: '编辑个人信息',
-        name: 'AdminEdit'
+        name: 'AdminEdit',
+        parent: 'Setting'
       },
       {
         title: '修改密码',
-        name: 'AdminUpdatePwd'
+        name: 'AdminUpdatePwd',
+        parent: 'Setting'
       },
       {
         title: '用户设置',
-        name: 'Admin',
-        children: [
-          {
-            title: '用户设置',
-            name: 'AdminList'
-          }
-        ]
+        name: 'AdminList',
+        parent: 'Setting'
       },
       {
         title: '密码强度设置',
-        name: 'PwdSet',
-        children: [
-          {
-            title: '密码强度设置',
-            name: 'AdminPwdSet'
-          }
-        ]
+        name: 'AdminPwdSet',
+        parent: 'Setting'
       },
       {
         title: '黑白名单设置',
-        name: 'BlackWhite',
-        children: [
-          {
-            title: '黑白名单设置',
-            name: 'BlackWhiteList'
-          }
-        ]
+        name: 'BlackWhiteList',
+        parent: 'Setting'
       },
       {
         title: '权限配置',
-        name: 'Role',
-        children: [
-          {
-            title: '权限配置',
-            name: 'RoleList'
-          }
-        ]
+        name: 'RoleList',
+        parent: 'Setting'
       },
       {
         title: '频道设置',
-        name: 'Channel',
-        children: [
-          {
-            title: '频道设置',
-            name: 'ChannelList'
-          }
-        ]
+        name: 'ChannelList',
+        parent: 'Setting'
       },
       {
         title: '设备管理',
-        name: 'Device',
-        children: [
-          {
-            title: '设备管理',
-            name: 'DeviceList'
-          }
-        ]
+        name: 'DeviceList',
+        parent: 'Setting'
       }
     ]
   },
@@ -123,7 +100,8 @@ export const constantRoutes = [
     children: [
       {
         title: '设备频道管理',
-        name: 'DeviceChnsList'
+        name: 'DeviceChnsList',
+        parent: 'DeviceChns'
       }
     ]
   },
@@ -133,7 +111,8 @@ export const constantRoutes = [
     children: [
       {
         title: '设备节目管理',
-        name: 'DeviceProsList'
+        name: 'DeviceProsList',
+        parent: 'DevicePros'
       }
     ]
   },
@@ -143,7 +122,8 @@ export const constantRoutes = [
     children: [
       {
         title: '频道节目管理',
-        name: 'ProChnsList'
+        name: 'ProChnsList',
+        parent: 'ProChns'
       }
     ]
   },
@@ -153,22 +133,19 @@ export const constantRoutes = [
     children: [
       {
         title: '任务总览',
-        name: 'TaskView'
+        name: 'TaskView',
+        parent: 'Task'
       },
       {
         title: '主任务',
-        name: 'TaskJobList'
+        name: 'TaskJobList',
+        parent: 'Task'
       },
       {
         title: '主线程',
-        name: 'TaskThreadList'
+        name: 'TaskThreadList',
+        parent: 'Task'
       }
     ]
   }
 ]
-
-export const asyncRoutes = [
-  // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
-

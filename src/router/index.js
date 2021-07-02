@@ -219,88 +219,40 @@ export const asyncRoutes = [
         meta: { title: '修改密码', icon: 'el-icon-edit' }
       },
       {
-        path: 'admin',
-        component: () => import('@/views/setting/admin/layout'),
-        name: 'Admin',
-        redirect: '/setting/admin/index',
-        children: [
-          {
-            path: 'index',
-            component: () => import('@/views/setting/admin/index'),
-            name: 'AdminList',
-            meta: { title: '用户设置', icon: 'peoples' }
-          }
-        ]
+        path: 'admin/index',
+        component: () => import('@/views/setting/admin/index'),
+        name: 'AdminList',
+        meta: { title: '用户设置', icon: 'peoples' }
       },
       {
-        path: 'pwdSet',
-        component: () => import('@/views/setting/admin/layout'),
-        name: 'PwdSet',
-        redirect: '/setting/admin/pwdSet',
-        children: [
-          {
-            path: 'index',
-            component: () => import('@/views/setting/admin/pwdSet'),
-            name: 'AdminPwdSet',
-            meta: { title: '密码强度设置', icon: 'el-icon-lock' }
-          }
-        ]
+        path: 'pwdSet/index',
+        component: () => import('@/views/setting/admin/pwdSet'),
+        name: 'AdminPwdSet',
+        meta: { title: '密码强度设置', icon: 'el-icon-lock' }
       },
       {
-        path: 'blackWhite',
-        component: () => import('@/views/setting/black-white/layout'),
-        name: 'BlackWhite',
-        redirect: '/setting/black-white/index',
-        children: [
-          {
-            path: 'index',
-            component: () => import('@/views/setting/black-white/index'),
-            name: 'BlackWhiteList',
-            meta: { title: '黑白名单设置', icon: 'el-icon-tickets' }
-          }
-        ]
+        path: 'blackWhite/index',
+        component: () => import('@/views/setting/black-white/index'),
+        name: 'BlackWhiteList',
+        meta: { title: '黑白名单设置', icon: 'el-icon-tickets' }
       },
       {
-        path: 'role',
-        component: () => import('@/views/setting/role/layout'),
-        name: 'Role',
-        redirect: '/setting/role/index',
-        children: [
-          {
-            path: 'index',
-            component: () => import('@/views/setting/role/index'),
-            name: 'RoleList',
-            meta: { title: '权限配置', icon: 'el-icon-key' }
-          }
-        ]
+        path: 'role/index',
+        component: () => import('@/views/setting/role/index'),
+        name: 'RoleList',
+        meta: { title: '权限配置', icon: 'el-icon-key' }
       },
       {
-        path: 'channel',
-        component: () => import('@/views/setting/channel/layout'),
-        name: 'Channel',
-        redirect: '/setting/channel/index',
-        children: [
-          {
-            path: 'index',
-            component: () => import('@/views/setting/channel/index'),
-            name: 'ChannelList',
-            meta: { title: '频道设置', icon: 'el-icon-monitor' }
-          }
-        ]
+        path: 'channel/index',
+        component: () => import('@/views/setting/channel/index'),
+        name: 'ChannelList',
+        meta: { title: '频道设置', icon: 'el-icon-monitor' }
       },
       {
-        path: 'device',
-        component: () => import('@/views/setting/device/layout'),
-        name: 'Device',
-        redirect: '/setting/device/index',
-        children: [
-          {
-            path: 'index',
-            component: () => import('@/views/setting/device/index'),
-            name: 'DeviceList',
-            meta: { title: '设备管理', icon: 'el-icon-cpu' }
-          }
-        ]
+        path: 'device/index',
+        component: () => import('@/views/setting/device/index'),
+        name: 'DeviceList',
+        meta: { title: '设备管理', icon: 'el-icon-cpu' }
       }
     ]
   },

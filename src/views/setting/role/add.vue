@@ -71,8 +71,16 @@ export default {
     commit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          const checkedKeys = this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
-          this.formadd.proms = checkedKeys
+          var checkedNodes = this.$refs.tree.getCheckedNodes()
+          console.log(checkedNodes.map(item => { return item.name }))
+          var names = []
+          checkedNodes.map(item => {
+            names.push(item.name)
+            if (item.parent && !names.includes(item.parent)) {
+              names.push(item.parent)
+            }
+          })
+          this.formadd.proms = names
           if (!this.formadd.proms.length) {
             this.$message({
               message: '请选择角色权限',

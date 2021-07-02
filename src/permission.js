@@ -41,7 +41,7 @@ router.beforeEach(async(to, from, next) => {
           // router.addRoutes(accessRoutes1)
           const roles = ['admin']
           await store.dispatch('user/setRole', roles)
-          const perms = ['Program', 'Setting', 'ProgramList', 'ProEdit', 'ProEditMain', 'Admin', 'AdminList']
+          const perms = ['Program', 'ProgramList', 'ProgramAdd', 'ProEditMain', 'ProEdit', 'AdminEdit', 'Setting']
           const accessRoutes = await store.dispatch('mypermission/generateRoutes', { roles: roles, perms: perms })
           router.addRoutes(accessRoutes)
           next({ ...to, replace: true })
