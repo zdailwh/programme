@@ -268,8 +268,7 @@ export default {
   computed: {
     heartbeatSpace() {
       if (this.currDeviceObj.id) {
-        var currtime = parseInt((new Date().getTime() + '').substr(0, 10))
-        return currtime - this.currDeviceObj.heartbeat
+        return this.currDeviceObj.timestamp - this.currDeviceObj.heartbeat
       } else {
         return ''
       }
@@ -281,8 +280,7 @@ export default {
         this.optionsDevices = newVal.map((item, idx, arr) => {
           return {
             label: item.name,
-            value: item.id,
-            obj: item
+            value: item.id
           }
         })
       }
@@ -292,20 +290,16 @@ export default {
         this.currDevice = newVal[0].label
         this.filterForm.device = newVal[0].label
         this.filterForm.deviceId = newVal[0].value
-        this.currDeviceObj = newVal[0].obj
         this.handleFilter()
       }
     },
     currDevice: function(newVal) {
       if (newVal !== '全部') {
-        var filteredDevs = this.optionsDevices.filter((item, idx, arr) => {
+        this.filterForm.deviceId = this.optionsDevices.filter((item, idx, arr) => {
           return item.label === newVal
-        })
-        this.filterForm.deviceId = filteredDevs[0].value
-        this.currDeviceObj = filteredDevs[0].obj
+        })[0].value
       } else {
         this.filterForm.deviceId = ''
-        this.currDeviceObj = {}
       }
     }
   },
@@ -325,7 +319,8 @@ export default {
     },
     getList() {
       getChannelsPreview(this.listQuery).then((response) => {
-        this.tableData = response.items
+        this.tableData = response.items || []
+        this.currDeviceObj = response.device || {}
         this.total = response.total
       }).catch((error) => {
         console.log(error)
