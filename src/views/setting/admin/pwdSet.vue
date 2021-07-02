@@ -48,7 +48,7 @@ export default {
 </script>
 <style scoped>
 .formWrap {
-  width: 900px;
+  width: 700px;
   padding: 20px;
   border: 1px solid #DCDFE6;
   border-radius: 10px;

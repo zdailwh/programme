@@ -46,7 +46,6 @@ export function updateUser(data) {
     url: '/admin/v1/users/' + data.id,
     method: 'put',
     data: {
-      username: data.username,
       mobile: data.mobile
     }
   })

@@ -2,9 +2,6 @@
   <div class="app-container">
     <div class="formWrap">
       <el-form ref="form" :model="currUser" :rules="ruleValidate" label-width="80px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="currUser.username" />
-        </el-form-item>
         <el-form-item label="手机号" prop="mobile">
           <el-input v-model="currUser.mobile" />
         </el-form-item>
@@ -26,10 +23,6 @@ export default {
       currUser: JSON.parse(getToken()),
       loading: false,
       ruleValidate: {
-        username: [
-          { required: true, type: 'string', message: '姓名不能为空', trigger: 'blur' },
-          { type: 'string', message: '用户名为2-8位字符', min: 2, max: 8, trigger: 'blur' }
-        ],
         mobile: [
           { required: true, message: '手机号码不能为空', trigger: 'blur' },
           { type: 'string', message: '手机号格式不正确', length: 11, pattern: /^1[3|5|8|7]([0-9]{9})$/, trigger: 'blur' }
