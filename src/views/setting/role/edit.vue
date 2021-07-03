@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="编辑频道"
+    title="编辑角色"
     :visible.sync="dialogVisibleEdit"
     width="50%"
     :before-close="handleClose"
@@ -10,17 +10,8 @@
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="editItem.name" placeholder="请输入角色名称" />
         </el-form-item>
-        <el-form-item label="权限" prop="proms">
-          <el-tree
-            ref="tree"
-            :default-expand-all="false"
-            :check-strictly="checkStrictly"
-            :data="routesData"
-            :props="defaultProps"
-            show-checkbox
-            node-key="name"
-            class="permission-tree"
-          />
+        <el-form-item label="角色描述" prop="description">
+          <el-input v-model="editItem.description" placeholder="请输入角色描述" />
         </el-form-item>
       </el-form>
     </div>
@@ -44,12 +35,6 @@ export default {
       default() {
         return {}
       }
-    },
-    routesData: {
-      type: Array,
-      default: function() {
-        return []
-      }
     }
   },
   data() {
@@ -58,12 +43,10 @@ export default {
       ruleValidate: {
         name: [
           { required: true, message: '角色名称不能为空', trigger: 'blur' }
+        ],
+        description: [
+          { required: true, message: '角色描述不能为空', trigger: 'blur' }
         ]
-      },
-      checkStrictly: false,
-      defaultProps: {
-        children: 'children',
-        label: 'title'
       }
     }
   },
@@ -73,15 +56,6 @@ export default {
     commit() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          const checkedKeys = this.$refs.tree.getHalfCheckedKeys().concat(this.$refs.tree.getCheckedKeys())
-          this.editItem.proms = checkedKeys
-          if (!this.editItem.proms.length) {
-            this.$message({
-              message: '请选择角色权限',
-              type: 'warning'
-            })
-            return
-          }
           this.updateRole()
         } else {
           console.log('error submit!!')

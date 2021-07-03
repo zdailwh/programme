@@ -240,6 +240,12 @@ export const asyncRoutes = [
         path: 'role/index',
         component: () => import('@/views/setting/role/index'),
         name: 'RoleList',
+        meta: { title: '角色配置', icon: 'el-icon-key' }
+      },
+      {
+        path: 'permission/index',
+        component: () => import('@/views/setting/permission/index'),
+        name: 'PermissionList',
         meta: { title: '权限配置', icon: 'el-icon-key' }
       },
       {

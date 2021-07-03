@@ -9,34 +9,37 @@ export function fetchList(query) {
     params.name = query.name
   }
   return request({
-    url: '/admin/user/v1/roles',
+    url: '/admin/user/v1/permissions',
     method: 'get',
     params
   })
 }
 
-export function createRole(data) {
+export function createPermission(data) {
+  data.menu = data.menu.join(',')
   return request({
-    url: '/admin/user/v1/roles',
+    url: '/admin/user/v1/permissions',
     method: 'post',
     data: data
   })
 }
 
-export function updateRole(data) {
+export function updatePermission(data) {
   return request({
-    url: '/admin/user/v1/roles/' + data.id,
+    url: '/admin/user/v1/permissions/' + data.id,
     method: 'put',
     data: {
       name: data.name,
-      description: data.description
+      type: data.type,
+      info: data.info,
+      menu: data.menu.join(',')
     }
   })
 }
 
-export function deleteRole(query) {
+export function deletePermission(query) {
   return request({
-    url: '/admin/user/v1/roles/' + query.id,
+    url: '/admin/user/v1/permissions/' + query.id,
     method: 'delete'
   })
 }

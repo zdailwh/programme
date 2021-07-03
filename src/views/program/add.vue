@@ -256,11 +256,13 @@ export default {
       const pickerOpts = {
         // types: [
         //   {
-        //     description: 'Images',
+        //     // description: 'Images',
         //     accept: {
-        //       'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+        //       'image/*': ['.PNG', '.gif', '.jpeg', '.jpg'],
+        //       'video/*': ['.TS', '.MXF', '.MP4', '.MPG', '.MOV', '.AVI', '.MPEG', '.M2TS', '.WMV', '.FLV', '.RMVB', '.M4V', '.MP2', '.MP3', '.AAC', '.AC3'],
+        //       'audio/*': ['.TS', '.MXF', '.MP4', '.MPG', '.MOV', '.AVI', '.MPEG', '.M2TS', '.WMV', '.FLV', '.RMVB', '.M4V', '.MP2', '.MP3', '.AAC', '.AC3']
         //     }
-        //   },
+        //   }
         // ],
         excludeAcceptAllOption: false,
         multiple: true

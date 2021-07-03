@@ -78,8 +78,13 @@ export const routes = [
         parent: 'Setting'
       },
       {
-        title: '权限配置',
+        title: '角色配置',
         name: 'RoleList',
+        parent: 'Setting'
+      },
+      {
+        title: '权限配置',
+        name: 'PermissionList',
         parent: 'Setting'
       },
       {

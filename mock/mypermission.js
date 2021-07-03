@@ -8,7 +8,9 @@ for (let i = 0; i < count; i++) {
     id: '@increment',
     create_time: '@datetime',
     name: '@first',
-    description: '@first',
+    info: '@first',
+    type: 1,
+    menu: 'Program,ProgramList,ProgramAdd,ProEditMain,ProEdit_,AdminList,Setting_',
     'status|1': [0, 1, 2]
   }))
 }
@@ -17,13 +19,15 @@ const role = Mock.mock({
   id: '@increment',
   create_time: '@datetime',
   name: '@first',
-  description: '@first',
+  info: '@first',
+  type: 1,
+  menu: 'Program,ProgramList,ProgramAdd,ProEditMain,ProEdit_,AdminList,Setting_',
   'status|1': [0, 1, 2]
 })
 
 module.exports = [
   {
-    url: '/admin/user/v1/roles',
+    url: '/admin/user/v1/permissions',
     type: 'get',
     response: config => {
       const { importance, type, title, page = 0, per_page = 20, sort } = config.query
@@ -48,21 +52,21 @@ module.exports = [
     }
   },
   {
-    url: '/admin/user/v1/roles/[0-9]',
+    url: '/admin/user/v1/permissions/[0-9]',
     type: 'put',
     response: config => {
       return role
     }
   },
   {
-    url: '/admin/user/v1/roles',
+    url: '/admin/user/v1/permissions',
     type: 'post',
     response: config => {
       return role
     }
   },
   {
-    url: '/admin/user/v1/roles/[0-9]',
+    url: '/admin/user/v1/permissions/[0-9]',
     type: 'delete',
     response: config => {
       return role
