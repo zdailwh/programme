@@ -15,6 +15,16 @@ export function fetchList(query) {
   })
 }
 
+export function getAllPermissions() {
+  var params = {}
+  params.orderby = 'id'
+  return request({
+    url: '/admin/user/v1/permissions',
+    method: 'get',
+    params
+  })
+}
+
 export function createPermission(data) {
   data.menu = data.menu.join(',')
   return request({

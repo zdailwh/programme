@@ -19,6 +19,16 @@ export function fetchList(query) {
   })
 }
 
+export function getAllUsers() {
+  var params = {}
+  params.orderby = 'id'
+  return request({
+    url: '/admin/v1/users',
+    method: 'get',
+    params
+  })
+}
+
 export function actived(query) {
   return request({
     url: '/admin/v1/users/' + query.id + '/actived',

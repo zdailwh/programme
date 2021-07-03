@@ -15,6 +15,16 @@ export function fetchList(query) {
   })
 }
 
+export function getAllRoles() {
+  var params = {}
+  params.orderby = 'id'
+  return request({
+    url: '/admin/user/v1/roles',
+    method: 'get',
+    params
+  })
+}
+
 export function createRole(data) {
   return request({
     url: '/admin/user/v1/roles',

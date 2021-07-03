@@ -17,6 +17,8 @@ const prochn = require('./pro-chn')
 const ip = require('./ip')
 const myrole = require('./myrole')
 const mypermission = require('./mypermission')
+const roleUser = require('./role-user')
+const rolePerm = require('./role-perm')
 
 const mocks = [
   ...user,
@@ -34,7 +36,9 @@ const mocks = [
   ...prochn,
   ...ip,
   ...myrole,
-  ...mypermission
+  ...mypermission,
+  ...roleUser,
+  ...rolePerm
 ]
 
 // for front mock

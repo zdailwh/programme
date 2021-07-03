@@ -88,6 +88,16 @@ export const routes = [
         parent: 'Setting'
       },
       {
+        title: '用户角色',
+        name: 'RoleUser',
+        parent: 'Setting'
+      },
+      {
+        title: '角色权限',
+        name: 'RolePerm',
+        parent: 'Setting'
+      },
+      {
         title: '频道设置',
         name: 'ChannelList',
         parent: 'Setting'

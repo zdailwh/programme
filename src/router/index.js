@@ -240,13 +240,25 @@ export const asyncRoutes = [
         path: 'role/index',
         component: () => import('@/views/setting/role/index'),
         name: 'RoleList',
-        meta: { title: '角色配置', icon: 'el-icon-key' }
+        meta: { title: '角色配置', icon: 'el-icon-user' }
       },
       {
         path: 'permission/index',
         component: () => import('@/views/setting/permission/index'),
         name: 'PermissionList',
         meta: { title: '权限配置', icon: 'el-icon-key' }
+      },
+      {
+        path: 'roleuser/index',
+        component: () => import('@/views/setting/roleuser/index'),
+        name: 'RoleUser',
+        meta: { title: '用户角色', icon: 'el-icon-link' }
+      },
+      {
+        path: 'roleperm/index',
+        component: () => import('@/views/setting/roleperm/index'),
+        name: 'RolePerm',
+        meta: { title: '角色权限', icon: 'el-icon-link' }
       },
       {
         path: 'channel/index',

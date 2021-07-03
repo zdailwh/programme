@@ -94,7 +94,7 @@ export default {
           checkedNodes.map(item => {
             names.push(item.name)
             if (item.parent && !names.includes(item.parent)) {
-              names.push(item.parent)
+              names.push(item.parent + '_')
             }
           })
           this.editItem.menu = names
