@@ -253,17 +253,26 @@ export default {
       }
       this.resetFilelist()
 
+      var accept = []
+      this.enableFile.map(item => {
+        if (item.indexOf('.') === 0) {
+          accept.push(item)
+        } else {
+          accept.push('.' + item)
+        }
+      })
       const pickerOpts = {
-        // types: [
-        //   {
-        //     // description: 'Images',
-        //     accept: {
-        //       'image/*': ['.PNG', '.gif', '.jpeg', '.jpg'],
-        //       'video/*': ['.TS', '.MXF', '.MP4', '.MPG', '.MOV', '.AVI', '.MPEG', '.M2TS', '.WMV', '.FLV', '.RMVB', '.M4V', '.MP2', '.MP3', '.AAC', '.AC3'],
-        //       'audio/*': ['.TS', '.MXF', '.MP4', '.MPG', '.MOV', '.AVI', '.MPEG', '.M2TS', '.WMV', '.FLV', '.RMVB', '.M4V', '.MP2', '.MP3', '.AAC', '.AC3']
-        //     }
-        //   }
-        // ],
+        types: [
+          {
+            // description: 'Images',
+            accept: {
+              // 'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+              // 'video/*': [],
+              // 'audio/*': []
+              '*/*': accept
+            }
+          }
+        ],
         excludeAcceptAllOption: false,
         multiple: true
       }
