@@ -82,13 +82,14 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <Add :dialog-visible-add="dialogVisibleAdd" @changeAddVisible="changeAddVisible" @refresh="getList" />
+    <Add :dialog-visible-add="dialogVisibleAdd" :options-roles="optionsRoles" @changeAddVisible="changeAddVisible" @refresh="getList" />
     <ResetPwd :edit-item="editItem" :dialog-visible-reset-pwd="dialogVisibleResetPwd" @changeResetPwdVisible="changeResetPwdVisible" />
   </div>
 </template>
 
 <script>
 import { fetchList, actived, inactived, deleteUser } from '@/api/admin'
+import { getAllRoles } from '@/api/myrole'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
@@ -121,11 +122,26 @@ export default {
       editItem: {},
       editIndex: '',
       dialogVisibleAdd: false,
-      dialogVisibleResetPwd: false
+      dialogVisibleResetPwd: false,
+      allRoles: [],
+      optionsRoles: []
+    }
+  },
+  watch: {
+    allRoles: function(newVal) {
+      if (newVal.length) {
+        this.optionsRoles = newVal.map((item, idx, arr) => {
+          return {
+            label: item.name,
+            value: item.id
+          }
+        })
+      }
     }
   },
   created() {
     this.getList()
+    this.getAllRoles()
   },
   methods: {
     getList() {
@@ -222,6 +238,16 @@ export default {
     },
     changeResetPwdVisible(params) {
       this.dialogVisibleResetPwd = params
+    },
+    getAllRoles() {
+      getAllRoles().then(data => {
+        this.allRoles = data.items || []
+      }).catch(error => {
+        this.$message({
+          message: error.message || '操作失败！',
+          type: 'error'
+        })
+      })
     }
   }
 }
