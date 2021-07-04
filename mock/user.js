@@ -49,7 +49,41 @@ const authentication = {
     mobile: '13900000000',
     isadmin: 2,
     activity: 0
-  }
+  },
+  permission: [
+    {
+      class: 'app\\user\\admin\\Permission',
+      id: 2,
+      type: 1,
+      name: '编单',
+      service: '',
+      version: '',
+      action: '',
+      serviceclass: '',
+      menu: 'ProgramList,Program_,ProEditMain,ProEdit_,AdminEdit,Setting_,AdminUpdatePwd,Setting_',
+      info: '编单',
+      status: 0,
+      delete_id: 0,
+      create_time: '2021-07-03 20:58:57',
+      update_time: '2021-07-03 21:30:20'
+    },
+    {
+      class: 'app\\user\\admin\\Permission',
+      id: 2,
+      type: 1,
+      name: '编单',
+      service: '',
+      version: '',
+      action: '',
+      serviceclass: '',
+      menu: 'ChannelViewList,ChannelView_,ProgramList,Program_,AdminEdit,Setting_,AdminUpdatePwd,Setting_',
+      info: '编单',
+      status: 0,
+      delete_id: 0,
+      create_time: '2021-07-03 20:58:57',
+      update_time: '2021-07-03 21:30:20'
+    }
+  ]
 }
 
 module.exports = [

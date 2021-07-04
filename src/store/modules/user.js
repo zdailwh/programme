@@ -45,6 +45,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(data => {
         commit('SET_ISADMIN', data.user.isadmin)
+        data.user.permission = data.permission || []
         commit('SET_TOKEN', JSON.stringify(data.user))
         setToken(JSON.stringify(data.user))
         resolve()

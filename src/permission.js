@@ -39,9 +39,24 @@ router.beforeEach(async(to, from, next) => {
           // await store.dispatch('user/setRole', roles)
           // console.log(accessRoutes1)
           // router.addRoutes(accessRoutes1)
-          const roles = ['admin']
+          const roles = ['editor']
           await store.dispatch('user/setRole', roles)
-          const perms = ['Program', 'ProgramList', 'ProgramAdd', 'ProEditMain', 'ProEdit', 'AdminEdit', 'Setting']
+          const permsarr = JSON.parse(hasToken).permission || []
+          permsarr.map(item => {
+            var a = item.menu.split(',')
+            item.menu = a.map(name => {
+              if (name.indexOf('_') !== -1) {
+                return name.substr(0, name.indexOf('_'))
+              } else {
+                return name
+              }
+            })
+          })
+          var perms = []
+          permsarr.map(item => {
+            perms = perms.concat(item.menu)
+          })
+          perms = unique(perms)
           const accessRoutes = await store.dispatch('mypermission/generateRoutes', { roles: roles, perms: perms })
           router.addRoutes(accessRoutes)
           next({ ...to, replace: true })
@@ -81,3 +96,14 @@ router.beforeEach(async(to, from, next) => {
 
 router.afterEach(() => {
 })
+
+function unique(arr) {
+  var result = []; var hash = {}
+  for (var i = 0, elem; (elem = arr[i]) != null; i++) {
+    if (!hash[elem]) {
+      result.push(elem)
+      hash[elem] = true
+    }
+  }
+  return result
+}
