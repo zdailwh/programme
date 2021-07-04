@@ -39,7 +39,12 @@ router.beforeEach(async(to, from, next) => {
           // await store.dispatch('user/setRole', roles)
           // console.log(accessRoutes1)
           // router.addRoutes(accessRoutes1)
-          const roles = ['editor']
+          var roles = []
+          if (JSON.parse(hasToken).isadmin > 0) {
+            roles = ['admin']
+          } else {
+            roles = ['editor']
+          }
           await store.dispatch('user/setRole', roles)
           const permsarr = JSON.parse(hasToken).permission || []
           permsarr.map(item => {
