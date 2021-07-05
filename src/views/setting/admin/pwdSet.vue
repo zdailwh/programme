@@ -22,7 +22,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button class="filter-item" type="primary">确定</el-button>
+          <el-button class="filter-item" type="primary" @click="commit">确定</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -30,19 +30,32 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 export default {
   data() {
     return {
       addForm: {
-        length: null,
+        length: 8,
         complexity: 1,
         changespace: 30
       }
     }
   },
   created() {
+    this.addForm = (Cookies.get('Programme-pwdset') && JSON.parse(Cookies.get('Programme-pwdset'))) || {
+      length: 8,
+      complexity: 1,
+      changespace: 30
+    }
   },
   methods: {
+    commit() {
+      Cookies.set('Programme-pwdset', this.addForm)
+      this.$message({
+        message: '密码强度设置成功！',
+        type: 'success'
+      })
+    }
   }
 }
 </script>

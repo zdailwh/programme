@@ -20,6 +20,7 @@
 </template>
 <script>
 import { resetPwd } from '@/api/admin'
+import Cookies from 'js-cookie'
 export default {
   props: {
     dialogVisibleResetPwd: {
@@ -34,15 +35,41 @@ export default {
     }
   },
   data() {
+    var validatePwd = (rule, value, callback) => {
+      var len = this.pwdset.length
+      var complexity = this.pwdset.complexity
+      var reg = new RegExp('^.*(?=.{8,})(?=.*[0-9])(?=.*[a-zA-Z]).*$')
+      var regMsg = '至少8位字母数字'
+      if (complexity === 1) {
+        // 字母数字
+        reg = new RegExp('^.*(?=.{' + len + ',})(?=.*[0-9])(?=.*[a-zA-Z]).*$')
+        regMsg = `至少${len}位字母数字`
+      } if (complexity === 2) {
+        // 大小写及数字
+        reg = new RegExp('^.*(?=.{' + len + ',})(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z]).*$')
+        regMsg = `至少${len}位大小写字母加数字`
+      } if (complexity === 3) {
+        // 大小写、数字及特殊符号
+        reg = new RegExp('^.*(?=.{' + len + ',})(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*? ]).*$')
+        regMsg = `至少${len}位大小写字母加数字加特殊符号`
+      }
+      if (value === '') {
+        callback(new Error('新密码不能为空'))
+      } else if (!reg.test(value)) {
+        callback(new Error(regMsg))
+      } else {
+        callback()
+      }
+    }
     return {
+      pwdset: (Cookies.get('Programme-pwdset') && JSON.parse(Cookies.get('Programme-pwdset'))) || { length: 8, complexity: 1, changespace: 30 },
       loading: false,
       formadd: {
         password: ''
       },
       ruleValidate: {
         password: [
-          { required: true, message: '新密码不能为空', trigger: 'blur' },
-          { type: 'string', message: '密码为6-12位字符', min: 6, max: 12, trigger: 'blur' }
+          { required: true, validator: validatePwd, trigger: 'blur' }
         ]
       }
     }
