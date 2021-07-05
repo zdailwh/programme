@@ -17,7 +17,7 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">添加</el-button>
       </el-form-item>
     </el-form>
@@ -49,7 +49,7 @@
           <el-tag v-else-if="row.status === 1" type="danger">{{ row.statusstr }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button v-if="row.status !== 0" type="text" size="medium" @click="valid(row.id, $index)">有效</el-button>
           <el-button v-if="row.status !== 1" type="text" size="medium" @click="invalid(row.id, $index)">无效</el-button>
@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList_white, valid_white, invalid_white, deleteIp_white } from '@/api/ip'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add_white.vue'
@@ -82,6 +83,7 @@ export default {
   components: { Pagination, Add },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,

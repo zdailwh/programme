@@ -21,8 +21,8 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-form-item>
-        <el-button v-if="currUser.isadmin !== '' && currUser.isadmin !== 0" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">创建用户</el-button>
+      <el-form-item v-if="!isVisitor">
+        <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">创建用户</el-button>
       </el-form-item>
     </el-form>
 
@@ -59,13 +59,13 @@
           <el-tag v-else type="info">{{ row.statusstr }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin !== 0 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
-          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin !== 0 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
+          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
+          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
           <el-button v-if="parseInt(currUser.isadmin) > parseInt(row.isadmin) && parseInt(row.status) === 2" type="text" size="medium" @click="resetPwdHandle(row, $index)">重置密码</el-button>
           <el-popover
-            v-if="currUser.isadmin !== '' && currUser.isadmin !== 0"
+            v-if="currUser.isadmin !== '' && currUser.isadmin > 3"
             placement="top"
             width="170"
             trigger="hover"
@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, actived, inactived, deleteUser } from '@/api/admin'
 import { getAllRoles } from '@/api/myrole'
 import waves from '@/directive/waves' // waves directive
@@ -101,12 +102,18 @@ export default {
   directives: { waves },
   filters: {
     isadminFilter(val) {
-      const typeMap = ['操作员', '管理员', '超级管理员']
-      return typeMap[val]
+      const typeObj = {
+        2: '普通',
+        3: '操作员',
+        4: '管理员',
+        5: '超级管理员'
+      }
+      return typeObj[val]
     }
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       currUser: JSON.parse(getToken()),
       list: null,
       total: 0,
@@ -148,13 +155,13 @@ export default {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
         this.list = data.items.filter(item => {
-          if (this.currUser.isadmin === 0) {
+          if (this.currUser.isadmin === 3) {
             // 操作员
-            return this.currUser.id === item.id
-          } else if (this.currUser.isadmin === 1) {
+            return item.isadmin < 3 || (item.isadmin === 3 && this.currUser.id === item.id)
+          } else if (this.currUser.isadmin === 4) {
             // 管理员
-            return item.isadmin === 0 || (item.isadmin === 1 && this.currUser.id === item.id)
-          } else if (this.currUser.isadmin === 2) {
+            return item.isadmin < 4 || (item.isadmin === 4 && this.currUser.id === item.id)
+          } else if (this.currUser.isadmin === 5) {
             // 超级管理员
             return true
           }

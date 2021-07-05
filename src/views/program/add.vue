@@ -25,7 +25,7 @@
           <!-- <span style="color: #909399;margin-left: 10px;">目前支持的文件格式有：{{ enableFile.join('、') }}</span> -->
         </el-form-item>
         <el-form-item>
-          <el-button class="filter-item" type="primary" icon="el-icon-upload" @click="createHandle">
+          <el-button class="filter-item" type="primary" icon="el-icon-upload" :disabled="isVisitor" @click="createHandle">
             上载
           </el-button>
         </el-form-item>
@@ -96,6 +96,7 @@
   </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import { createProgram, mergeProgram } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
@@ -142,6 +143,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       chnOptions: [],
       allChannels: [],
       deviceOptions: [],

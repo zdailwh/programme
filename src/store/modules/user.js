@@ -1,6 +1,7 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
+import Cookies from 'js-cookie'
 
 const state = {
   token: getToken(),
@@ -48,6 +49,7 @@ const actions = {
         data.user.permission = data.permission || []
         commit('SET_TOKEN', JSON.stringify(data.user))
         setToken(JSON.stringify(data.user))
+        Cookies.set('Programme-isVisitor', data.user.isadmin === 2)
         resolve()
       }).catch(error => {
         reject(error)

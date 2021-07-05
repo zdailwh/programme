@@ -12,7 +12,7 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <!-- <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+      <!-- <el-button v-if="!isVisitor" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建角色
       </el-button> -->
     </el-form>
@@ -33,7 +33,7 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center">
+      <!-- <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
@@ -43,12 +43,13 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <Add :dialog-visible-add="dialogVisibleAdd" :routes-data="routesData" @changeAddVisible="changeAddVisible" @refresh="getList" />
-    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" :routes-data="routesData" @changeEditVisible="changeEditVisible" @refresh="getList" />
+    <Add :dialog-visible-add="dialogVisibleAdd" @changeAddVisible="changeAddVisible" @refresh="getList" />
+    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" @changeEditVisible="changeEditVisible" @refresh="getList" />
   </div>
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, deleteRole } from '@/api/myrole'
 import Pagination from '@/components/Pagination'
 import Add from './add.vue'
@@ -58,6 +59,7 @@ export default {
   components: { Pagination, Add, Edit },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,

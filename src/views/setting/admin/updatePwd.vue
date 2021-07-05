@@ -49,6 +49,7 @@ export default {
       }
     }
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       pwdset: (Cookies.get('Programme-pwdset') && JSON.parse(Cookies.get('Programme-pwdset'))) || { length: 8, complexity: 1, changespace: 30 },
       loading: false,
       formadd: {

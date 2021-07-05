@@ -17,7 +17,7 @@
             <p><span class="label">exception：</span><span class="val">{{ thread.exception }}</span></p>
             <p><span class="label">log：</span><span class="val">{{ thread.log }}</span></p>
           </div>
-          <div>
+          <div v-if="!isVisitor">
             <el-button type="primary" round :disabled="!(thread.status === 0 && thread.flag === 0)" @click="threadStop">停止</el-button>
             <el-button type="primary" round @click="threadRestart">重启</el-button>
           </div>
@@ -28,11 +28,13 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { getLast, threadStop, threadRestart } from '@/api/task-thread'
 
 export default {
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       thread: {},
       listLoading: true
     }

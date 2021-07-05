@@ -50,19 +50,19 @@
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
       <br>
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelectedPros">批量删除</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="danger" icon="el-icon-share" :disabled="!selectedItems.length" @click="dialogVisibleDevice = true">批量关联设备</el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="danger" icon="el-icon-share" :disabled="!selectedItems.length" @click="dialogVisibleChannel = true">批量关联频道</el-button>
       </el-form-item>
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" />
+      <el-table-column v-if="!isVisitor" type="selection" />
       <el-table-column type="expand">
         <template slot-scope="{row}">
           <el-form label-position="left" inline class="table-expand">
@@ -121,7 +121,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
@@ -181,6 +181,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, deleteProgram } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
@@ -224,6 +225,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       allChannels: [],
       optionsChannels: [],
       allDevices: [],

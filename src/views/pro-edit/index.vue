@@ -13,13 +13,13 @@
           <div slot="header" class="clearfix">
             <span>在编节目单 <span v-if="tempEpg !== null" style="color: #F56C6C;">（{{ tempEpg.statusstr }}）</span></span>
             <template v-if="tempEpg === null">
-              <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">保存编单</el-button>
+              <el-button v-if="!isVisitor" type="text" icon="el-icon-s-claim" class="cardBtn" @click="createHandler">保存编单</el-button>
             </template>
             <template v-else>
-              <el-button type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
-              <el-button type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
+              <el-button v-if="!isVisitor" type="text" icon="el-icon-upload2" class="cardBtn" @click="pendHandler">提交审核</el-button>
+              <el-button v-if="!isVisitor" type="text" icon="el-icon-s-claim" class="cardBtn" @click="updateHandler">确认修改</el-button>
             </template>
-            <el-button type="text" icon="el-icon-download" class="cardBtn" :disabled="getepgsDisable" @click="getEpgsOfDay">读取在播单</el-button>
+            <el-button v-if="!isVisitor" type="text" icon="el-icon-download" class="cardBtn" :disabled="getepgsDisable" @click="getEpgsOfDay">读取在播单</el-button>
           </div>
           <Edit ref="editlist" :list-curr="listCurrComp" :has-prepend="hasPrepend" @remove-pro="removePro" @copy-pro="copyPro" @cut-pro="cutPro" @fixed-time="fixedTime" @turn-time="turnTime" /><!--  @hide-the-last-epg-online="ifHideLastEpgOnline = true" -->
         </el-card>
@@ -36,6 +36,7 @@
   </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, createTempEpg, pend, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
 import { fetchListByDate, getLastEpg, getCurrEpg } from '@/api/epg'
@@ -106,6 +107,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       tempEpg: null,
       currChannel: '',
       currChannelId: 0,

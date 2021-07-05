@@ -15,11 +15,13 @@
   </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import { updateUser } from '@/api/admin'
 import { getToken, setToken } from '@/utils/auth'
 export default {
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       currUser: JSON.parse(getToken()),
       loading: false,
       ruleValidate: {

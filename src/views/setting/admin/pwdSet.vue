@@ -22,7 +22,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item>
-          <el-button class="filter-item" type="primary" @click="commit">确定</el-button>
+          <el-button class="filter-item" type="primary" :disabled="isVisitor" @click="commit">确定</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -34,6 +34,7 @@ import Cookies from 'js-cookie'
 export default {
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       addForm: {
         length: 8,
         complexity: 1,

@@ -39,7 +39,7 @@
       </el-radio-group>
     </div>
 
-    <div>
+    <div v-if="!isVisitor">
       <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
       </el-button>
@@ -144,7 +144,7 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button v-if="row.action === 0" type="text" size="medium" @click="actived(row.id, $index)">启用</el-button>
           <el-button v-if="row.action === 1" type="text" size="medium" @click="inactived(row.id, $index)">停止</el-button>
@@ -162,6 +162,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { getAllChannels } from '@/api/channel'
 import { getAllDevices } from '@/api/device'
 import { fetchList, deleteDevicechn, actived, inactived } from '@/api/devicechns'
@@ -185,6 +186,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,

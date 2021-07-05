@@ -13,8 +13,8 @@
           <div slot="header" class="clearfix">
             <span>新编节目单 <span v-if="tempEpg !== null" style="color: #F56C6C;">（{{ tempEpg.statusstr }}）</span></span>
             <template v-if="tempEpg !== null">
-              <el-button type="text" icon="el-icon-finished" class="cardBtn" @click="passHandler">审核通过</el-button>
-              <el-button type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
+              <el-button v-if="!isVisitor" type="text" icon="el-icon-finished" class="cardBtn" @click="passHandler">审核通过</el-button>
+              <el-button v-if="!isVisitor" type="text" icon="el-icon-refresh-left" class="cardBtn" @click="failHandler">返回再编</el-button>
             </template>
           </div>
           <Waiting :list-curr="listCurrComp" />
@@ -32,6 +32,7 @@
   </div>
 </template>
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, pass, fail, upload, updateTempEpg } from '@/api/temp-epg'
 import { getAllChannels } from '@/api/channel'
 import { epgExport } from '@/api/epg'
@@ -47,6 +48,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       tempEpg: null,
       currChannel: '',
       currChannelId: 0,

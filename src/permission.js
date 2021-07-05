@@ -40,7 +40,7 @@ router.beforeEach(async(to, from, next) => {
           // console.log(accessRoutes1)
           // router.addRoutes(accessRoutes1)
           var roles = []
-          if (JSON.parse(hasToken).isadmin > 0) {
+          if (JSON.parse(hasToken).isadmin > 3) {
             roles = ['admin']
           } else {
             roles = ['editor']

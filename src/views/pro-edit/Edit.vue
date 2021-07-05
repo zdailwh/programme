@@ -1,12 +1,12 @@
 <template>
   <div class="programListWrap tempEpgTableWrap">
     <el-form ref="filterForm" :inline="true" size="mini" class="filter-form">
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="primary" icon="el-icon-document-copy" :disabled="!selectedItems.length" @click="handleCopySelected">
           复制
         </el-button>
       </el-form-item>
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelected">
           删除
         </el-button>
@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import waves from '@/directive/waves' // waves directive
 
 export default {
@@ -110,6 +111,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       selectedItems: [],
       currentRow: null,
       myStartDate: '',

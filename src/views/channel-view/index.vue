@@ -80,11 +80,11 @@
         <template slot-scope="scope">
           <div v-if="scope.row.defaultrecord" style="text-align: center;">
             {{ scope.row.defaultrecord.showname }}
-            <el-button type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id, 1)">选择垫片</el-button>
-            <el-button type="primary" size="mini" @click="emerempty(scope.row.id)">播出垫片</el-button>
+            <el-button v-show="!isVisitor" type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id, 1)">选择垫片</el-button>
+            <el-button v-show="!isVisitor" type="primary" size="mini" @click="emerempty(scope.row.id)">播出垫片</el-button>
           </div>
           <div v-else>
-            <el-button type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id, 1)">选择垫片</el-button>
+            <el-button v-show="!isVisitor" type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id, 1)">选择垫片</el-button>
           </div>
         </template>
       </el-table-column>
@@ -92,11 +92,11 @@
         <template slot-scope="scope">
           <div v-if="scope.row.record" style="text-align: center;">
             {{ scope.row.record.showname }}
-            <el-button type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id, 2)">选择切播节目</el-button>
-            <el-button type="primary" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button>
+            <el-button v-show="!isVisitor" type="warning" size="mini" style="margin-left: 10px;margin-bottom: 5px;" @click="toGetTs(scope.row.id, 2)">选择切播节目</el-button>
+            <el-button v-show="!isVisitor" type="primary" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button>
           </div>
           <div v-else>
-            <el-button type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id, 2)">选择切播节目</el-button>
+            <el-button v-show="!isVisitor" type="warning" size="mini" style="margin-top: 5px;margin-left: 0;" @click="toGetTs(scope.row.id, 2)">选择切播节目</el-button>
           </div>
         </template>
       </el-table-column>
@@ -115,7 +115,7 @@
           <div :class="{ playstate: scope.row.emergency !== 0 }">{{ scope.row.emergency === 0 ? '正常' : scope.row.emergency === 1 ? '播出垫片' : '节目替换' }}</div>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="scope">
           <!-- <el-button v-if="scope.row.emergency !== 1" type="text" size="mini" @click="emerempty(scope.row.id)">播出垫片</el-button>
           <el-button v-if="scope.row.emergency !== 2" type="text" size="mini" @click="emerreplace(scope.row.id)">节目替换</el-button> -->
@@ -197,6 +197,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { parseTime } from '@/utils/index'
 import Pagination from '@/components/Pagination'
 import { getChannelsPreview, emerempty, emerreplace, emernone } from '@/api/channel'
@@ -240,6 +241,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       canInterval: true,
       currtime: parseTime(new Date(), '{y}年{m}月{d}日 {h}:{i}:{s}'),
       tableData: [],

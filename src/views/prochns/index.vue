@@ -27,7 +27,7 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+      <el-button v-if="!isVisitor" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
       </el-button>
     </el-form> -->
@@ -40,7 +40,7 @@
     </div>
 
     <el-form class="filter-form">
-      <el-form-item>
+      <el-form-item v-if="!isVisitor">
         <el-button class="filter-item" type="danger" icon="el-icon-delete" :disabled="!selectedItems.length" @click="handleDelSelected">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -75,7 +75,7 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center">
+      <!-- <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="emergency(row, $index)">设为应急切播节目</el-button>
         </template>
@@ -90,6 +90,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { getAllPros } from '@/api/program'
 import { getAllChannels } from '@/api/channel'
 import { fetchList, deleteProchn, emergency } from '@/api/prochns'
@@ -103,6 +104,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,

@@ -193,7 +193,7 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button v-if="row.status === 0" type="text" size="medium" @click="jobCancel(row, $index)">取消任务</el-button>
           <el-button v-if="row.status === 0" type="text" size="medium" @click="jobImmediate(row, $index)">立即执行</el-button>
@@ -207,6 +207,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList, jobCancel, jobImmediate } from '@/api/task-job'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -216,6 +217,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,

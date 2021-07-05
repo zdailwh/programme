@@ -61,6 +61,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList } from '@/api/program'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -99,6 +100,7 @@ export default {
   },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,
@@ -159,7 +161,9 @@ export default {
     },
     // 双击插入
     handleDblclick(item) {
-      this.$emit('append-pro', { item: item })
+      if (!this.isVisitor) {
+        this.$emit('append-pro', { item: item })
+      }
     }
   }
 }

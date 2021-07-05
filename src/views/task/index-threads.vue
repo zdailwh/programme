@@ -57,7 +57,7 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row}">
           <router-link :to="{name: 'TaskJobList', query: { thread_id: row.id }}">
             <el-button type="text" size="medium">jobs</el-button>
@@ -72,6 +72,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { fetchList } from '@/api/task-thread'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -81,6 +82,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,

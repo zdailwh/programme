@@ -27,7 +27,7 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-button class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+      <el-button v-if="!isVisitor" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
       </el-button>
     </el-form> -->
@@ -60,7 +60,7 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center">
+      <!-- <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import Cookies from 'js-cookie'
 import { getAllPros } from '@/api/program'
 import { getAllDevices } from '@/api/device'
 import { fetchList, deleteProdevice } from '@/api/devicepros'
@@ -89,6 +90,7 @@ export default {
   directives: { waves },
   data() {
     return {
+      isVisitor: (Cookies.get('Programme-isVisitor') && JSON.parse(Cookies.get('Programme-isVisitor'))) || false,
       list: null,
       total: 0,
       listLoading: true,
