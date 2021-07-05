@@ -42,11 +42,11 @@
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="操作" align="center">
+      <el-table-column label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
-      </el-table-column> -->
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />

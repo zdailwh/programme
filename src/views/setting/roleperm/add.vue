@@ -7,14 +7,14 @@
   >
     <div>
       <el-form ref="form" :model="formadd" :rules="ruleValidate" label-width="100px">
-        <el-form-item prop="permissionId" label="权限">
-          <el-select v-model="formadd.permissionId" placeholder="请选择" style="width: 100%;">
-            <el-option v-for="item in optionsPermissions" :key="item.value" :label="item.label" :value="item.value" />
-          </el-select>
-        </el-form-item>
         <el-form-item prop="roleId" label="角色">
           <el-select v-model="formadd.roleId" placeholder="请选择" style="width: 100%;">
             <el-option v-for="item in optionsRoles" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item prop="permissionId" label="权限">
+          <el-select v-model="formadd.permissionId" placeholder="请选择" style="width: 100%;">
+            <el-option v-for="item in optionsPermissions" :key="item.value" :label="item.label" :value="item.value" />
           </el-select>
         </el-form-item>
       </el-form>
