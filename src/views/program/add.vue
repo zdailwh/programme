@@ -177,7 +177,7 @@ export default {
       if (newVal.length) {
         this.chnOptions = newVal.map((item, idx, arr) => {
           return {
-            label: item.name,
+            label: item.showname,
             value: item.id,
             supportedformat: item.supportedformat
           }

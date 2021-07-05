@@ -22,7 +22,7 @@
       <el-table-column prop="videores" label="视频类型" width="60" align="center" />
       <el-table-column prop="name" label="频道名称" width="120" align="center">
         <template slot-scope="scope">
-          <el-button type="text" @click="toGetEpgs(scope.row.id)">{{ scope.row.name }}</el-button>
+          <el-button type="text" @click="toGetEpgs(scope.row.id)">{{ scope.row.showname }}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="CurEpg.name" label="当前播出节目" align="center">

@@ -109,7 +109,7 @@
       </el-table-column>
       <el-table-column label="频道" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.channel.name }}</span>
+          <span>{{ row.channel.showname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="运行进程PID" align="center">
@@ -217,7 +217,7 @@ export default {
       if (newVal.length) {
         this.optionsChns = newVal.map((item, idx, arr) => {
           return {
-            label: item.name,
+            label: item.showname,
             value: item.id
           }
         })

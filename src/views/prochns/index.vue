@@ -54,7 +54,7 @@
       </el-table-column>
       <el-table-column label="频道" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.channel && row.channel.name }}</span>
+          <span>{{ row.channel && row.channel.showname }}</span>
         </template>
       </el-table-column>
       <el-table-column label="节目" align="center">
