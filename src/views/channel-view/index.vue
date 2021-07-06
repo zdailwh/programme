@@ -73,7 +73,8 @@
       </el-table-column>
       <el-table-column prop="EndTime" label="节目单剩余时间" class-name="endtime" align="center" width="100">
         <template slot-scope="scope">
-          {{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | timeDiff }}
+          <div v-if="scope.row.EndTime">{{ (new Date(scope.row.EndTime).getTime() - new Date().getTime()) | timeDiff }}</div>
+          <div v-else>0</div>
         </template>
       </el-table-column>
       <el-table-column prop="defaultrecord" label="垫播节目" align="center">
@@ -343,7 +344,7 @@ export default {
       this.beginInterval()
     },
     tableRowClassName({ row, rowIndex }) {
-      var endtime = new Date(row.EndTime).getTime() - new Date().getTime()
+      var endtime = row.EndTime ? (new Date(row.EndTime).getTime() - new Date().getTime()) : 0
       if (row.action === 0) {
         return 'stop-row'
       }
