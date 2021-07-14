@@ -14,6 +14,9 @@ export function fetchList(query) {
   if (query.channelId !== '') {
     params.channelId = query.channelId
   }
+  if (query.name !== '') {
+    params.name = query.name
+  }
   params.orderby = 'id'
   return request({
     url: '/admin/programme/v1/prochns',

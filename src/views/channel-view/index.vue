@@ -127,17 +127,28 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog title="设置应急垫片" :visible.sync="tsVisible1" width="50%" :before-close="handleCloseTs">
+    <el-dialog title="设置应急垫片" :visible.sync="tsVisible1" width="70%" :before-close="handleCloseTs">
       <div>
-        <el-select v-model="checkedTs" value-key="id" placeholder="请选择" style="width: 100%">
-          <el-option
-            v-for="item in tsList"
-            :key="item.id"
-            :label="item.record.showname"
-            :value="item"
-            :disabled="item.status !== 2"
-          />
-        </el-select>
+        <p>
+          <el-input v-model="tsName" placeholder="节目名称" style="width:250px;margin-right: 10px;" />
+          <el-button type="primary" icon="el-icon-search" @click="getProChnList">搜索</el-button>
+        </p>
+        <el-radio-group v-model="checkedTs">
+          <el-row>
+            <el-col v-for="item in tsList" :key="item.id" :span="12">
+              <el-radio :label="item" :disabled="item.status !== 2" border style="margin-bottom: 10px;">{{ item.record.showname }}</el-radio>
+            </el-col>
+          </el-row>
+        </el-radio-group>
+        <el-pagination
+          :current-page="currentPageTslist"
+          :page-sizes="[20, 50, 100, 200]"
+          :page-size="pageSizeTslist"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="tsListTotal"
+          @size-change="handleTslistSizeChange"
+          @current-change="handleTslistCurrentChange"
+        />
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="tsVisible1 = false; canInterval = true;">取 消</el-button>
@@ -145,17 +156,28 @@
       </span>
     </el-dialog>
 
-    <el-dialog title="设置应急切播节目" :visible.sync="tsVisible2" width="50%" :before-close="handleCloseTs">
+    <el-dialog title="设置应急切播节目" :visible.sync="tsVisible2" width="70%" :before-close="handleCloseTs">
       <div>
-        <el-select v-model="checkedTs" value-key="id" placeholder="请选择" style="width: 100%">
-          <el-option
-            v-for="item in tsList"
-            :key="item.id"
-            :label="item.record.showname"
-            :value="item"
-            :disabled="item.status !== 2"
-          />
-        </el-select>
+        <p>
+          <el-input v-model="tsName" placeholder="节目名称" style="width:250px;margin-right: 10px;" />
+          <el-button type="primary" icon="el-icon-search" @click="getProChnList">搜索</el-button>
+        </p>
+        <el-radio-group v-model="checkedTs">
+          <el-row>
+            <el-col v-for="item in tsList" :key="item.id" :span="12">
+              <el-radio :label="item" :disabled="item.status !== 2" border style="margin-bottom: 10px;">{{ item.record.showname }}</el-radio>
+            </el-col>
+          </el-row>
+        </el-radio-group>
+        <el-pagination
+          :current-page="currentPageTslist"
+          :page-sizes="[20, 50, 100, 200]"
+          :page-size="pageSizeTslist"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="tsListTotal"
+          @size-change="handleTslistSizeChange"
+          @current-change="handleTslistCurrentChange"
+        />
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="tsVisible2 = false; canInterval = true;">取 消</el-button>
@@ -262,6 +284,11 @@ export default {
       tsVisible2: false,
       checkedTs: null,
       tsList: [],
+      tsName: '',
+      getTsCurrChannel: null,
+      currentPageTslist: 1,
+      pageSizeTslist: 20,
+      tsListTotal: 0,
       tsLoading: false,
       epglistLoading: false,
       epgList: [],
@@ -418,11 +445,32 @@ export default {
       this['tsVisible' + tag] = true
       this.canInterval = false
       this.checkedTs = null
-      this.getProChnList(id)
+      this.getTsCurrChannel = id
+      this.tsName = ''
+      this.currentPageTslist = 1
+      this.pageSizeTslist = 20
+      this.getProChnList()
     },
-    getProChnList(channelId) {
-      fetchList({ page: 1, channelId: channelId }).then(data => {
+    handleTslistSizeChange(val) {
+      this.pageSizeTslist = val
+      this.getProChnList()
+    },
+    handleTslistCurrentChange(val) {
+      this.currentPageTslist = val
+      this.getProChnList()
+    },
+    getProChnList() {
+      var param = {
+        page: this.currentPageTslist,
+        limit: this.pageSizeTslist,
+        channelId: this.getTsCurrChannel
+      }
+      if (this.tsName !== '') {
+        param.name = this.tsName
+      }
+      fetchList(param).then(data => {
         this.tsList = data.items || []
+        this.tsListTotal = data.total
       }).catch(() => {
       })
     },
