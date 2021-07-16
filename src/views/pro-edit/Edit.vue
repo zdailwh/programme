@@ -147,7 +147,7 @@ export default {
       popNodes.forEach((item) => {
         item.style.display = 'none'
       })
-      this.$emit('fixed-time', { index: idx, starttime: this.myStartDate + ' ' + this.myStartTime + this.myStartTimeHaom })
+      this.$emit('fixed-time', { index: idx, starttime: this.myStartDate + ' ' + this.myStartTime + '.000' })
     },
     turnTime(row, idx) {
       var popNodes = document.querySelectorAll('.el-popover.el-popper')
