@@ -10,6 +10,11 @@
         <el-form-item label="角色名称" prop="name">
           <el-input v-model="editItem.name" placeholder="请输入角色名称" />
         </el-form-item>
+        <el-form-item label="角色等级" prop="level">
+          <el-select v-model="editItem.level" placeholder="请选择" style="width: 100%;">
+            <el-option v-for="item in levelArr" :key="item.value" :label="item.label" :value="item.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="角色描述" prop="description">
           <el-input v-model="editItem.description" placeholder="请输入角色描述" />
         </el-form-item>
@@ -44,10 +49,17 @@ export default {
         name: [
           { required: true, message: '角色名称不能为空', trigger: 'blur' }
         ],
-        description: [
-          { required: true, message: '角色描述不能为空', trigger: 'blur' }
+        level: [
+          { required: true, message: '角色等级不能为空', trigger: 'change' }
         ]
-      }
+      },
+      levelArr: [
+        // { label: '最高', value: 5 },
+        { label: '高', value: 4 },
+        { label: '中', value: 3 },
+        { label: '低', value: 2 }
+        // { label: '最低', value: 1 }
+      ]
     }
   },
   mounted() {

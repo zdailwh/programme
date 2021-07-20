@@ -39,6 +39,7 @@ export function updateRole(data) {
     method: 'put',
     data: {
       name: data.name,
+      level: data.level,
       description: data.description
     }
   })
