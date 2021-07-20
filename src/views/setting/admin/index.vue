@@ -157,10 +157,10 @@ export default {
         this.list = data.items.filter(item => {
           if (this.currUser.isadmin === 3) {
             // 操作员
-            return item.isadmin < 3 || (item.isadmin === 3 && this.currUser.id === item.id)
+            return this.currUser.id === item.id
           } else if (this.currUser.isadmin === 4) {
             // 管理员
-            return item.isadmin < 4 || (item.isadmin === 4 && this.currUser.id === item.id)
+            return item.isadmin <= 4
           } else if (this.currUser.isadmin === 5) {
             // 超级管理员
             return true
