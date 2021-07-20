@@ -63,7 +63,7 @@
         <template slot-scope="{row, $index}">
           <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
           <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
-          <el-button v-if="parseInt(currUser.isadmin) > parseInt(row.isadmin) && parseInt(row.status) === 2" type="text" size="medium" @click="resetPwdHandle(row, $index)">重置密码</el-button>
+          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3" type="text" size="medium" @click="resetPwdHandle(row, $index)">重置密码</el-button>
           <el-popover
             v-if="currUser.isadmin !== '' && currUser.isadmin > 3"
             placement="top"
