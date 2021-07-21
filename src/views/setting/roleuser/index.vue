@@ -21,9 +21,9 @@
       <el-form-item>
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
-      <el-button v-if="!isVisitor" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
+      <!-- <el-button v-if="!isVisitor" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">
         创建关联记录
-      </el-button>
+      </el-button> -->
     </el-form>
 
     <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
@@ -44,7 +44,7 @@
       </el-table-column>
       <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
+          <!-- <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button> -->
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
       </el-table-column>

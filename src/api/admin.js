@@ -29,6 +29,13 @@ export function getAllUsers() {
   })
 }
 
+export function getUserRole(query) {
+  return request({
+    url: '/admin/v1/users/' + query.id + '/role',
+    method: 'get'
+  })
+}
+
 export function actived(query) {
   return request({
     url: '/admin/v1/users/' + query.id + '/actived',
