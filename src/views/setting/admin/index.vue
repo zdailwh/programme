@@ -22,7 +22,7 @@
         <el-button @click="resetForm('filterForm')">重置</el-button>
       </el-form-item>
       <el-form-item v-if="!isVisitor">
-        <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">创建用户</el-button>
+        <el-button v-if="currUser.role && currUser.role.level > 3" class="filter-item" type="primary" icon="el-icon-plus" @click="dialogVisibleAdd = true">创建用户</el-button>
       </el-form-item>
     </el-form>
 
@@ -61,11 +61,11 @@
       </el-table-column>
       <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
-          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
-          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
-          <el-button v-if="currUser.isadmin !== '' && currUser.isadmin > 3" type="text" size="medium" @click="resetPwdHandle(row, $index)">重置密码</el-button>
+          <el-button v-if="currUser.role && currUser.role.level > 3 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
+          <el-button v-if="currUser.role && currUser.role.level > 3 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>
+          <el-button v-if="currUser.role && currUser.role.level > 3" type="text" size="medium" @click="resetPwdHandle(row, $index)">重置密码</el-button>
           <el-popover
-            v-if="currUser.isadmin !== '' && currUser.isadmin > 3"
+            v-if="currUser.role && currUser.role.level > 3"
             placement="top"
             width="170"
             trigger="hover"
@@ -155,13 +155,13 @@ export default {
       this.listLoading = true
       fetchList(this.listQuery).then(data => {
         this.list = data.items.filter(item => {
-          if (this.currUser.isadmin === 3) {
+          if (this.currUser.role && this.currUser.role.level === 3) {
             // 操作员
             return this.currUser.id === item.id
-          } else if (this.currUser.isadmin === 4) {
+          } else if (this.currUser.role && this.currUser.role.level === 4) {
             // 管理员
-            return item.isadmin <= 4
-          } else if (this.currUser.isadmin === 5) {
+            return true
+          } else if (this.currUser.role && this.currUser.role.level === 5) {
             // 超级管理员
             return true
           }

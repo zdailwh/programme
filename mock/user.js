@@ -50,6 +50,17 @@ const authentication = {
     isadmin: 4,
     activity: 0
   },
+  role: {
+      name: '管理员',
+      description: '管理员',
+      level: 4,
+      status: 0,
+      class: 'app\\user\\admin\\Role',
+      id: 2,
+      delete_id: 0,
+      create_time: '2021-07-03 16:54:52',
+      update_time: '2021-07-20 19:58:41'
+  },
   permission: [
     {
       class: 'app\\user\\admin\\Permission',

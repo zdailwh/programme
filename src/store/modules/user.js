@@ -47,9 +47,10 @@ const actions = {
       login({ username: username.trim(), password: password }).then(data => {
         commit('SET_ISADMIN', data.user.isadmin)
         data.user.permission = data.permission || []
+        data.user.role = data.role || {}
         commit('SET_TOKEN', JSON.stringify(data.user))
         setToken(JSON.stringify(data.user))
-        Cookies.set('Programme-isVisitor', data.user.isadmin === 2)
+        Cookies.set('Programme-isVisitor', data.user.role && data.user.role.level === 2)
         resolve()
       }).catch(error => {
         reject(error)
