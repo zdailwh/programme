@@ -87,7 +87,7 @@ const authentication = {
       version: '',
       action: '',
       serviceclass: '',
-      menu: 'ChannelViewList,ChannelView_,ProgramList,Program_,AdminEdit,Setting_,AdminUpdatePwd,Setting_',
+      menu: 'ProgramList,Program_,AdminEdit,Setting_,AdminUpdatePwd,Setting_',
       info: '编单',
       status: 0,
       delete_id: 0,

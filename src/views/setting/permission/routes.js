@@ -53,16 +53,6 @@ export const routes = [
     name: 'Setting',
     children: [
       {
-        title: '编辑个人信息',
-        name: 'AdminEdit',
-        parent: 'Setting'
-      },
-      {
-        title: '修改密码',
-        name: 'AdminUpdatePwd',
-        parent: 'Setting'
-      },
-      {
         title: '用户设置',
         name: 'AdminList',
         parent: 'Setting'

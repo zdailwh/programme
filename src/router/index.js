@@ -75,17 +75,24 @@ export const constantRoutes = [
     redirect: '/channelView/index'
   },
   {
-    path: '/channelView',
+    path: '/my',
     component: Layout,
-    redirect: '/channelView/index',
-    name: 'ChannelView',
-    meta: { title: '频道预览', icon: 'el-icon-view' },
+    redirect: '/my/admin/edit',
+    name: 'My',
+    meta: { title: '个人账号', icon: 'el-icon-s-custom' },
+    hidden: true,
     children: [
       {
-        path: 'index',
-        component: () => import('@/views/channel-view/index'),
-        name: 'ChannelViewList',
-        meta: { title: '频道预览', icon: 'el-icon-view' }
+        path: 'admin/edit',
+        component: () => import('@/views/setting/admin/edit'),
+        name: 'MyEdit',
+        meta: { title: '编辑个人信息', icon: 'el-icon-user-solid' }
+      },
+      {
+        path: 'admin/updatePwd',
+        component: () => import('@/views/setting/admin/updatePwd'),
+        name: 'MyUpdatePwd',
+        meta: { title: '修改密码', icon: 'el-icon-edit' }
       }
     ]
   }
@@ -149,6 +156,21 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
+    path: '/channelView',
+    component: Layout,
+    redirect: '/channelView/index',
+    name: 'ChannelView',
+    meta: { title: '频道预览', icon: 'el-icon-view' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/channel-view/index'),
+        name: 'ChannelViewList',
+        meta: { title: '频道预览', icon: 'el-icon-view' }
+      }
+    ]
+  },
+  {
     path: '/program',
     component: Layout,
     redirect: '/program/index',
@@ -206,18 +228,6 @@ export const asyncRoutes = [
     name: 'Setting',
     meta: { title: '基本配置', icon: 'el-icon-set-up' },
     children: [
-      {
-        path: 'admin/edit',
-        component: () => import('@/views/setting/admin/edit'),
-        name: 'AdminEdit',
-        meta: { title: '编辑个人信息', icon: 'el-icon-user-solid' }
-      },
-      {
-        path: 'admin/updatePwd',
-        component: () => import('@/views/setting/admin/updatePwd'),
-        name: 'AdminUpdatePwd',
-        meta: { title: '修改密码', icon: 'el-icon-edit' }
-      },
       {
         path: 'admin/index',
         component: () => import('@/views/setting/admin/index'),
