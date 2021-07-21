@@ -33,6 +33,16 @@ export function createRoleUser(data) {
   })
 }
 
+export function updateRoleUser(data) {
+  return request({
+    url: '/admin/user/v1/userroles/' + data.id,
+    method: 'put',
+    data: {
+      roleId: data.roleId
+    }
+  })
+}
+
 export function deleteRoleUser(query) {
   return request({
     url: '/admin/user/v1/userroles/' + query.id,

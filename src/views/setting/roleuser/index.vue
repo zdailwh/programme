@@ -44,6 +44,7 @@
       </el-table-column>
       <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
+          <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
       </el-table-column>
@@ -52,6 +53,7 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
     <Add :dialog-visible-add="dialogVisibleAdd" :options-users="optionsUsers" :options-roles="optionsRoles" @changeAddVisible="changeAddVisible" @refresh="getList" />
+    <Edit :edit-item="editItem" :dialog-visible-edit="dialogVisibleEdit" :options-roles="optionsRoles" @changeEditVisible="changeEditVisible" @refresh="getList" />
   </div>
 </template>
 
@@ -63,9 +65,10 @@ import { fetchList, deleteRoleUser } from '@/api/roleuser'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import Add from './add.vue'
+import Edit from './edit.vue'
 
 export default {
-  components: { Pagination, Add },
+  components: { Pagination, Add, Edit },
   directives: { waves },
   data() {
     return {
@@ -85,7 +88,10 @@ export default {
       allUsers: [],
       optionsUsers: [],
       allRoles: [],
-      optionsRoles: []
+      optionsRoles: [],
+      editItem: {},
+      editIndex: '',
+      dialogVisibleEdit: false
     }
   },
   watch: {
@@ -146,6 +152,14 @@ export default {
     },
     changeAddVisible(params) {
       this.dialogVisibleAdd = params
+    },
+    editHandle(item, idx) {
+      this.editItem = JSON.parse(JSON.stringify(item))
+      this.editIndex = idx
+      this.dialogVisibleEdit = true
+    },
+    changeEditVisible(params) {
+      this.dialogVisibleEdit = params
     },
     getAllUsers() {
       getAllUsers().then(data => {
