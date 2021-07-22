@@ -133,11 +133,11 @@
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="ID" align="center" width="80">
+      <!-- <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <!-- <el-table-column label="target" align="center">
         <template slot-scope="{row}">
           <span>{{ row.target }}</span>

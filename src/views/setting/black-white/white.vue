@@ -22,12 +22,12 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="ID" align="center" width="80">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 671px;">
+      <!-- <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="IP" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.ip }}</span>
@@ -49,7 +49,7 @@
           <el-tag v-else-if="row.status === 1" type="danger">{{ row.statusstr }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="!isVisitor" label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center" width="120">
         <template slot-scope="{row, $index}">
           <el-button v-if="row.status !== 0" type="text" size="medium" @click="valid(row.id, $index)">有效</el-button>
           <el-button v-if="row.status !== 1" type="text" size="medium" @click="invalid(row.id, $index)">无效</el-button>

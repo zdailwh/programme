@@ -26,23 +26,23 @@
       </el-button> -->
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="用户名" align="center">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 601px;">
+      <el-table-column label="用户名" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.user && row.user.username }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="角色名" align="center">
+      <el-table-column label="角色名" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.role && row.role.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="!isVisitor" label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center" width="150">
         <template slot-scope="{row, $index}">
           <!-- <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button> -->
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>

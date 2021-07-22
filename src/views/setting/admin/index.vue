@@ -26,7 +26,7 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 831px;">
       <!-- <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
@@ -59,7 +59,7 @@
           <el-tag v-else type="info">{{ row.statusstr }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column v-if="!isVisitor" label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center" width="250">
         <template slot-scope="{row, $index}">
           <el-button v-if="currUser.role && currUser.role.level > 3 && row.status !== 1" type="text" size="medium" @click="actived(row.id, $index)">激活</el-button>
           <el-button v-if="currUser.role && currUser.role.level > 3 && row.status !== 2" type="text" size="medium" @click="inactived(row.id, $index)">禁用</el-button>

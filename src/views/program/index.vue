@@ -84,11 +84,11 @@
           </el-form>
         </template>
       </el-table-column>
-      <el-table-column label="ID" align="center" width="100">
+      <!-- <el-table-column label="ID" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="节目名称" align="center">
         <template slot-scope="{row}">
           <span>{{ row.showname }}</span>

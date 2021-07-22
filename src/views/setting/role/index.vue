@@ -17,28 +17,28 @@
       </el-button>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="角色名称" align="center">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 641px;">
+      <el-table-column label="角色名称" align="center" width="120">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="描述" align="center">
+      <el-table-column label="描述" align="center" width="200">
         <template slot-scope="{row}">
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="等级" align="center">
+      <el-table-column label="等级" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.levelstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>
       </el-table-column>
-      <el-table-column v-if="!isVisitor" label="操作" align="center">
+      <el-table-column v-if="!isVisitor" label="操作" align="center" width="120">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
           <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>

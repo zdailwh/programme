@@ -39,23 +39,23 @@
       </el-radio-group>
     </div>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;">
-      <el-table-column label="ID" align="center" width="80">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 451px;">
+      <!-- <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="设备" align="center">
+      </el-table-column> -->
+      <el-table-column label="设备" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.device && row.device.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="节目" align="center">
+      <el-table-column label="节目" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.record && row.record.showname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>

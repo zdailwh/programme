@@ -45,24 +45,24 @@
       </el-form-item>
     </el-form>
 
-    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 100%;" @selection-change="handleSelectionChange">
+    <el-table v-loading="listLoading" :data="list" border fit highlight-current-row style="width: 641px;" @selection-change="handleSelectionChange">
       <el-table-column type="selection" />
-      <el-table-column label="ID" align="center" width="80">
+      <!-- <el-table-column label="ID" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
-      </el-table-column>
-      <el-table-column label="频道" align="center">
+      </el-table-column> -->
+      <el-table-column label="频道" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.channel && row.channel.showname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="节目" align="center">
+      <el-table-column label="节目" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.record && row.record.showname }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="应急类型" align="center">
+      <el-table-column label="应急类型" align="center" width="150">
         <template slot-scope="{row}">
           <el-tag v-if="row.emertag === 0" type="info">{{ row.emertagstr }}</el-tag>
           <el-tag v-else-if="row.emertag === 1" type="warning">{{ row.emertagstr }}</el-tag>
@@ -70,7 +70,7 @@
           <el-tag v-else-if="row.emertag === 3" type="danger">{{ row.emertagstr }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="状态" align="center">
+      <el-table-column label="状态" align="center" width="150">
         <template slot-scope="{row}">
           <span>{{ row.statusstr }}</span>
         </template>
