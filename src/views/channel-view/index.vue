@@ -397,38 +397,56 @@ export default {
     },
     // 修改应急状态为第一种————播出垫片
     emerempty(id) {
-      emerempty({ id: id }).then(data => {
-        if (data.emergency === 1) {
-          this.$message({
-            message: '执行成功！',
-            type: 'success'
-          })
-          this.epgExport(id)
-        }
+      this.$confirm('确定要播出垫片吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        emerempty({ id: id }).then(data => {
+          if (data.emergency === 1) {
+            this.$message({
+              message: '执行成功！',
+              type: 'success'
+            })
+            this.epgExport(id)
+          }
+        })
       })
     },
     // 修改应急状态为第二种————节目替换
     emerreplace(id) {
-      emerreplace({ id: id }).then(data => {
-        if (data.emergency === 2) {
-          this.$message({
-            message: '执行成功！',
-            type: 'success'
-          })
-          this.epgExport(id)
-        }
+      this.$confirm('确定要切播节目吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        emerreplace({ id: id }).then(data => {
+          if (data.emergency === 2) {
+            this.$message({
+              message: '执行成功！',
+              type: 'success'
+            })
+            this.epgExport(id)
+          }
+        })
       })
     },
     // 修改应急状态为非应急状态
     emernone(id) {
-      emernone({ id: id }).then(data => {
-        if (data.emergency === 0) {
-          this.$message({
-            message: '执行成功！',
-            type: 'success'
-          })
-          this.epgExport(id)
-        }
+      this.$confirm('确定要恢复非应急状态吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        emernone({ id: id }).then(data => {
+          if (data.emergency === 0) {
+            this.$message({
+              message: '执行成功！',
+              type: 'success'
+            })
+            this.epgExport(id)
+          }
+        })
       })
     },
     epgExport(channelId) {

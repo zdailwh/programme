@@ -41,7 +41,7 @@
       <el-table-column v-if="!isVisitor" label="操作" align="center">
         <template slot-scope="{row, $index}">
           <el-button type="text" size="medium" @click="editHandle(row, $index)">编辑</el-button>
-          <!-- <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button> -->
+          <el-button type="text" size="medium" @click="delHandler(row.id, $index)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
